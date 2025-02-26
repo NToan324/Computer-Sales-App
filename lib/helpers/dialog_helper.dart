@@ -16,14 +16,14 @@ class DialogHelper {
               Text(
                 title,
                 style:
-                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
               Text(description),
               ElevatedButton(
                 onPressed: () {
                   Get.back();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               )
             ],
           ),

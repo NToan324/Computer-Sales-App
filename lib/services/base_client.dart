@@ -3,21 +3,23 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:computer_sales_app/services/app_exceptions.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 class BaseClient {
   static const int TIME_OUT_DURATION = 30;
   //GET
   Future<dynamic> get(String baseUrl, String api) async {
     var uri = Uri.parse(baseUrl + api); //http://localhost:3000/api
+    final dio = Dio();
     try {
-      var response = await http
-          .get(uri)
+      var response = await dio
+          .get(uri.toString())
           .timeout(const Duration(seconds: TIME_OUT_DURATION));
       return _processReponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', uri.toString());
     } on TimeoutException {
+      print('TimeoutException');
       throw ApiNotRespondingException(
           'API not responded in time', uri.toString());
     }
@@ -26,11 +28,15 @@ class BaseClient {
   //POST
   Future<dynamic> post(String baseUrl, String api, dynamic payloadObj) async {
     var uri = Uri.parse(baseUrl + api); //http://localhost:3000/api
+    final dio = Dio();
     var payload = json.encode(payloadObj);
     try {
-      var response = await http
-          .post(uri, body: payload)
+      var response = await dio
+          .post(uri.toString(), data: payload)
           .timeout(const Duration(seconds: TIME_OUT_DURATION));
+      // var response = await http
+      //     .post(uri, body: payload)
+      //     .timeout(const Duration(seconds: TIME_OUT_DURATION));
       return _processReponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', uri.toString());
@@ -43,11 +49,14 @@ class BaseClient {
   //DELETE
   Future<dynamic> delete(String baseUrl, String api, {String? id}) async {
     var uri = Uri.parse('$baseUrl$api${id != null ? '/$id' : ''}');
-    print(uri);
+    final dio = Dio();
     try {
-      var response = await http
-          .delete(uri)
+      var response = await dio
+          .delete(uri.toString())
           .timeout(const Duration(seconds: TIME_OUT_DURATION));
+      // var response = await http
+      //     .delete(uri)
+      //     .timeout(const Duration(seconds: TIME_OUT_DURATION));
       return _processReponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', uri.toString());
@@ -59,17 +68,17 @@ class BaseClient {
 
   //OTHERS
 
-  dynamic _processReponse(http.Response response) {
+  dynamic _processReponse(Response response) {
     switch (response.statusCode) {
       case 200:
-        var responseJson = utf8.decode(response.bodyBytes);
+        var responseJson = response.data;
         return responseJson;
       case 400:
         throw BadRequestException(
-            utf8.decode(response.bodyBytes), response.request!.url.toString());
+            utf8.decode(response.data), response.requestOptions.path);
       case 500:
         throw FetchDataException('Error occured: ${response.statusCode}',
-            response.request!.url.toString());
+            response.requestOptions.uri.toString());
       default:
     }
   }
