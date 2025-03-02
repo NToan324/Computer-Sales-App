@@ -1,5 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 
 class AvatarWidget extends StatelessWidget {
@@ -17,6 +18,14 @@ class AvatarWidget extends StatelessWidget {
           Row(
             spacing: 10,
             children: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  FeatherIcons.shoppingCart,
+                  color: AppColor.primary,
+                  size: 30,
+                ),
+              ),
               Container(
                 width: Responsive.isDesktop(context) ? 50 : 40,
                 height: Responsive.isDesktop(context) ? 50 : 40,

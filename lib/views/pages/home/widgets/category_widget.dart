@@ -2,6 +2,7 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
 
 class CategoryWidget extends StatefulWidget {
   const CategoryWidget({super.key});
@@ -70,8 +71,9 @@ class _CategoryWidgetState extends State<CategoryWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: Responsive.isDesktop(context) ? 90 : 60,
-                height: Responsive.isDesktop(context) ? 90 : 60,
+                width: Responsive.isDesktop(context) ? 90 : 70,
+                height: Responsive.isDesktop(context) ? 90 : 70,
+
                 decoration: BoxDecoration(
                   color: BackgroundColor.primary,
                   shape: BoxShape.circle,
@@ -94,14 +96,16 @@ class _CategoryWidgetState extends State<CategoryWidget> {
         SizedBox(
           width: double.infinity,
           child: Wrap(
-            runSpacing: 10,
+            runSpacing: 20,
             alignment: WrapAlignment.spaceBetween,
-            children: [
-              ProductCardWidget(),
-              ProductCardWidget(),
-            ],
+            children: List.generate(
+                2,
+                (index) => SizedBox(
+                      child: ProductCardWidget(),
+                    )),
           ),
-        ),
+        )
+
       ],
     );
   }
