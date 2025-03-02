@@ -38,6 +38,7 @@ class _SearchWidgetState extends State<SearchWidget> {
               controller: searchController,
               onSubmitted: (value) => {},
               decoration: InputDecoration(
+                fillColor: Colors.white,
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 hintText: 'Search',

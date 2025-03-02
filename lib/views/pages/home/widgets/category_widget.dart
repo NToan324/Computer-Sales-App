@@ -2,6 +2,7 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
 
 class CategoryWidget extends StatefulWidget {
   const CategoryWidget({super.key});
@@ -30,6 +31,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -70,8 +72,8 @@ class _CategoryWidgetState extends State<CategoryWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: Responsive.isDesktop(context) ? 90 : 60,
-                height: Responsive.isDesktop(context) ? 90 : 60,
+                width: Responsive.isDesktop(context) ? 90 : 70,
+                height: Responsive.isDesktop(context) ? 90 : 70,
                 decoration: BoxDecoration(
                   color: BackgroundColor.primary,
                   shape: BoxShape.circle,
@@ -91,7 +93,18 @@ class _CategoryWidgetState extends State<CategoryWidget> {
             ],
           ),
         ),
-        ProductCardWidget(),
+        SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            runSpacing: 20,
+            alignment: WrapAlignment.spaceBetween,
+            children: List.generate(
+                2,
+                (index) => SizedBox(
+                      child: ProductCardWidget(),
+                    )),
+          ),
+        )
       ],
     );
   }
@@ -103,6 +116,10 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      //minwidth
+      width: Responsive.isDesktop(context)
+          ? MediaQuery.of(context).size.width * 0.48
+          : double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       height: 250,
       decoration: BoxDecoration(
