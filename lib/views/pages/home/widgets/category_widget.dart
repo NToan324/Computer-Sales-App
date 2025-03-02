@@ -31,7 +31,6 @@ class _CategoryWidgetState extends State<CategoryWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
-      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,6 +73,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
               Container(
                 width: Responsive.isDesktop(context) ? 90 : 70,
                 height: Responsive.isDesktop(context) ? 90 : 70,
+
                 decoration: BoxDecoration(
                   color: BackgroundColor.primary,
                   shape: BoxShape.circle,
@@ -105,6 +105,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
                     )),
           ),
         )
+
       ],
     );
   }
@@ -116,7 +117,6 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      //minwidth
       width: Responsive.isDesktop(context)
           ? MediaQuery.of(context).size.width * 0.48
           : double.infinity,
