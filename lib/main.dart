@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/route_manager.dart';
 import 'package:get/get.dart';
+import 'views/pages/login/login_view.dart';
 
 void main() async {
-  await dotenv.load(fileName: '.env');
-  return runApp(const GetMaterialApp(
-    home: ApiApp(),
+  // await dotenv.load(fileName: '.env');
+  return runApp(GetMaterialApp(
+    home: LoginView(),
+    debugShowCheckedModeBanner: false,
   ));
 }
 
