@@ -6,7 +6,7 @@ import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:dio/dio.dart';
 
 class BaseClient {
-  static const int TIME_OUT_DURATION = 30;
+  static const int timeOutDuration = 30;
   //GET
   Future<dynamic> get(String baseUrl, String api) async {
     var uri = Uri.parse(baseUrl + api); //http://localhost:3000/api
@@ -14,12 +14,11 @@ class BaseClient {
     try {
       var response = await dio
           .get(uri.toString())
-          .timeout(const Duration(seconds: TIME_OUT_DURATION));
+          .timeout(const Duration(seconds: timeOutDuration));
       return _processReponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', uri.toString());
     } on TimeoutException {
-      print('TimeoutException');
       throw ApiNotRespondingException(
           'API not responded in time', uri.toString());
     }
@@ -33,7 +32,7 @@ class BaseClient {
     try {
       var response = await dio
           .post(uri.toString(), data: payload)
-          .timeout(const Duration(seconds: TIME_OUT_DURATION));
+          .timeout(const Duration(seconds: timeOutDuration));
       // var response = await http
       //     .post(uri, body: payload)
       //     .timeout(const Duration(seconds: TIME_OUT_DURATION));
@@ -53,7 +52,7 @@ class BaseClient {
     try {
       var response = await dio
           .delete(uri.toString())
-          .timeout(const Duration(seconds: TIME_OUT_DURATION));
+          .timeout(const Duration(seconds: timeOutDuration));
       // var response = await http
       //     .delete(uri)
       //     .timeout(const Duration(seconds: TIME_OUT_DURATION));
