@@ -1,20 +1,29 @@
-import 'package:computer_sales_app/views/pages/login/signup_view.dart';
-import 'package:computer_sales_app/views/pages/login/verifyemail_view.dart';
+// TODO Implement this library.
 import "package:computer_sales_app/views/pages/login/widgets/text_field.dart";
 import "package:flutter/material.dart";
 import 'widgets/button.dart';
-class LoginView extends StatelessWidget {
-  LoginView({Key? key}) : super(key: key);
+class SignUpView extends StatelessWidget {
+  SignUpView({Key? key}) : super(key: key);
   final userNameController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmedpasswordController = TextEditingController();
   //Sign user in method
-  void signIn() {
-    print('Sign In');
+  void signUp() {
+    print('Sign Up');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Quay lại trang Login
+          },
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
@@ -31,7 +40,7 @@ class LoginView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Sign In',
+                  'Create an account',
                   style: TextStyle(
                     fontSize: 40,
                     color: Colors.black,
@@ -40,10 +49,12 @@ class LoginView extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  'Hi Welcome Back!',
+                  'Fill your information below or register',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: const Color.fromARGB(255, 159, 159, 159),
                     fontSize: 14,
+                    
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -66,61 +77,20 @@ class LoginView extends StatelessWidget {
                   controller: passwordController,
                   obscureText: true,
                 ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 30.0),
-                    child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => VerifyEmailView()),
-                          );
-                        },
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontSize: 14,
-                          ),
-                        ),
-                    )
-                  )
-                    
-                ),
+                const SizedBox(height: 15),
+                MyTextField(
+                  hintText: 'Password',
+                  prefixIcon: Icons.lock,
+                  controller: confirmedpasswordController,
+                  obscureText: true,
+                ),               
                 const SizedBox(height: 40),
                 MyButton(
-                  text: 'Sign In',
-                  onTap: signIn,
+                  text: 'Sign Up',
+                  onTap: signUp,
                 ),
                 const SizedBox(height: 40),
-               
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account?",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    const SizedBox(width: 5),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignUpView()),
-                        );
-                      },
-                      child: Text(
-                        "Sign up",
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+
               ],
              ),
             ),

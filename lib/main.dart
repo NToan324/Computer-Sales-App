@@ -1,5 +1,6 @@
 import 'package:computer_sales_app/views/pages/home/home_view.dart';
 import 'package:flutter/material.dart';
+import 'views/pages/login/login_view.dart';
 
 void main() {
   runApp(const MyApp());

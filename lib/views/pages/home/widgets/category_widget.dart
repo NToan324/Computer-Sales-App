@@ -91,7 +91,17 @@ class _CategoryWidgetState extends State<CategoryWidget> {
             ],
           ),
         ),
-        ProductCardWidget(),
+        SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            runSpacing: 10,
+            alignment: WrapAlignment.spaceBetween,
+            children: [
+              ProductCardWidget(),
+              ProductCardWidget(),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -103,6 +113,9 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: Responsive.isDesktop(context)
+          ? MediaQuery.of(context).size.width * 0.48
+          : double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       height: 250,
       decoration: BoxDecoration(

@@ -1,4 +1,5 @@
 import 'package:computer_sales_app/config/font.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 class ProductListViewWidget extends StatelessWidget {
@@ -9,6 +10,7 @@ class ProductListViewWidget extends StatelessWidget {
     return SliverGrid.builder(
       itemCount: 10,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: Responsive.isDesktop(context) ? 6 : 2,
           crossAxisCount: 2,
           childAspectRatio: 0.7,
           crossAxisSpacing: 10,

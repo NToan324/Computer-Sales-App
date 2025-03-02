@@ -15,6 +15,8 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
+        forceMaterialTransparency: true,
+        toolbarHeight: Responsive.isDesktop(context) ? 80 : 60,
         centerTitle: Responsive.isDesktop(context) ? true : false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
