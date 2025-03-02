@@ -7,6 +7,5 @@ class APIController with BaseController {
         .get('https://jsonplaceholder.typicode.com/', '/todos/1')
         .catchError(handleError);
     if (response == null) return;
-    print(response);
   }
 }

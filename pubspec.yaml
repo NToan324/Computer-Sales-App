@@ -38,6 +38,10 @@ dependencies:
   get: ^4.6.6
   dio: ^5.8.0+1
   flutter_dotenv: ^5.2.1
+  feather_icons: ^1.2.0
+  carousel_slider: ^5.0.0
+  smooth_page_indicator: ^1.2.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
