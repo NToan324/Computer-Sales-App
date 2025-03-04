@@ -33,6 +33,7 @@ class _MobileCartViewState extends State<MobileCartView> {
   ];
 
   final TextEditingController _promoCodeController = TextEditingController();
+
   int? _itemToRemove;
   int _quantityToRemove = 1;
 
@@ -95,42 +96,45 @@ class _MobileCartViewState extends State<MobileCartView> {
               Column(
                 children: [
                   Expanded(
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemCount: cartItems.length,
-                      itemBuilder: (context, index) {
-                        final item = cartItems[index];
-                        return Slidable(
-                          key: ValueKey(item.name),
-                          endActionPane: ActionPane(
-                            motion: const ScrollMotion(),
-                            children: [
-                              SlidableAction(
-                                onPressed: (context) {
-                                  _confirmRemoveItem(index);
-                                },
-                                label: 'Delete',
-                                backgroundColor: AppColors.pink,
-                                foregroundColor: AppColors.red,
-                                icon: Icons.delete,
-                              ),
-                            ],
-                          ),
-                          child: CartItemWidget(
-                            item: item,
-                            onQuantityChanged: (quantity) {
-                              setState(() {
-                                cartItems[index] = CartItem(
-                                  name: item.name,
-                                  price: item.price,
-                                  image: item.image,
-                                  quantity: quantity,
-                                );
-                              });
-                            },
-                          ),
-                        );
-                      },
+                    child: SlidableAutoCloseBehavior(
+                      child: ListView.separated(
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemCount: cartItems.length,
+                        itemBuilder: (context, index) {
+                          final item = cartItems[index];
+                          return Slidable(
+                            key: ValueKey(item.name),
+                            closeOnScroll: true,
+                            endActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (context) {
+                                    _confirmRemoveItem(index);
+                                  },
+                                  label: 'Delete',
+                                  backgroundColor: AppColors.pink,
+                                  foregroundColor: AppColors.red,
+                                  icon: Icons.delete,
+                                ),
+                              ],
+                            ),
+                            child: CartItemWidget(
+                              item: item,
+                              onQuantityChanged: (quantity) {
+                                setState(() {
+                                  cartItems[index] = CartItem(
+                                    name: item.name,
+                                    price: item.price,
+                                    image: item.image,
+                                    quantity: quantity,
+                                  );
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],
