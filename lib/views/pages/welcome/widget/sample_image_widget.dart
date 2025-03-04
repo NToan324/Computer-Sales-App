@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 void main(List<String> args) {
   runApp(const MaterialApp(
     home: Scaffold(
-      body: SampleImageWidget(),
+      body: WelcomeImageWidget(),
     ),
   ));
 }
 
-class SampleImageWidget extends StatelessWidget {
-  const SampleImageWidget({super.key});
+class WelcomeImageWidget extends StatelessWidget {
+  const WelcomeImageWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

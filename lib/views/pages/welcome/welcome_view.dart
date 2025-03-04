@@ -20,7 +20,7 @@ class WelcomeView extends StatelessWidget {
           spacing: 10,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SampleImageWidget(),
+            const WelcomeImageWidget(),
             const Text("An Computer Sales App"),
             const Text("Welcome to the Computer Sales App"),
             SizedBox(
