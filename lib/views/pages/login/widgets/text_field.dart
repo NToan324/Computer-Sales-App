@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class MyTextField extends StatefulWidget {
   const MyTextField({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.prefixIcon,
     required this.controller,
     required this.obscureText,
-  }) : super(key: key);
+  });
 
   final String hintText;
   final IconData prefixIcon;
@@ -20,7 +20,6 @@ class MyTextField extends StatefulWidget {
 
 class _MyTextFieldState extends State<MyTextField> {
   late bool isObscure;
-
   @override
   void initState() {
     super.initState();
@@ -40,6 +39,7 @@ class _MyTextFieldState extends State<MyTextField> {
             borderSide: BorderSide(color: Colors.grey),
           ),
           focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(color: Colors.black),
           ),
           hintText: widget.hintText,

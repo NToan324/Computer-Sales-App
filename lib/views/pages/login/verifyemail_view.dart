@@ -5,7 +5,7 @@ import "package:flutter/material.dart";
 import 'widgets/button.dart';
 
 class VerifyEmailView extends StatelessWidget {
-  VerifyEmailView({Key? key}) : super(key: key);
+  VerifyEmailView({super.key});
   final userNameController = TextEditingController();
 
   //Sign user in method
@@ -16,6 +16,7 @@ class VerifyEmailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
@@ -28,60 +29,62 @@ class VerifyEmailView extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
-          child: Container(
-            width: 400,
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Verify email',
-                    style: TextStyle(
-                      fontSize: 40,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            child: Container(
+              width: 400,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Verify email',
+                      style: TextStyle(
+                        fontSize: 40,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Please enter email to send otp code',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
+                    const SizedBox(height: 5),
+                    Text(
+                      'Please enter email to send otp code',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 159, 159, 159),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Container(
+                      height: 1,
+                      width: 150,
                       color: const Color.fromARGB(255, 159, 159, 159),
-                      fontSize: 14,
                     ),
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                    height: 1,
-                    width: 150,
-                    color: const Color.fromARGB(255, 159, 159, 159),
-                  ),
-                  const SizedBox(height: 60),
-                  MyTextField(
-                    hintText: 'Email',
-                    prefixIcon: Icons.email,
-                    controller: userNameController,
-                    obscureText: false,
-                  ),
-                  const SizedBox(height: 60),
-                  MyButton(
-                      text: 'Send code',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => VerifyOtpView())
-                        );
-                      }
+                    const SizedBox(height: 60),
+                    MyTextField(
+                      hintText: 'Email',
+                      prefixIcon: Icons.email,
+                      controller: userNameController,
+                      obscureText: false,
                     ),
-                  const SizedBox(height: 100),
-                ],
+                    const SizedBox(height: 60),
+                    MyButton(
+                        text: 'Send code',
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => VerifyOtpView())
+                          );
+                        }
+                      ),
+                    const SizedBox(height: 100),
+                  ],
+                ),
               ),
             ),
           ),
