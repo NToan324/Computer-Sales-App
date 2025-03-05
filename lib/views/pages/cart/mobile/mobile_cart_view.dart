@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:computer_sales_app/consts/app_colors.dart';
-import 'package:computer_sales_app/utils/widget/CustomAppBar.dart';
+import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/utils/widget/button.dart';
 
 class MobileCartView extends StatefulWidget {
@@ -145,7 +145,7 @@ class _MobileCartViewState extends State<MobileCartView> {
     return Stack(
       children: <Widget>[
         Scaffold(
-          appBar: const CustomAppBar(title: "My Cart"),
+          appBar: const CustomAppBarMobile(title: "My Cart"),
           body: Stack(
             children: <Widget>[
               Column(
