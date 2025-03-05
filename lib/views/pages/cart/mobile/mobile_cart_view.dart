@@ -91,8 +91,6 @@ class _MobileCartViewState extends State<MobileCartView> {
     ),
   ];
 
-  final TextEditingController _promoCodeController = TextEditingController();
-
   int? _itemToRemove;
   int _quantityToRemove = 1;
 
@@ -125,24 +123,11 @@ class _MobileCartViewState extends State<MobileCartView> {
 
   double get subtotal =>
       cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
-  double get deliveryFee => 5.0; // Example delivery fee
-  double _discount = 10.0;
+  double get deliveryFee => 5.0;
+  final double _discount = 0;
   double get discount => _discount;
-  set discount(double value) {
-    setState(() {
-      _discount = value;
-    });
-  }
 
   double get total => subtotal + deliveryFee - discount;
-
-  void _applyPromoCode() {
-    if (_promoCodeController.text == 'DISCOUNT') {
-      discount = 20.0;
-    } else {
-      discount = 0.0;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,8 +185,6 @@ class _MobileCartViewState extends State<MobileCartView> {
                 ],
               ),
               SummaryWidget(
-                promoCodeController: _promoCodeController,
-                applyPromoCode: _applyPromoCode,
                 subtotal: subtotal,
                 deliveryFee: deliveryFee,
                 discount: discount,

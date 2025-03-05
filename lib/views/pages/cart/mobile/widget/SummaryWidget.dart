@@ -4,17 +4,13 @@ import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/utils/widget/Button.dart';
 
 class SummaryWidget extends StatefulWidget {
-  final TextEditingController promoCodeController;
-  final Function applyPromoCode;
   final double subtotal;
   final double deliveryFee;
-  final double discount;
-  final double total;
+  double discount;
+  double total;
 
-  const SummaryWidget(
+  SummaryWidget(
       {super.key,
-      required this.promoCodeController,
-      required this.applyPromoCode,
       required this.subtotal,
       required this.deliveryFee,
       required this.discount,
@@ -25,6 +21,17 @@ class SummaryWidget extends StatefulWidget {
 }
 
 class _SummaryWidgetState extends State<SummaryWidget> {
+  final TextEditingController promoCodeController = TextEditingController();
+
+  void applyPromoCode() {
+    if (promoCodeController.text == 'DISCOUNT') {
+      widget.discount = 20.0;
+    } else {
+      widget.discount = 0.0;
+    }
+    widget.total = widget.subtotal + widget.deliveryFee - widget.discount;
+  }
+
   Widget _buildSummaryRow(String label, double amount, {bool isTotal = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -80,7 +87,7 @@ class _SummaryWidgetState extends State<SummaryWidget> {
               height: 60,
               child: TextField(
                 textAlign: TextAlign.start,
-                controller: widget.promoCodeController,
+                controller: promoCodeController,
                 decoration: InputDecoration(
                   hintText: 'Promo Code',
                   focusedBorder: const OutlineInputBorder(
@@ -94,7 +101,12 @@ class _SummaryWidgetState extends State<SummaryWidget> {
                   suffixIcon: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Button(
-                          text: "Apply", onPressed: widget.applyPromoCode)),
+                          text: "Apply",
+                          onPressed: () {
+                            setState(() {
+                              applyPromoCode();
+                            });
+                          })),
                 ),
               ),
             ),
