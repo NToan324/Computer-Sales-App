@@ -5,6 +5,13 @@ class ProductDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Product Details'),
+      ),
+      body: Center(
+        child: Text('Product Details'),
+      ),
+    );
   }
 }
