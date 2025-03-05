@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +11,12 @@ class ProductListViewWidget extends StatelessWidget {
     return SliverGrid.builder(
       itemCount: 10,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: Responsive.isDesktop(context) ? 6 : 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10),
+        crossAxisCount: Responsive.isDesktop(context) ? 6 : 2,
+        childAspectRatio: 0.5,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        mainAxisExtent: 400,
+      ),
       itemBuilder: (context, index) => ProductView(),
     );
   }
@@ -26,81 +29,114 @@ class ProductView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        border: Border.all(color: const Color.fromARGB(255, 219, 219, 219)),
-      ),
-      child: Column(
-        spacing: 10,
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: const Color.fromARGB(255, 255, 255, 249),
-              ),
-              child: Image.asset(
-                'assets/images/laptop.png',
+    return GestureDetector(
+      onTap: () => {
+        Navigator.pushNamed(context, 'product-details'),
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          border: Border.all(color: const Color.fromARGB(255, 219, 219, 219)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: 150, maxHeight: 350),
+                child: Container(
+                  width: double.infinity,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromARGB(255, 238, 238, 238),
+                  ),
+                  child: Image.asset(
+                    'assets/images/laptop.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              spacing: 10,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Acer Aspire 5 Slim Laptop',
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                spacing: 10,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Acer Aspire 5 Slim Laptop',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: FontSizes.medium)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.star,
-                          size: 15,
-                          color: Colors.amber,
+                        fontSize: FontSizes.medium),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    spacing: 5,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: AppColor.orangePastel,
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        Icon(
-                          Icons.star,
-                          size: 15,
-                          color: Colors.amber,
+                        child: Text(
+                          'Ram 8GB',
+                          style: TextStyle(
+                            fontSize: FontSizes.small,
+                            color: AppColor.primary,
+                          ),
                         ),
-                        Icon(
-                          Icons.star,
-                          size: 15,
-                          color: Colors.amber,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: AppColor.orangePastel,
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        Icon(
-                          Icons.star,
-                          size: 15,
-                          color: Colors.amber,
+                        child: Text(
+                          'SSD 512GB',
+                          style: TextStyle(
+                            fontSize: FontSizes.small,
+                            color: AppColor.primary,
+                          ),
                         ),
-                        Icon(
-                          Icons.star,
-                          size: 15,
-                          color: Colors.amber,
-                        ),
-                      ],
-                    ),
-                    Text('23 Reviews'),
-                  ],
-                ),
-                Text(
-                  '13,000,000 VND',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '13,000,000 VND',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColor.secondary,
+                        fontSize: FontSizes.medium),
+                  ),
+                  Wrap(
+                    spacing: 5,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.star,
+                            size: 15,
+                            color: Colors.amber,
+                          ),
+                          Text('4.5'),
+                        ],
+                      ),
+                      Text('23 Reviews'),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

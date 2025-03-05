@@ -63,8 +63,8 @@ class _CarouselSliderCustomState extends State<CarouselSliderCustom> {
           count: items.length,
           effect: SwapEffect(
             activeDotColor: AppColor.primary,
-            dotHeight: 10,
-            dotWidth: 10,
+            dotHeight: 7,
+            dotWidth: 7,
           ),
           onDotClicked: (index) => {
             _controller.animateToPage(index),

@@ -19,10 +19,11 @@ class LocationWidget extends StatelessWidget {
         spacing: 5,
         children: [
           Row(
+            spacing: 5,
             children: [
               Icon(
                 Icons.location_on_rounded,
-                color: AppColor.primary,
+                color: AppColor.secondary,
                 size: IconSize.large,
               ),
               Text(

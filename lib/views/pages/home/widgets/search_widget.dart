@@ -27,35 +27,34 @@ class _SearchWidgetState extends State<SearchWidget> {
       mainAxisAlignment: Responsive.isDesktop(context)
           ? MainAxisAlignment.start
           : MainAxisAlignment.spaceBetween,
-      spacing: 20,
       children: [
         SizedBox(
           child: SizedBox(
             width: Responsive.isDesktop(context)
                 ? 400
-                : MediaQuery.of(context).size.width * 0.7,
+                : MediaQuery.of(context).size.width * 0.75,
             child: TextField(
               controller: searchController,
               onSubmitted: (value) => {},
               decoration: InputDecoration(
-                fillColor: Colors.white,
+                fillColor: Colors.orange,
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                hintText: 'Search',
+                hintText: 'What are you looking for?',
                 labelStyle: TextStyle(color: Colors.black54),
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.only(left: 10),
+                suffixIcon: Padding(
+                  padding: const EdgeInsets.only(right: 10),
                   child: Icon(
                     FeatherIcons.search,
                     size: 30,
                   ),
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColor.primary, width: 1),
-                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: AppColor.primary, width: 0.5),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
@@ -64,12 +63,14 @@ class _SearchWidgetState extends State<SearchWidget> {
         Container(
           width: 50,
           height: 50,
-          decoration:
-              BoxDecoration(color: AppColor.primary, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: AppColor.primary,
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: IconButton(
             onPressed: () {},
             icon: Icon(
-              CupertinoIcons.slider_horizontal_3,
+              Icons.camera_alt_outlined,
               color: Colors.white,
             ),
           ),

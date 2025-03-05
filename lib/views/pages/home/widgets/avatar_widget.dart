@@ -26,19 +26,19 @@ class AvatarWidget extends StatelessWidget {
                   size: 30,
                 ),
               ),
-              Container(
-                width: Responsive.isDesktop(context) ? 50 : 40,
-                height: Responsive.isDesktop(context) ? 50 : 40,
-                decoration: BoxDecoration(
-                    color: AppColor.primary, shape: BoxShape.circle),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.notifications_rounded,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              // Container(
+              //   width: Responsive.isDesktop(context) ? 50 : 40,
+              //   height: Responsive.isDesktop(context) ? 50 : 40,
+              //   decoration: BoxDecoration(
+              //       color: AppColor.primary, shape: BoxShape.circle),
+              //   child: IconButton(
+              //     onPressed: () {},
+              //     icon: Icon(
+              //       Icons.notifications_rounded,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
               CircleAvatar(
                 backgroundImage: AssetImage(
                   'assets/images/avatar.jpeg',
