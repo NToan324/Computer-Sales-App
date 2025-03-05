@@ -123,10 +123,8 @@ class _MobileCartViewState extends State<MobileCartView> {
   double get subtotal =>
       cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
   double get deliveryFee => 5.0;
-  final double _discount = 0;
-  double get discount => _discount;
 
-  double get total => subtotal + deliveryFee - discount;
+  double get total => subtotal + deliveryFee;
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +184,6 @@ class _MobileCartViewState extends State<MobileCartView> {
               SummaryWidget(
                 subtotal: subtotal,
                 deliveryFee: deliveryFee,
-                discount: discount,
                 total: total,
               ),
             ],

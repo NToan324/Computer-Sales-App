@@ -6,14 +6,13 @@ import 'package:computer_sales_app/utils/widget/Button.dart';
 class SummaryWidget extends StatefulWidget {
   final double subtotal;
   final double deliveryFee;
-  double discount;
+  double discount = 0.0;
   double total;
 
   SummaryWidget(
       {super.key,
       required this.subtotal,
       required this.deliveryFee,
-      required this.discount,
       required this.total});
 
   @override
