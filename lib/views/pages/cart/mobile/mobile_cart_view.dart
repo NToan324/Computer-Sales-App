@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:computer_sales_app/consts/app_colors.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBar.dart';
+import 'package:computer_sales_app/utils/widget/button.dart';
 
 class MobileCartView extends StatefulWidget {
   const MobileCartView({super.key});
@@ -181,21 +182,9 @@ class _MobileCartViewState extends State<MobileCartView> {
                                   BorderRadius.all(Radius.circular(12.0)),
                             ),
                             suffixIcon: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      AppColors.primary),
-                                  foregroundColor:
-                                      WidgetStateProperty.all(AppColors.white),
-                                ),
-                                onPressed: _applyPromoCode,
-                                child: const Text(
-                                  'Apply',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
+                                padding: const EdgeInsets.all(10),
+                                child: Button(
+                                    text: "Apply", onPressed: _applyPromoCode)),
                           ),
                         ),
                       ),
@@ -205,6 +194,17 @@ class _MobileCartViewState extends State<MobileCartView> {
                       _buildSummaryRow('Discount', -discount),
                       const Divider(),
                       _buildSummaryRow('Total', total, isTotal: true),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: Button(
+                          onPressed: () {
+                            // Checkout
+                          },
+                          text: 'Proceed to checkout',
+                        ),
+                      ),
                     ],
                   ),
                 ),

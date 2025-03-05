@@ -15,7 +15,7 @@ class Cart extends StatelessWidget {
     return MaterialApp(
         home: SafeArea(
             child: Responsive.isMobile(context)
-                ? MobileCartView()
+                ? const MobileCartView()
                 : const WebCartView()));
   }
 }
