@@ -40,6 +40,12 @@ dependencies:
   get: ^4.6.6
   dio: ^5.8.0+1
   flutter_dotenv: ^5.2.1
+  feather_icons: ^1.2.0
+  carousel_slider: ^5.0.0
+  smooth_page_indicator: ^1.2.1
+  intl: ^0.20.2
+  typicons_flutter: ^0.5.0
+  flutter_svg: ^2.0.17
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +72,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/icons/brand/
     - assets/fonts/
     - .env
   #   - images/a_dot_ham.jpeg
@@ -81,13 +88,14 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
+  fonts:
+    - family: Noto
+      fonts:
+        - asset: assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf
+        - asset: assets/fonts/NotoSans-VariableFont_wdth,wght.ttf
+
   #         style: italic
-  #   - family: Trajan Pro
+  #   - family: Trajan Proxx
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf

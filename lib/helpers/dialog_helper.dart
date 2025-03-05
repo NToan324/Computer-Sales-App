@@ -15,8 +15,8 @@ class DialogHelper {
             children: [
               Text(
                 title,
-                style:
-                    const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.red, fontWeight: FontWeight.bold),
               ),
               Text(description),
               ElevatedButton(

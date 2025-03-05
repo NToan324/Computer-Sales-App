@@ -10,10 +10,8 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        home: SafeArea(
-            child: Scaffold(
+    return Scaffold(
       body: SplashImageViewWidget(),
-    )));
+    );
   }
 }

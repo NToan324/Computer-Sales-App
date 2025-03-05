@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/config/font.dart';
 
 class CustomAppBarMobile extends StatelessWidget
     implements PreferredSizeWidget {
@@ -11,7 +13,8 @@ class CustomAppBarMobile extends StatelessWidget
     return AppBar(
       title: Text(
         title,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+            fontSize: FontSizes.large, fontWeight: FontWeight.bold),
       ),
       leading: BackButton(
         onPressed: () {
@@ -19,6 +22,8 @@ class CustomAppBarMobile extends StatelessWidget
         },
       ),
       centerTitle: true,
+      backgroundColor: BackgroundColor.secondary,
+      forceMaterialTransparency: true,
     );
   }
 
