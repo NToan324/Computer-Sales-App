@@ -31,6 +31,60 @@ class _MobileCartViewState extends State<MobileCartView> {
       image: Image.asset('assets/images/laptop_banner.jpg'),
       quantity: 3,
     ),
+    CartItem(
+      name: 'Item 4',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 5,
+    ),
+    CartItem(
+      name: 'Item 5',
+      price: 50.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 6,
+    ),
+    CartItem(
+      name: 'Item 6',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 6,
+    ),
+    CartItem(
+      name: 'Item 7',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 5,
+    ),
+    CartItem(
+      name: 'Item 8',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 5,
+    ),
+    CartItem(
+      name: 'Item 9',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 5,
+    ),
+    CartItem(
+      name: 'Item 10',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 5,
+    ),
+    CartItem(
+      name: 'Item 11',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 5,
+    ),
+    CartItem(
+      name: 'Item 12',
+      price: 40.0,
+      image: Image.asset('assets/images/laptop_banner.jpg'),
+      quantity: 5,
+    ),
   ];
 
   final TextEditingController _promoCodeController = TextEditingController();
@@ -99,6 +153,7 @@ class _MobileCartViewState extends State<MobileCartView> {
                   Expanded(
                     child: SlidableAutoCloseBehavior(
                       child: ListView.separated(
+                        padding: const EdgeInsets.only(bottom: 400),
                         separatorBuilder: (context, index) => const Divider(),
                         itemCount: cartItems.length,
                         itemBuilder: (context, index) {

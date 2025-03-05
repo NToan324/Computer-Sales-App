@@ -12,10 +12,11 @@ class Cart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: SafeArea(
-            child: Responsive.isMobile(context)
-                ? const MobileCartView()
-                : const WebCartView()));
+    return const MaterialApp(
+        home: SafeArea(child: MobileCartView()
+            // Responsive.isMobile(context)
+            //     ? const MobileCartView()
+            //     : const WebCartView()
+            ));
   }
 }
