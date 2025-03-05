@@ -1,14 +1,22 @@
-class ProductCardPromotion {
-  final String name;
-  final String description;
-  final double price;
-  final String image;
-  final double promotionValue;
+class ProductPromotion {
+  String name;
+  String description;
+  double price;
+  double discount;
+  String imageUrl;
+  String category;
 
-  ProductCardPromotion(
-      {required this.promotionValue,
-      required this.name,
-      required this.description,
-      required this.price,
-      required this.image});
+  // Constructor
+  ProductPromotion({
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.discount,
+    required this.imageUrl,
+    required this.category,
+  });
+
+  double getDiscountedPrice() {
+    return price - (price * (discount / 100));
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:computer_sales_app/views/pages/home/home_view.dart';
+import 'package:computer_sales_app/views/pages/product_details/product_details_view.dart';
 import 'package:flutter/material.dart';
 import 'views/pages/login/login_view.dart';
 
@@ -14,6 +15,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomeView(),
+      routes: {
+        'home': (context) => const HomeView(),
+        'product-details': (context) => const ProductDetailsView(),
+      },
     );
   }
 }
