@@ -6,27 +6,29 @@ class OtpInput extends StatelessWidget {
   final bool autoFocus;
 
   const OtpInput({
-    Key? key,
+    super.key,
     required this.controller,
     this.autoFocus = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 50,
+      width: 60,
+      height: 60,
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        maxLength: 1,
+        maxLength: 10,        
         autofocus: autoFocus, // Tự động focus ô đầu tiên
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly, // Chỉ cho nhập số
         ],
         decoration: InputDecoration(
           counterText: "",
+
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey),
