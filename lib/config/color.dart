@@ -8,6 +8,9 @@ class AppColor {
   static const Color greenPastel = Color(0xFFB1C29E);
   static const Color yellowPastel = Color(0xFFFCFFC1);
   static const Color bluePastel = Color(0xFFD4EBF8);
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color black = Color(0xFF000000);
+  static const Color pink = Color(0xFFf8c1a0);
 }
 
 class BackgroundColor {
