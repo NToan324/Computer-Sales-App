@@ -18,6 +18,7 @@ class HomeView extends StatelessWidget {
         forceMaterialTransparency: true,
         toolbarHeight: Responsive.isDesktop(context) ? 90 : 60,
         titleSpacing: 0,
+
         centerTitle: Responsive.isDesktop(context) ? true : false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,

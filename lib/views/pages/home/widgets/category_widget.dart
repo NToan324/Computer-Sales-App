@@ -67,7 +67,6 @@ class _CategoryWidgetState extends State<CategoryWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
-      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
