@@ -20,7 +20,7 @@ class OtpInput extends StatelessWidget {
         controller: controller,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        maxLength: 10,        
+        maxLength: 10,
         autofocus: autoFocus, // Tự động focus ô đầu tiên
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         inputFormatters: [
@@ -28,7 +28,6 @@ class OtpInput extends StatelessWidget {
         ],
         decoration: InputDecoration(
           counterText: "",
-
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey),

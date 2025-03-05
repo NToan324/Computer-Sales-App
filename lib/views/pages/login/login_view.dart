@@ -10,8 +10,8 @@ class LoginView extends StatelessWidget {
   final passwordController = TextEditingController();
 
   // Sign user in method
-  void signIn() {
-    print('Sign In');
+  void signIn(BuildContext context) {
+    Navigator.pushNamed(context, 'home');
   }
 
   @override
@@ -114,7 +114,7 @@ class LoginView extends StatelessWidget {
                           "Don't have an account?",
                           style: TextStyle(color: Colors.grey),
                         ),
-                      ),                      
+                      ),
                       const SizedBox(width: 5),
                       GestureDetector(
                         onTap: () {

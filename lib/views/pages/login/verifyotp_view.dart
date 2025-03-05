@@ -1,4 +1,3 @@
-import 'package:computer_sales_app/views/pages/login/newpass_view.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/login/widgets/button.dart';
 import 'widgets/otp_input.dart';
@@ -11,11 +10,12 @@ class VerifyOtpView extends StatelessWidget {
   final otp3Controller = TextEditingController();
   final otp4Controller = TextEditingController();
 
-  void verifyOtp() {
+  void verifyOtp(BuildContext context) {
     String otpCode = otp1Controller.text +
         otp2Controller.text +
         otp3Controller.text +
         otp4Controller.text;
+    Navigator.pushNamed(context, 'change-password');
     print("OTP Entered: $otpCode");
   }
 
@@ -74,7 +74,9 @@ class VerifyOtpView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(child: OtpInput(controller: otp1Controller, autoFocus: true)),
+                      Flexible(
+                          child: OtpInput(
+                              controller: otp1Controller, autoFocus: true)),
                       SizedBox(width: 20),
                       Flexible(child: OtpInput(controller: otp2Controller)),
                       SizedBox(width: 20),
@@ -86,13 +88,7 @@ class VerifyOtpView extends StatelessWidget {
                   const SizedBox(height: 60),
                   MyButton(
                     text: 'Verify OTP',
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NewPasswordView())
-                      );
-                    }
+                    onTap: verifyOtp,
                   ),
                   const SizedBox(height: 100),
                 ],

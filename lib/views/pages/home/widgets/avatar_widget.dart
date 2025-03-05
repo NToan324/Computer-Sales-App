@@ -19,7 +19,9 @@ class AvatarWidget extends StatelessWidget {
             spacing: 10,
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, 'cart');
+                },
                 icon: Icon(
                   FeatherIcons.shoppingCart,
                   color: AppColor.primary,

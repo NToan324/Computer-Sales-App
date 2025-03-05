@@ -1,5 +1,4 @@
 // TODO Implement this library.
-import "package:computer_sales_app/views/pages/login/verifyotp_view.dart";
 import "package:computer_sales_app/views/pages/login/widgets/text_field.dart";
 import "package:flutter/material.dart";
 import 'widgets/button.dart';
@@ -9,8 +8,8 @@ class VerifyEmailView extends StatelessWidget {
   final userNameController = TextEditingController();
 
   //Sign user in method
-  void sendCode() {
-    print('Sendcode');
+  void sendCode(BuildContext context) {
+    Navigator.pushNamed(context, 'verify-otp');
   }
 
   @override
@@ -73,15 +72,9 @@ class VerifyEmailView extends StatelessWidget {
                     ),
                     const SizedBox(height: 60),
                     MyButton(
-                        text: 'Send code',
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => VerifyOtpView())
-                          );
-                        }
-                      ),
+                      text: 'Send code',
+                      onTap: sendCode,
+                    ),
                     const SizedBox(height: 100),
                   ],
                 ),

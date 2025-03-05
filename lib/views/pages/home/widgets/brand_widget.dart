@@ -1,9 +1,8 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class BrandWidget extends StatefulWidget {
-  BrandWidget({super.key});
+  const BrandWidget({super.key});
 
   @override
   State<BrandWidget> createState() => _BrandWidgetState();

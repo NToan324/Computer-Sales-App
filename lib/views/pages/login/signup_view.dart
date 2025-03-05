@@ -1,14 +1,14 @@
-// TODO Implement this library.
 import "package:computer_sales_app/views/pages/login/widgets/text_field.dart";
 import "package:flutter/material.dart";
 import 'widgets/button.dart';
+
 class SignUpView extends StatelessWidget {
   SignUpView({super.key});
   final userNameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmedpasswordController = TextEditingController();
   //Sign user in method
-  void signUp() {
+  void signUp(BuildContext context) {
     print('Sign Up');
   }
 
@@ -36,70 +36,67 @@ class SignUpView extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
               ),
-            
               child: Center(
                 child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Create an account',
-                    style: TextStyle(
-                      fontSize: 40,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Create an account',
+                      style: TextStyle(
+                        fontSize: 40,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Fill your information below or register',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
+                    const SizedBox(height: 5),
+                    Text(
+                      'Fill your information below or register',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 159, 159, 159),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Container(
+                      height: 1,
+                      width: 150,
                       color: const Color.fromARGB(255, 159, 159, 159),
-                      fontSize: 14,
-                      
                     ),
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                    height: 1,
-                    width: 150,
-                    color: const Color.fromARGB(255, 159, 159, 159),
-                  ),
-                  const SizedBox(height: 30),
-                  MyTextField(
-                    hintText: 'Email',
-                    prefixIcon: Icons.email,
-                    controller: userNameController,
-                    obscureText: false,
-                  ),
-                  const SizedBox(height: 15),
-                  MyTextField(
-                    hintText: 'Password',
-                    prefixIcon: Icons.lock,
-                    controller: passwordController,
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 15),
-                  MyTextField(
-                    hintText: 'Password',
-                    prefixIcon: Icons.lock,
-                    controller: confirmedpasswordController,
-                    obscureText: true,
-                  ),               
-                  const SizedBox(height: 40),
-                  MyButton(
-                    text: 'Sign Up',
-                    onTap: signUp,
-                  ),
-                  const SizedBox(height: 40),
-            
-                ],
-               ),
+                    const SizedBox(height: 30),
+                    MyTextField(
+                      hintText: 'Email',
+                      prefixIcon: Icons.email,
+                      controller: userNameController,
+                      obscureText: false,
+                    ),
+                    const SizedBox(height: 15),
+                    MyTextField(
+                      hintText: 'Password',
+                      prefixIcon: Icons.lock,
+                      controller: passwordController,
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 15),
+                    MyTextField(
+                      hintText: 'Password',
+                      prefixIcon: Icons.lock,
+                      controller: confirmedpasswordController,
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 40),
+                    MyButton(
+                      text: 'Sign Up',
+                      onTap: signUp,
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ) ,
+      ),
     );
   }
 }
