@@ -1,3 +1,4 @@
+import "package:computer_sales_app/config/color.dart";
 import 'package:computer_sales_app/views/pages/login/signup_view.dart';
 import 'package:computer_sales_app/views/pages/login/verifyemail_view.dart';
 import "package:computer_sales_app/views/pages/login/widgets/text_field.dart";
@@ -93,7 +94,7 @@ class LoginView extends StatelessWidget {
                         child: Text(
                           'Forgot Password?',
                           style: TextStyle(
-                            color: Colors.orange,
+                            color: AppColor.primary,
                             fontSize: 14,
                           ),
                         ),

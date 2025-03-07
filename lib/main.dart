@@ -2,6 +2,7 @@ import 'package:computer_sales_app/views/pages/cart/cart_view.dart';
 import 'package:computer_sales_app/views/pages/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/login/verifyotp_view.dart';
+import 'package:computer_sales_app/views/pages/login/login_view.dart';
 import 'package:computer_sales_app/views/pages/product_details/product_details_view.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
       home: HomeView(),
       routes: {
         //Login
+        'login': (context) => LoginView(),
         'verify-otp': (context) => VerifyOtpView(),
         'change-password': (context) => CreateNewPasswordView(),
         //Home
