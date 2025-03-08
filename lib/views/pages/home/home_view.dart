@@ -6,11 +6,24 @@ import 'package:computer_sales_app/views/pages/home/widgets/category_widget.dart
 import 'package:computer_sales_app/views/pages/home/widgets/location_widget.dart';
 import 'package:computer_sales_app/views/pages/home/widgets/product_widget.dart';
 import 'package:computer_sales_app/views/pages/home/widgets/search_widget.dart';
+import 'package:computer_sales_app/views/pages/search/search_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
-
+  void _navigateToSearchScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchScreen(
+          initialRecentSearches: [],
+          onSearch: (query) {
+            // Handle search
+          },
+        ),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +41,9 @@ class HomeView extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SearchWidget(),
+                        SearchWidget(
+                          onTap: () => _navigateToSearchScreen(context),
+                        ),
                       ],
                     ),
                   )
@@ -50,7 +65,9 @@ class HomeView extends StatelessWidget {
                   spacing: 20,
                   children: [
                     Responsive.isTablet(context) || Responsive.isMobile(context)
-                        ? SearchWidget()
+                        ? SearchWidget(
+                            onTap: () => _navigateToSearchScreen(context)
+                        )
                         : SizedBox(),
                     BannerWidget(),
                     CategoryWidget(),

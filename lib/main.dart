@@ -4,6 +4,7 @@ import 'package:computer_sales_app/views/pages/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/login/verifyotp_view.dart';
 import 'package:computer_sales_app/views/pages/login/login_view.dart';
 import 'package:computer_sales_app/views/pages/product_details/product_details_view.dart';
+import 'package:computer_sales_app/views/pages/search/search_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -26,6 +27,10 @@ class MyApp extends StatelessWidget {
         //Home
         'home': (context) => const HomeView(),
         'product-details': (context) => const ProductDetailsView(),
+        //Search
+        'search': (context) => SearchScreen(onSearch: (query) {
+          print('Search query: $query');
+        }),
         //Cart
         'cart': (context) => const CartView()
       },
