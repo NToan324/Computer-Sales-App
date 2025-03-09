@@ -6,29 +6,15 @@ import 'package:computer_sales_app/views/pages/home/widgets/category_widget.dart
 import 'package:computer_sales_app/views/pages/home/widgets/location_widget.dart';
 import 'package:computer_sales_app/views/pages/home/widgets/product_widget.dart';
 import 'package:computer_sales_app/views/pages/home/widgets/search_widget.dart';
-import 'package:computer_sales_app/views/pages/search/search_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
-  void _navigateToSearchScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SearchScreen(
-          initialRecentSearches: [],
-          onSearch: (query) {
-            // Handle search
-          },
-        ),
-      ),
-    );
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        forceMaterialTransparency: true,
         toolbarHeight: Responsive.isDesktop(context) ? 90 : 60,
         titleSpacing: 0,
         centerTitle: Responsive.isDesktop(context) ? true : false,
@@ -41,9 +27,7 @@ class HomeView extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SearchWidget(
-                          onTap: () => _navigateToSearchScreen(context),
-                        ),
+                        SearchWidget(),
                       ],
                     ),
                   )
@@ -65,9 +49,7 @@ class HomeView extends StatelessWidget {
                   spacing: 20,
                   children: [
                     Responsive.isTablet(context) || Responsive.isMobile(context)
-                        ? SearchWidget(
-                            onTap: () => _navigateToSearchScreen(context)
-                        )
+                        ? SearchWidget()                        
                         : SizedBox(),
                     BannerWidget(),
                     CategoryWidget(),
@@ -80,14 +62,6 @@ class HomeView extends StatelessWidget {
               ),
               ProductListViewWidget(),
             ],
-            // child: Column(
-            //   spacing: 20,
-            //   children: [
-            //     SearchWidget(),
-            //     BannerWidget(),
-            //     CategoryWidget(),
-            //     ProductListViewWidget(),
-            //   ],
           ),
         ),
       ),

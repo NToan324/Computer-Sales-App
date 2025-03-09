@@ -1,15 +1,27 @@
-import 'package:computer_sales_app/config/color.dart';
-import 'package:feather_icons/feather_icons.dart';
+import 'package:computer_sales_app/views/pages/search/mobile/search_mobile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/pages/search/widget.dart/search_field.dart';
+import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/views/pages/search/web/search_web_view.dart'; // Import overlay mới
 
-class SearchWidget extends StatelessWidget {
-  final VoidCallback onTap; // Callback when the search bar is tapped
+class SearchWidget extends StatefulWidget {
+  const SearchWidget({super.key});
 
-  const SearchWidget({
-    super.key,
-    required this.onTap,
-  });
+  @override
+  _SearchWidgetState createState() => _SearchWidgetState();
+}
+
+class _SearchWidgetState extends State<SearchWidget> {
+  final TextEditingController _searchController = TextEditingController();
+  final LayerLink _layerLink = LayerLink();
+  List<String> _recentSearches = [
+    "Laptop gaming",
+    "Chuột không dây",
+    "Bàn phím cơ",
+    "Màn hình 4K",
+    "Tai nghe bluetooth"
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -22,36 +34,32 @@ class SearchWidget extends StatelessWidget {
           width: Responsive.isDesktop(context)
               ? 400
               : MediaQuery.of(context).size.width * 0.75,
-          child: GestureDetector(
-            onTap: onTap, // Trigger the callback when tapped
-            child: AbsorbPointer(
-              child: TextField(
-                readOnly: true, // Prevent keyboard input
-                decoration: InputDecoration(
-                  fillColor: BackgroundColor.secondary,
-                  filled: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 20,
-                  ),
-                  hintText: 'What are you looking for?',
-                  labelStyle: const TextStyle(color: Colors.black54),
-                  suffixIcon: Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Icon(
-                      FeatherIcons.search,
-                      size: 30,
+          child: CompositedTransformTarget(
+            link: _layerLink,
+            child: SearchField(
+              controller: _searchController,
+              onTap: () {
+                if (Responsive.isMobile(context) || Responsive.isTablet(context)) {
+                  // Mobile: Chuyển sang SearchScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchMobile(
+                        initialRecentSearches: _recentSearches,
+                        onSearch: (query) {},
+                      ),
                     ),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColor.primary, width: 0.5),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+                  );
+                } else {
+                  // Desktop: Hiển thị dropdown qua SearchWebOverlay
+                  SearchWeb(
+                    context: context,
+                    searchController: _searchController,
+                    recentSearches: _recentSearches,
+                    layerLink: _layerLink,
+                  ).showOverlay();
+                }
+              },
             ),
           ),
         ),
@@ -64,9 +72,7 @@ class SearchWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: IconButton(
-            onPressed: () {
-              // Handle camera action if needed
-            },
+            onPressed: () {},
             icon: const Icon(
               Icons.camera_alt_outlined,
               color: Colors.white,
