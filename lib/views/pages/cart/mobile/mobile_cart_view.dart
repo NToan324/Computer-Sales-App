@@ -1,11 +1,12 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
-import 'package:computer_sales_app/views/pages/cart/mobile/widget/SummaryWidget.dart';
+import 'package:computer_sales_app/views/pages/cart/widget/SummaryWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
-import 'package:computer_sales_app/views/pages/cart/mobile/widget/CartItemWidget.dart';
+import 'package:computer_sales_app/views/pages/cart/mobile/widget/MobileCartItemWidget.dart';
 import 'package:computer_sales_app/models/cart_item.dart';
+import 'package:computer_sales_app/views/pages/cart/cart_view.dart';
 
 class MobileCartView extends StatefulWidget {
   const MobileCartView({super.key});
@@ -15,81 +16,6 @@ class MobileCartView extends StatefulWidget {
 }
 
 class _MobileCartViewState extends State<MobileCartView> {
-  List<CartItem> cartItems = [
-    CartItem(
-      name: 'Item 1',
-      price: 10.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 4,
-    ),
-    CartItem(
-      name: 'Item 2',
-      price: 20.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 1,
-    ),
-    CartItem(
-      name: 'Item 3',
-      price: 30.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 3,
-    ),
-    CartItem(
-      name: 'Item 4',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 5,
-    ),
-    CartItem(
-      name: 'Item 5',
-      price: 50.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 6,
-    ),
-    CartItem(
-      name: 'Item 6',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 6,
-    ),
-    CartItem(
-      name: 'Item 7',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 5,
-    ),
-    CartItem(
-      name: 'Item 8',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 5,
-    ),
-    CartItem(
-      name: 'Item 9',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 5,
-    ),
-    CartItem(
-      name: 'Item 10',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 5,
-    ),
-    CartItem(
-      name: 'Item 11',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 5,
-    ),
-    CartItem(
-      name: 'Item 12',
-      price: 40.0,
-      image: AssetImage('assets/images/laptop_banner.jpg'),
-      quantity: 5,
-    ),
-  ];
-
   int? _itemToRemove;
   int _quantityToRemove = 1;
 
@@ -161,7 +87,7 @@ class _MobileCartViewState extends State<MobileCartView> {
                                 ),
                               ],
                             ),
-                            child: CartItemWidget(
+                            child: MobileCartItemWidget(
                               item: item,
                               onQuantityChanged: (quantity) {
                                 setState(() {
@@ -181,11 +107,16 @@ class _MobileCartViewState extends State<MobileCartView> {
                   ),
                 ],
               ),
-              SummaryWidget(
-                subtotal: subtotal,
-                deliveryFee: deliveryFee,
-                total: total,
-              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: SummaryWidget(
+                  subtotal: subtotal,
+                  deliveryFee: deliveryFee,
+                  total: total,
+                ),
+              )
             ],
           ),
         ),
@@ -201,7 +132,7 @@ class _MobileCartViewState extends State<MobileCartView> {
             left: 0.0,
             right: 0.0,
             child: Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(top: 16.0),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -229,7 +160,7 @@ class _MobileCartViewState extends State<MobileCartView> {
                     thickness: 1,
                   ),
                   const SizedBox(height: 5),
-                  CartItemWidget(
+                  MobileCartItemWidget(
                     item: cartItems[_itemToRemove!],
                     onQuantityChanged: (newQuantity) {
                       setState(() {
@@ -239,36 +170,45 @@ class _MobileCartViewState extends State<MobileCartView> {
                     maxQuantity: cartItems[_itemToRemove!].quantity,
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SizedBox(
-                        width: 150,
-                        child: ElevatedButton(
-                          onPressed: _cancelRemoveItem,
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(
-                                BackgroundColor.grayBlue),
-                          ),
-                          child: const Text(
-                            'Cancel',
-                            style: TextStyle(color: AppColor.black),
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 10,
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            width: 150,
+                            child: ElevatedButton(
+                              onPressed: _cancelRemoveItem,
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(
+                                    BackgroundColor.grayBlue),
+                              ),
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(color: AppColor.black),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 150,
-                        child: ElevatedButton(
-                          onPressed: _removeItem,
-                          style: ButtonStyle(
-                            backgroundColor:
-                                WidgetStateProperty.all(AppColor.primary),
+                        Expanded(
+                          child: SizedBox(
+                            width: 150,
+                            child: ElevatedButton(
+                              onPressed: _removeItem,
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    WidgetStateProperty.all(AppColor.primary),
+                              ),
+                              child: const Text('Yes, Remove',
+                                  style: TextStyle(color: AppColor.white)),
+                            ),
                           ),
-                          child: const Text('Yes, Remove',
-                              style: TextStyle(color: AppColor.white)),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),

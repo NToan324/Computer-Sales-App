@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/utils/widget/Button.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
 
 class SummaryWidget extends StatefulWidget {
   final double subtotal;
@@ -35,20 +36,25 @@ class _SummaryWidgetState extends State<SummaryWidget> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: FontSizes.medium,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: FontSizes.medium,
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
-          Text(
-            '\$${amount.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: FontSizes.medium,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+          const Spacer(),
+          Expanded(
+            child: Text(
+              '\$${amount.toStringAsFixed(2)}',
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: FontSizes.medium,
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
         ],
@@ -58,25 +64,33 @@ class _SummaryWidgetState extends State<SummaryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
       child: Container(
         padding: const EdgeInsets.all(16.0),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
+            topLeft: const Radius.circular(10),
+            topRight: const Radius.circular(10),
+            bottomLeft: Responsive.isMobile(context)
+                ? const Radius.circular(0)
+                : const Radius.circular(10),
+            bottomRight: Responsive.isMobile(context)
+                ? const Radius.circular(0)
+                : const Radius.circular(10),
           ),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: AppColor.black,
-              offset: Offset(0, 5),
-              blurRadius: 20.0,
-            ),
-          ],
+          color: Responsive.isMobile(context)
+              ? AppColor.white
+              : AppColor.lightgrey,
+          boxShadow: Responsive.isMobile(context)
+              ? [
+                  BoxShadow(
+                    color: AppColor.black,
+                    offset: Offset(0, 5),
+                    blurRadius: 20.0,
+                  ),
+                ]
+              : [],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -117,13 +131,25 @@ class _SummaryWidgetState extends State<SummaryWidget> {
             _buildSummaryRow('Total', widget.total, isTotal: true),
             const SizedBox(height: 10),
             SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: Button(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.07,
+              child: ElevatedButton(
                 onPressed: () {
                   // Checkout
                 },
-                text: 'Proceed to checkout',
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(AppColor.primary),
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Proceed to checkout',
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      color: AppColor.white,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

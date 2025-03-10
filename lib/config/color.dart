@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
 class AppColor {
   static const Color primary = Color(0xFFFF8108);
   static const Color secondary = Color.fromARGB(255, 237, 50, 50);
@@ -11,6 +13,8 @@ class AppColor {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color pink = Color(0xFFf8c1a0);
+  static const Color grey = Colors.grey;
+  static const Color lightgrey = Color.fromARGB(255, 243, 242, 249);
 }
 
 class BackgroundColor {
