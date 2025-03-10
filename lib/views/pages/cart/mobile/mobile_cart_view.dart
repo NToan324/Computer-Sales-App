@@ -1,6 +1,6 @@
+import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:computer_sales_app/consts/app_colors.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBar.dart';
 import 'package:computer_sales_app/utils/widget/button.dart';
 
@@ -164,14 +164,27 @@ class _MobileCartViewState extends State<MobileCartView> {
                             endActionPane: ActionPane(
                               motion: const ScrollMotion(),
                               children: [
-                                SlidableAction(
+                                CustomSlidableAction(
+                                  borderRadius: BorderRadius.circular(16),
                                   onPressed: (context) {
                                     _confirmRemoveItem(index);
                                   },
-                                  label: 'Delete',
                                   backgroundColor: AppColors.pink,
-                                  foregroundColor: AppColors.red,
-                                  icon: Icons.delete,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(
+                                        Icons.delete_outline,
+                                        color: AppColors.red,
+                                        size: 28,
+                                      ),
+                                      Text(
+                                        'Remove',
+                                        style: TextStyle(
+                                            color: AppColors.red, fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -295,9 +308,7 @@ class _MobileCartViewState extends State<MobileCartView> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
                       color: AppColors.black,
-                      decoration: TextDecoration.none,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -453,21 +464,13 @@ class _QuantitySelectorState extends State<QuantitySelector> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: AppColors.gray,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-            child: IconButton(
-              icon: const Icon(Icons.remove, size: 16),
-              onPressed: _decrementQuantity,
-              padding: EdgeInsets.zero,
-              color: AppColors.black,
-              constraints: const BoxConstraints(),
-            ),
+        Center(
+          child: IconButton(
+            icon: const Icon(Icons.remove, size: 20),
+            onPressed: _decrementQuantity,
+            padding: EdgeInsets.zero,
+            color: AppColors.black,
+            constraints: const BoxConstraints(),
           ),
         ),
         Padding(
@@ -477,28 +480,17 @@ class _QuantitySelectorState extends State<QuantitySelector> {
             style: const TextStyle(
               fontSize: 20,
               fontFamily: "Poppins",
-              fontWeight: FontWeight.normal,
               color: AppColors.black,
-              decoration: TextDecoration.none,
             ),
           ),
         ),
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          alignment: Alignment.center,
-          child: Center(
-            child: IconButton(
-              icon: const Icon(Icons.add, size: 16),
-              onPressed: _incrementQuantity,
-              color: AppColors.white,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
+        Center(
+          child: IconButton(
+            icon: const Icon(Icons.add, size: 20),
+            onPressed: _incrementQuantity,
+            color: AppColors.black,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
           ),
         ),
       ],
@@ -538,30 +530,27 @@ class CartItemWidget extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 20),
             Column(
               spacing: 10,
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   item.name,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    fontFamily: "Poppins",
                     color: AppColors.black,
-                    decoration: TextDecoration.none,
                   ),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   '\$${item.price.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Poppins",
+                    fontSize: 18,
                     color: AppColors.black,
-                    decoration: TextDecoration.none,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

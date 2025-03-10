@@ -43,21 +43,21 @@ class ProductView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: 150, maxHeight: 350),
-                child: Container(
-                  width: double.infinity,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color.fromARGB(255, 238, 238, 238),
+            ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 150, maxHeight: 350),
+              child: Container(
+                width: double.infinity,
+                height: 180,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
                   ),
-                  child: Image.asset(
-                    'assets/images/laptop.png',
-                    fit: BoxFit.contain,
-                  ),
+                  color: const Color.fromARGB(255, 238, 238, 238),
+                ),
+                child: Image.asset(
+                  'assets/images/laptop.png',
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
@@ -81,28 +81,28 @@ class ProductView extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: AppColor.orangePastel,
+                          color: AppColors.orangePastel,
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
                           'Ram 8GB',
                           style: TextStyle(
                             fontSize: FontSizes.small,
-                            color: AppColor.primary,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
                       Container(
                         padding: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: AppColor.orangePastel,
+                          color: AppColors.orangePastel,
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
                           'SSD 512GB',
                           style: TextStyle(
                             fontSize: FontSizes.small,
-                            color: AppColor.primary,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -112,7 +112,7 @@ class ProductView extends StatelessWidget {
                     '13,000,000 VND',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: AppColor.secondary,
+                        color: AppColors.secondary,
                         fontSize: FontSizes.medium),
                   ),
                   Wrap(

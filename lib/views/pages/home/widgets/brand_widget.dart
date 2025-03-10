@@ -56,7 +56,7 @@ class _BrandWidgetState extends State<BrandWidget> {
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   decoration: BoxDecoration(
                     color: isSelectedList[index]
-                        ? AppColor.orangePastel
+                        ? AppColors.orangePastel
                         : Colors.white,
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -65,7 +65,7 @@ class _BrandWidgetState extends State<BrandWidget> {
                       brands[index],
                       style: TextStyle(
                           color: isSelectedList[index]
-                              ? AppColor.primary
+                              ? AppColors.primary
                               : Colors.black,
                           fontWeight: FontWeight.w600),
                     ),

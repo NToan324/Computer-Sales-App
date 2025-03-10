@@ -23,7 +23,7 @@ class LocationWidget extends StatelessWidget {
             children: [
               Icon(
                 Icons.location_on_rounded,
-                color: AppColor.secondary,
+                color: AppColors.secondary,
                 size: IconSize.large,
               ),
               Text(
