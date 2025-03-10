@@ -75,6 +75,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/icons/brand/
+    - assets/icons/navbar/
     - assets/fonts/
     - assets/lotties/
     - .env

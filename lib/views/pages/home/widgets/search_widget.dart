@@ -1,24 +1,27 @@
-import 'package:computer_sales_app/config/color.dart';
-import 'package:feather_icons/feather_icons.dart';
+import 'package:computer_sales_app/views/pages/search/mobile/search_mobile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/pages/search/widget.dart/search_field.dart';
+import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/views/pages/search/web/search_web_view.dart'; // Import overlay mới
 
 class SearchWidget extends StatefulWidget {
-  const SearchWidget({
-    super.key,
-  });
+  const SearchWidget({super.key});
 
   @override
-  State<SearchWidget> createState() => _SearchWidgetState();
+  _SearchWidgetState createState() => _SearchWidgetState();
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  TextEditingController searchController = TextEditingController();
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
+  final TextEditingController _searchController = TextEditingController();
+  final LayerLink _layerLink = LayerLink();
+  final List<String> _recentSearches = [
+    "Laptop gaming",
+    "Chuột không dây",
+    "Bàn phím cơ",
+    "Màn hình 4K",
+    "Tai nghe bluetooth"
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -28,37 +31,40 @@ class _SearchWidgetState extends State<SearchWidget> {
           : MainAxisAlignment.spaceBetween,
       children: [
         SizedBox(
-          child: SizedBox(
-            width: Responsive.isDesktop(context)
-                ? 400
-                : MediaQuery.of(context).size.width * 0.75,
-            child: TextField(
-              controller: searchController,
-              onSubmitted: (value) => {},
-              decoration: InputDecoration(
-                fillColor: Colors.orange,
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                hintText: 'What are you looking for?',
-                labelStyle: TextStyle(color: Colors.black54),
-                suffixIcon: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Icon(
-                    FeatherIcons.search,
-                    size: 30,
-                  ),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primary, width: 0.5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+          width: Responsive.isDesktop(context)
+              ? 400
+              : MediaQuery.of(context).size.width * 0.75,
+          child: CompositedTransformTarget(
+            link: _layerLink,
+            child: SearchField(
+              controller: _searchController,
+              onTap: () {
+                if (Responsive.isMobile(context) ||
+                    Responsive.isTablet(context)) {
+                  // Mobile: Chuyển sang SearchScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchMobile(
+                        initialRecentSearches: _recentSearches,
+                        onSearch: (query) {},
+                      ),
+                    ),
+                  );
+                } else {
+                  // Desktop: Hiển thị dropdown qua SearchWebOverlay
+                  SearchWeb(
+                    context: context,
+                    searchController: _searchController,
+                    recentSearches: _recentSearches,
+                    layerLink: _layerLink,
+                  ).showOverlay();
+                }
+              },
             ),
           ),
         ),
+        const SizedBox(width: 10),
         Container(
           width: 50,
           height: 50,
@@ -68,7 +74,7 @@ class _SearchWidgetState extends State<SearchWidget> {
           ),
           child: IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.camera_alt_outlined,
               color: Colors.white,
             ),
