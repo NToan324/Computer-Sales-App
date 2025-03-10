@@ -9,6 +9,7 @@ class SearchField extends StatelessWidget {
   final Function(String)? onSubmitted;
   final VoidCallback? onTap;
   final bool autofocus;
+  final bool readOnly;
 
   const SearchField({
     Key? key,
@@ -17,6 +18,7 @@ class SearchField extends StatelessWidget {
     this.onSubmitted,
     this.onTap,
     this.autofocus = false,
+    this.readOnly = false,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class SearchField extends StatelessWidget {
         controller: controller,
         autofocus: autofocus,
         onTap: onTap,
-        readOnly: !Responsive.isDesktop(context),
+        readOnly: !readOnly && !Responsive.isDesktop(context),
         decoration: InputDecoration(
             fillColor: BackgroundColor.secondary,
             filled: true,

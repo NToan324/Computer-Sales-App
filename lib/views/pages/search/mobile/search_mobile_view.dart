@@ -69,6 +69,7 @@ class _SearchMobileState extends State<SearchMobile> {
         ),
         title: SearchField(
           autofocus: true,
+          readOnly: true,
           controller: _searchController,
           onSubmitted: (query) {
             _addRecentSearch(query);
