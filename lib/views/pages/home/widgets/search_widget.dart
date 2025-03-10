@@ -52,7 +52,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColor.primary, width: 0.5),
+                  borderSide: BorderSide(color: AppColors.primary, width: 0.5),
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -63,7 +63,7 @@ class _SearchWidgetState extends State<SearchWidget> {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: AppColor.primary,
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(10),
           ),
           child: IconButton(

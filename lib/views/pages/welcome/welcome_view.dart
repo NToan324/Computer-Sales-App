@@ -1,7 +1,7 @@
+import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/welcome/widget/sample_image_widget.dart';
 import 'package:computer_sales_app/utils/widget/button.dart';
-import 'package:computer_sales_app/consts/app_colors.dart';
 
 void main() {
   runApp(const WelcomeView());

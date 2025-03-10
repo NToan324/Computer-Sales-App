@@ -63,7 +63,7 @@ class _CarouselSliderCustomState extends State<CarouselSliderCustom> {
           activeIndex: activeIndex,
           count: items.length,
           effect: SwapEffect(
-            activeDotColor: AppColor.primary,
+            activeDotColor: AppColors.primary,
             dotHeight: 7,
             dotWidth: 7,
           ),

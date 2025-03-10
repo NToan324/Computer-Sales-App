@@ -1,3 +1,5 @@
+import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:computer_sales_app/views/pages/home/home_view.dart';
 import 'package:flutter/material.dart';
 
 class SplashImageViewWidget extends StatelessWidget {
@@ -7,8 +9,13 @@ class SplashImageViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Image.asset("assets/icons/icon_splash.png"),
+    return AnimatedSplashScreen(
+      duration: 1500,
+      splash: 'assets/images/accessories.png',
+      splashIconSize: 300,
+      nextScreen: HomeView(),
+      splashTransition: SplashTransition.fadeTransition,
+      backgroundColor: Colors.white,
     );
   }
 }
