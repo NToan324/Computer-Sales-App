@@ -29,7 +29,7 @@ class AppColors {
   static const Color amber = Color.fromARGB(255, 255, 191, 0);
   static const Color lightBlue = Color.fromARGB(255, 173, 216, 230);
   static const Color deepPurple = Color.fromARGB(255, 75, 0, 130);
-  static const Color gray = Color.fromARGB(255, 217, 217, 217);
+  static const Color gray = Color.fromARGB(43, 217, 217, 217);
 }
 
 class BackgroundColor {
