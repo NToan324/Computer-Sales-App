@@ -3,16 +3,18 @@ import 'dart:ui';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBarMobile extends StatelessWidget
+    implements PreferredSizeWidget {
   final String title;
 
-  const CustomAppBar({super.key, required this.title});
+  const CustomAppBarMobile({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.white,
+      scrolledUnderElevation: 0,
       // flexibleSpace: ClipRRect(
       //   child: BackdropFilter(
       //     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),

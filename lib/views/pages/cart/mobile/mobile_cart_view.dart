@@ -1,11 +1,12 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/models/item_cart.dart';
 import 'package:computer_sales_app/views/pages/cart/widgets/cart_item_widget.dart';
+import 'package:computer_sales_app/views/pages/cart/widgets/empty_cart_widget.dart';
 import 'package:computer_sales_app/views/pages/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/cart/widgets/remove_cart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:computer_sales_app/utils/widget/CustomAppBar.dart';
+import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 
 class MobileCartView extends StatefulWidget {
   const MobileCartView({super.key});
@@ -125,7 +126,7 @@ class _MobileCartViewState extends State<MobileCartView> {
     return Stack(
       children: <Widget>[
         Scaffold(
-          appBar: const CustomAppBar(
+          appBar: const CustomAppBarMobile(
             title: "Cart",
           ),
           body: Container(
