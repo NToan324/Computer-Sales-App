@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:ui';
+
 import 'package:computer_sales_app/config/color.dart';
-import 'package:computer_sales_app/config/font.dart';
+import 'package:flutter/material.dart';
 
 class CustomAppBarMobile extends StatelessWidget
     implements PreferredSizeWidget {
@@ -11,19 +12,32 @@ class CustomAppBarMobile extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      elevation: 0,
+      backgroundColor: Colors.white,
+      scrolledUnderElevation: 0,
+      // flexibleSpace: ClipRRect(
+      //   child: BackdropFilter(
+      //     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+      //     child: Container(
+      //       color: Colors.transparent,
+      //     ),
+      //   ),
+      // ),
       title: Text(
         title,
         style: const TextStyle(
-            fontSize: FontSizes.large, fontWeight: FontWeight.bold),
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
       ),
       leading: BackButton(
+        color: Colors.black,
         onPressed: () {
           Navigator.pop(context);
         },
       ),
       centerTitle: true,
-      backgroundColor: BackgroundColor.secondary,
-      forceMaterialTransparency: true,
     );
   }
 

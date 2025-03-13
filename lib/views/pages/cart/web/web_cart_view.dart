@@ -5,6 +5,7 @@ import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/views/pages/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/cart/cart_view.dart';
 import 'package:computer_sales_app/views/pages/cart/web/widget/WebCartItemWidget.dart';
+import 'package:computer_sales_app/views/pages/cart/widgets/empty_cart_widget.dart';
 
 class WebCartView extends StatefulWidget {
   const WebCartView({super.key});
@@ -110,28 +111,30 @@ class _WebCartViewState extends State<WebCartView> {
                     ),
                     SizedBox(height: 16.0),
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: cartItems.length,
-                        itemBuilder: (context, index) {
-                          final item = cartItems[index];
+                      child: cartItems.isEmpty
+                          ? EmptyCartView()
+                          : ListView.builder(
+                              itemCount: cartItems.length,
+                              itemBuilder: (context, index) {
+                                final item = cartItems[index];
 
-                          return WebCartItemWidget(
-                              item: item,
-                              onQuantityChanged: (quantity) {
-                                setState(() {
-                                  cartItems[index] = CartItem(
-                                    name: item.name,
-                                    price: item.price,
-                                    image: item.image,
-                                    quantity: quantity,
-                                  );
-                                });
+                                return WebCartItemWidget(
+                                    item: item,
+                                    onQuantityChanged: (quantity) {
+                                      setState(() {
+                                        cartItems[index] = CartItem(
+                                          name: item.name,
+                                          price: item.price,
+                                          image: item.image,
+                                          quantity: quantity,
+                                        );
+                                      });
+                                    },
+                                    onRemove: () {
+                                      removeItem(index);
+                                    });
                               },
-                              onRemove: () {
-                                removeItem(index);
-                              });
-                        },
-                      ),
+                            ),
                     ),
                   ],
                 ),
