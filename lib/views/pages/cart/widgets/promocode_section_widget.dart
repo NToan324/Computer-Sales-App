@@ -1,5 +1,4 @@
 import 'package:computer_sales_app/config/color.dart';
-import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/item_cart.dart';
 import 'package:flutter/material.dart';

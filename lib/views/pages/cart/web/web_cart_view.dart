@@ -87,7 +87,7 @@ class _WebCartViewState extends State<WebCartView> {
                     SizedBox(height: 16.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      spacing: 80,
+                      spacing: 50,
                       children: [
                         Expanded(
                           flex: 2,
