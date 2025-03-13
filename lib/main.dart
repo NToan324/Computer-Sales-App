@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         'change-password': (context) => CreateNewPasswordView(),
         //Home
         'home': (context) => const HomeView(),
-        'product-details': (context) => const ProductDetailsView(),
+        'product-details': (context) => ProductDetailsView(),
         'search-product': (context) =>
             SearchProductScreen(onSearch: (query) {}),
         //Search

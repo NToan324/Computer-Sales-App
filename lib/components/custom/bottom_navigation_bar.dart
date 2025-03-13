@@ -47,7 +47,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       child: IconButton(
         icon: Icon(
           iconData,
-          size: 25,
+          size: 28,
         ),
         color: currentIndex == index ? AppColors.white : Colors.black,
         onPressed: () {

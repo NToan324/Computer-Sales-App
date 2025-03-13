@@ -1,5 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
+import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
@@ -109,7 +110,7 @@ class ProductView extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    '13,000,000 VND',
+                    formatMoney(5000000),
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.secondary,

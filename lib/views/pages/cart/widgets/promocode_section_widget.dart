@@ -48,14 +48,14 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
           Text(
             label,
             style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: isTotal ? FontWeight.bold : FontWeight.w300,
                 color: Colors.black),
           ),
           Text(
             formatMoney(amount),
             style: TextStyle(
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
                 color: Colors.black),
           ),
@@ -70,16 +70,6 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Apply Coupon',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(
-          height: 15,
-        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           spacing: 15,
@@ -127,16 +117,6 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
           ],
         ),
         SizedBox(height: 20),
-        Text(
-          'Payment Details',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(
-          height: 15,
-        ),
         _buildSummaryRow('Subtotal', subtotal),
         _buildSummaryRow('Delivery Fee', deliveryFee),
         _buildSummaryRow('Discount', -discount),
