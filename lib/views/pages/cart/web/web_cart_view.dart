@@ -1,8 +1,8 @@
-import 'package:computer_sales_app/models/cart_item.dart';
+import 'package:computer_sales_app/models/item_cart.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
-import 'package:computer_sales_app/views/pages/cart/widget/SummaryWidget.dart';
+import 'package:computer_sales_app/views/pages/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/cart/cart_view.dart';
 import 'package:computer_sales_app/views/pages/cart/web/widget/WebCartItemWidget.dart';
 
@@ -14,13 +14,6 @@ class WebCartView extends StatefulWidget {
 }
 
 class _WebCartViewState extends State<WebCartView> {
-  double get subtotal =>
-      cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
-
-  double get deliveryFee => 5.0;
-
-  double get total => subtotal + deliveryFee;
-
   void clearAll() {
     setState(() {
       cartItems.clear();
@@ -38,7 +31,7 @@ class _WebCartViewState extends State<WebCartView> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Cart"),
-        backgroundColor: AppColor.primary,
+        backgroundColor: AppColors.primary,
       ),
       resizeToAvoidBottomInset: false,
       body: SizedBox(
@@ -54,7 +47,7 @@ class _WebCartViewState extends State<WebCartView> {
                 // Container for Cart
                 margin: EdgeInsets.only(top: 50, bottom: 50),
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColor.grey, width: 0.5),
+                  border: Border.all(color: AppColors.grey, width: 0.5),
                   borderRadius: BorderRadius.circular(16.0),
                 ),
                 child: Column(
@@ -81,12 +74,12 @@ class _WebCartViewState extends State<WebCartView> {
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           icon: Icon(
                             Icons.close,
-                            color: AppColor.secondary,
+                            color: AppColors.secondary,
                             weight: 700,
                           ),
                           style: ButtonStyle(
                             foregroundColor:
-                                WidgetStateProperty.all(AppColor.secondary),
+                                WidgetStateProperty.all(AppColors.secondary),
                           ),
                         )
                       ],
@@ -94,6 +87,7 @@ class _WebCartViewState extends State<WebCartView> {
                     SizedBox(height: 16.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 80,
                       children: [
                         Expanded(
                           flex: 2,
@@ -150,12 +144,7 @@ class _WebCartViewState extends State<WebCartView> {
                   Expanded(
                     child: Container(
                       margin: EdgeInsets.only(top: 50),
-                      child: SummaryWidget(
-                        // Summary Widget
-                        subtotal: subtotal,
-                        deliveryFee: deliveryFee,
-                        total: total,
-                      ),
+                      child: PromocodeSectionWidget(cartItems: cartItems),
                     ),
                   ),
                 ],

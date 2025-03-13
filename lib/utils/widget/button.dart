@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/font.dart';
 
 class Button extends StatelessWidget {
@@ -12,7 +12,7 @@ class Button extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(AppColor.primary),
+        backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary),
       ),
       onPressed: () {
         onPressed();
@@ -20,7 +20,7 @@ class Button extends StatelessWidget {
       child: Text(
         text,
         style:
-            const TextStyle(color: AppColor.white, fontSize: FontSizes.medium),
+            const TextStyle(color: AppColors.white, fontSize: FontSizes.medium),
       ),
     );
   }

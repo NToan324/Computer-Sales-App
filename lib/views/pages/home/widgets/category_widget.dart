@@ -86,7 +86,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
             //     isSeeAll ? 'See less' : 'See all',
             //     style: TextStyle(
             //         fontSize: FontSizes.medium,
-            //         color: AppColor.primary,
+            //         color: AppColors.primary,
             //         fontWeight: FontWeight.w500),
             //   ),
             // ),
@@ -196,7 +196,7 @@ class _ListCategoryWidgetState extends State<ListCategoryWidget> {
         ),
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColor.orangePastel,
+        backgroundColor: AppColors.orangePastel,
         overlayColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0,
@@ -212,14 +212,15 @@ class _ListCategoryWidgetState extends State<ListCategoryWidget> {
         children: [
           SvgPicture.asset(
             widget.icon,
-            colorFilter: ColorFilter.mode(AppColor.primary, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
             width: 30,
           ),
           Text(
             widget.text,
             style: TextStyle(
               fontWeight: FontWeight.w500,
-              color: widget.isHoverButton ? AppColor.primary : AppColor.primary,
+              color:
+                  widget.isHoverButton ? AppColors.primary : AppColors.primary,
             ),
           ),
         ],
@@ -279,7 +280,7 @@ class ProductCardWidget extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColor.primary),
+                        backgroundColor: AppColors.primary),
                     child: Text(
                       'Buy now',
                       style: TextStyle(color: Colors.white),

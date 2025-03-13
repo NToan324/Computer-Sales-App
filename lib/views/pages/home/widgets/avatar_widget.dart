@@ -24,7 +24,7 @@ class AvatarWidget extends StatelessWidget {
                 },
                 icon: Icon(
                   FeatherIcons.shoppingCart,
-                  color: AppColor.primary,
+                  color: AppColors.primary,
                   size: 30,
                 ),
               ),
@@ -32,7 +32,7 @@ class AvatarWidget extends StatelessWidget {
               //   width: Responsive.isDesktop(context) ? 50 : 40,
               //   height: Responsive.isDesktop(context) ? 50 : 40,
               //   decoration: BoxDecoration(
-              //       color: AppColor.primary, shape: BoxShape.circle),
+              //       color: AppColors.primary, shape: BoxShape.circle),
               //   child: IconButton(
               //     onPressed: () {},
               //     icon: Icon(

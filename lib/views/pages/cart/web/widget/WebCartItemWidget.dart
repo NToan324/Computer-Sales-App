@@ -1,8 +1,9 @@
+import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
-import 'package:computer_sales_app/models/cart_item.dart';
-import 'package:computer_sales_app/views/pages/cart/widget/QuantitySelectorWidget.dart';
+import 'package:computer_sales_app/models/item_cart.dart';
+import 'package:computer_sales_app/views/pages/cart/widgets/quantity_widget.dart';
 
 class WebCartItemWidget extends StatelessWidget {
   final CartItem item;
@@ -38,7 +39,7 @@ class WebCartItemWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       image: DecorationImage(
-                        image: item.image,
+                        image: AssetImage(item.image),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -52,7 +53,7 @@ class WebCartItemWidget extends StatelessWidget {
                           fontSize: FontSizes.medium,
                           fontWeight: FontWeight.bold,
                           fontFamily: "Poppins",
-                          color: AppColor.black,
+                          color: AppColors.black,
                           decoration: TextDecoration.none,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -60,7 +61,7 @@ class WebCartItemWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  QuantitySelectorWidget(
+                  QuantitySelector(
                     initialQuantity: item.quantity,
                     onQuantityChanged: onQuantityChanged,
                     maxQuantity: maxQuantity,
@@ -72,12 +73,12 @@ class WebCartItemWidget extends StatelessWidget {
                       width: 140,
                       child: Center(
                         child: Text(
-                          "\$${item.price}",
+                          formatMoney(item.price),
                           style: const TextStyle(
                             fontSize: FontSizes.medium,
                             fontWeight: FontWeight.bold,
                             fontFamily: "Poppins",
-                            color: AppColor.black,
+                            color: AppColors.black,
                             decoration: TextDecoration.none,
                           ),
                         ),
@@ -88,7 +89,7 @@ class WebCartItemWidget extends StatelessWidget {
                     child: IconButton(
                       icon: const Icon(
                         Icons.close,
-                        color: AppColor.secondary,
+                        color: AppColors.secondary,
                       ),
                       onPressed: () {
                         onRemove();

@@ -1,7 +1,7 @@
+import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/welcome/widget/sample_image_widget.dart';
 import 'package:computer_sales_app/utils/widget/button.dart';
-import 'package:computer_sales_app/config/color.dart';
 
 void main() {
   runApp(const WelcomeView());
@@ -39,7 +39,7 @@ class WelcomeView extends StatelessWidget {
                   child: const Text(
                     "Sign in",
                     style: TextStyle(
-                      color: AppColor.primary,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
