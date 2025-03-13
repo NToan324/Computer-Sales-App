@@ -4,6 +4,7 @@ import 'package:computer_sales_app/views/pages/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/login/verifyotp_view.dart';
 import 'package:computer_sales_app/views/pages/login/login_view.dart';
+import 'package:computer_sales_app/views/pages/notification/notification_view.dart';
 import 'package:computer_sales_app/views/pages/product_details/product_details_view.dart';
 import 'package:computer_sales_app/views/pages/splash/splash_view.dart';
 import 'package:computer_sales_app/views/pages/search/mobile/search_mobile_view.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashView(),
+      home: NotificationView(),
       routes: {
         //Login
         'login': (context) => LoginView(),
