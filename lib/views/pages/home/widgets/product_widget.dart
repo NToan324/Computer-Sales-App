@@ -9,14 +9,16 @@ class ProductListViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverGrid.builder(
+    return GridView.builder(
       itemCount: 10,
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: Responsive.isDesktop(context) ? 6 : 2,
         childAspectRatio: 0.5,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        mainAxisExtent: 400,
+        mainAxisExtent: 350,
       ),
       itemBuilder: (context, index) => ProductView(),
     );

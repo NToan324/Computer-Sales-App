@@ -9,7 +9,7 @@ class DraggableScrollCustom extends StatelessWidget {
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.6,
-      maxChildSize: 1,
+      maxChildSize: 0.8,
       builder: (context, scrollController) {
         return Container(
           padding: EdgeInsets.only(
@@ -20,8 +20,8 @@ class DraggableScrollCustom extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
             ),
           ),
           child: InformationProduct(

@@ -1,5 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
+import 'package:computer_sales_app/config/font.dart';
 
 class Button extends StatelessWidget {
   final String text;
@@ -18,7 +19,8 @@ class Button extends StatelessWidget {
       },
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
+        style:
+            const TextStyle(color: AppColors.white, fontSize: FontSizes.medium),
       ),
     );
   }

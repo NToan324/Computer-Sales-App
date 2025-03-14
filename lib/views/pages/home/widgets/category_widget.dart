@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/models/product_card.dart';
@@ -15,10 +17,10 @@ class _CategoryWidgetState extends State<CategoryWidget> {
   final Map<String, String> categoriesIcon = {
     'All': 'assets/icons/Category00008.svg',
     'Deals': 'assets/icons/Category00001.svg',
-    'Best Seller': 'assets/icons/laptop.svg',
-    'New Arrival': 'assets/icons/laptop.svg',
     'Laptop': 'assets/icons/Category00002.svg',
+    'Best Seller': 'assets/icons/laptop.svg',
     'Desktop': 'assets/icons/Category00003.svg',
+    'New Arrival': 'assets/icons/laptop.svg',
     'Monitor': 'assets/icons/Category00004.svg',
     'Mouse': 'assets/icons/Category00006.svg',
     'Headphone': 'assets/icons/Category00007.svg',
@@ -31,7 +33,8 @@ class _CategoryWidgetState extends State<CategoryWidget> {
       description: 'Laptop mới nhất với hiệu năng vượt trội.',
       price: 10000000,
       discount: 15,
-      imageUrl: 'assets/images/laptop.png', // Đảm bảo đường dẫn ảnh đúng
+      imageUrl:
+          'assets/images/laptop-popular-1.jpg', // Đảm bảo đường dẫn ảnh đúng
       category: 'Laptop', // Danh mục sản phẩm
     ),
     ProductPromotion(
@@ -39,7 +42,8 @@ class _CategoryWidgetState extends State<CategoryWidget> {
       description: 'Máy tính bàn hiệu suất cao dành cho công việc.',
       price: 12000000,
       discount: 10,
-      imageUrl: 'assets/images/laptop.png', // Đảm bảo đường dẫn ảnh đúng
+      imageUrl:
+          'assets/images/laptop-popular-2.jpg', // Đảm bảo đường dẫn ảnh đúng
       category: 'Desktop', // Danh mục sản phẩm
     ),
     ProductPromotion(
@@ -47,7 +51,8 @@ class _CategoryWidgetState extends State<CategoryWidget> {
       description: 'Chuột Logitech dành cho laptop và máy tính bàn.',
       price: 500000,
       discount: 5,
-      imageUrl: 'assets/images/laptop.png', // Đảm bảo đường dẫn ảnh đúng
+      imageUrl:
+          'assets/images/laptop-popular-1.jpg', // Đảm bảo đường dẫn ảnh đúng
       category: 'Accessories', // Danh mục phụ kiện
     ),
     ProductPromotion(
@@ -55,7 +60,8 @@ class _CategoryWidgetState extends State<CategoryWidget> {
       description: 'Màn hình Dell với độ phân giải 4K.',
       price: 8000000,
       discount: 20,
-      imageUrl: 'assets/images/laptop.png', // Đảm bảo đường dẫn ảnh đúng
+      imageUrl:
+          'assets/images/laptop-popular-1.jpg', // Đảm bảo đường dẫn ảnh đúng
       category: 'Accessories', // Danh mục phụ kiện
     ),
   ];
@@ -76,34 +82,34 @@ class _CategoryWidgetState extends State<CategoryWidget> {
               style: TextStyle(
                   fontSize: FontSizes.large, fontWeight: FontWeight.bold),
             ),
-            // GestureDetector(
-            //   onTap: () {
-            //     setState(() {
-            //       isSeeAll = !isSeeAll;
-            //     });
-            //   },
-            //   child: Text(
-            //     isSeeAll ? 'See less' : 'See all',
-            //     style: TextStyle(
-            //         fontSize: FontSizes.medium,
-            //         color: AppColors.primary,
-            //         fontWeight: FontWeight.w500),
-            //   ),
-            // ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  isSeeAll = !isSeeAll;
+                });
+              },
+              child: Text(
+                isSeeAll ? 'See less' : 'See all',
+                style: TextStyle(
+                  color: Colors.black.withAlpha(100),
+                ),
+              ),
+            ),
           ],
         ),
-        SizedBox(
-          height: 60,
-          child: ListView.separated(
-            separatorBuilder: (context, index) => SizedBox(width: 10),
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: categoriesIcon.length,
-            itemBuilder: (context, index) => ListCategoryWidget(
-              isHoverButton: isHoverButton,
-              icon: categoriesIcon.values.elementAt(index),
-              text: categoriesIcon.keys.elementAt(index),
-            ),
+        GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: isSeeAll ? categoriesIcon.length : 4,
+          itemBuilder: (context, index) => ListCategoryWidget(
+            isHoverButton: isHoverButton,
+            icon: categoriesIcon.values.elementAt(index),
+            text: categoriesIcon.keys.elementAt(index),
           ),
         ),
         Text(
@@ -111,56 +117,17 @@ class _CategoryWidgetState extends State<CategoryWidget> {
           style:
               TextStyle(fontSize: FontSizes.large, fontWeight: FontWeight.bold),
         ),
-
-        // GridView.builder(
-        //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        //     crossAxisCount: Responsive.isDesktop(context) ? 10 : 4,
-        //     crossAxisSpacing: 10,
-        //     mainAxisSpacing: 10,
-        //   ),
-        //   shrinkWrap: true,
-        //   physics: NeverScrollableScrollPhysics(),
-        //   itemCount: isSeeAll
-        //       ? categoriesImage.length
-        //       : Responsive.isDesktop(context)
-        //           ? 10
-        //           : 4,
-        //   itemBuilder: (context, index) => Column(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     crossAxisAlignment: CrossAxisAlignment.center,
-        //     children: [
-        //       Container(
-        //         width: Responsive.isDesktop(context) ? 90 : 70,
-        //         height: Responsive.isDesktop(context) ? 90 : 70,
-        //         decoration: BoxDecoration(
-        //           color: BackgroundColor.primary,
-        //           shape: BoxShape.circle,
-        //         ),
-        //         child: Image.asset(
-        //           categoriesImage.values.elementAt(index),
-        //           fit: BoxFit.cover,
-        //           width: 30,
-        //           height: 30,
-        //         ),
-        //       ),
-        //       Text(
-        //         categoriesImage.keys.elementAt(index),
-        //         style: TextStyle(fontSize: FontSizes.small),
-        //         maxLines: 1,
-        //       ),
-        //     ],
-        //   ),
-        // ),
         SizedBox(
-          height: 250,
+          height: 270,
           child: ListView.separated(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) => ProductCardWidget(
-                    productsPromotion: productsPromotion[index],
-                  ),
-              separatorBuilder: (context, index) => SizedBox(width: 20),
-              itemCount: productsPromotion.length),
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) => ProductCardWidget(
+              productsPromotion: productsPromotion[index],
+            ),
+            separatorBuilder: (context, index) => SizedBox(width: 30),
+            itemCount: productsPromotion.length,
+          ),
         )
       ],
     );
@@ -187,44 +154,39 @@ class ListCategoryWidget extends StatefulWidget {
 class _ListCategoryWidgetState extends State<ListCategoryWidget> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onHover: (value) => {
-        setState(
-          () {
-            widget.isHoverButton = value;
-          },
-        ),
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.orangePastel,
-        overlayColor: Colors.white,
-        shadowColor: Colors.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      onPressed: () {},
-      child: Row(
-        spacing: 10,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SvgPicture.asset(
+    return Column(
+      spacing: 10,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color:
+                widget.isHoverButton ? AppColors.orangePastel : AppColors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(40),
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          child: SvgPicture.asset(
             widget.icon,
-            colorFilter: ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(AppColors.black, BlendMode.srcIn),
             width: 30,
           ),
-          Text(
-            widget.text,
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color:
-                  widget.isHoverButton ? AppColors.primary : AppColors.primary,
-            ),
+        ),
+        Text(
+          widget.text,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: widget.isHoverButton ? AppColors.primary : Colors.black,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -239,65 +201,90 @@ class ProductCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: 350,
-        maxWidth: 500,
-      ),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-        height: 250,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          color: BackgroundColor.primary,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 10,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text('${productsPromotion.discount}% off'),
-                  ),
-                  Text(
-                    productsPromotion.name,
-                    style: TextStyle(
-                        fontSize: FontSizes.large, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.visible,
-                  ),
-                  Text('From ${productsPromotion.price}'),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary),
-                    child: Text(
-                      'Buy now',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+    return Stack(
+      children: [
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: 280,
+            maxWidth: 280,
+          ),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            height: 250,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              color: BackgroundColor.primary,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(50),
+                  blurRadius: 10,
+                  offset: Offset(10, 10),
+                ),
+              ],
+              image: DecorationImage(
+                image: AssetImage(productsPromotion.imageUrl),
+                fit: BoxFit.cover,
               ),
             ),
-            Column(
-              children: [
-                Image.asset(productsPromotion.imageUrl,
-                    width: 200, height: 200),
-              ],
-            )
-          ],
+          ),
         ),
-      ),
+        Positioned(
+          bottom: 30,
+          right: 10,
+          left: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(18)),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: 10,
+                sigmaY: 10,
+              ),
+              child: Container(
+                padding: EdgeInsets.all(10),
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(130),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          productsPromotion.name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text('From ${productsPromotion.price}'),
+                        Text('${productsPromotion.discount}% off'),
+                      ],
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 }

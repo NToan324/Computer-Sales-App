@@ -9,16 +9,13 @@ class AppBarOrderCustom extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: Colors.white,
       title: const Text('My Order',
           style: TextStyle(
               color: Colors.black,
               fontSize: FontSizes.large,
               fontWeight: FontWeight.bold)),
       centerTitle: true,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.pop(context),
-      ),
       iconTheme: const IconThemeData(color: Colors.black),
       bottom: TabBar(
         indicatorColor: AppColors.primary,

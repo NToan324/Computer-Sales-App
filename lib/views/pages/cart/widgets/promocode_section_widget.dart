@@ -45,19 +45,24 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: isTotal ? FontWeight.bold : FontWeight.w300,
-                color: Colors.black),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: isTotal ? FontWeight.bold : FontWeight.w300,
+                  color: Colors.black),
+            ),
           ),
-          Text(
-            formatMoney(amount),
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-                color: Colors.black),
+          Expanded(
+            child: Text(
+              formatMoney(amount),
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                  color: Colors.black),
+            ),
           ),
         ],
       ),
@@ -66,83 +71,92 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          spacing: 15,
-          children: [
-            Expanded(
-              flex: 3,
-              child: SizedBox(
-                height: 50,
-                child: TextField(
-                  textAlign: TextAlign.start,
-                  controller: _promoCodeController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter Coupon Code',
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black38, width: 0.5),
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    ),
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black38),
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: SizedBox(
-                height: 50,
-                width: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 15,
+            children: [
+              Expanded(
+                flex: 3,
+                child: SizedBox(
+                  height: 50,
+                  child: TextField(
+                    textAlign: TextAlign.start,
+                    controller: _promoCodeController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Coupon Code',
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.black38, width: 0.5),
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
-                      backgroundColor: AppColors.primary),
-                  onPressed: () {},
-                  child: Text(
-                    'Apply',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black38),
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 20),
-        _buildSummaryRow('Subtotal', subtotal),
-        _buildSummaryRow('Delivery Fee', deliveryFee),
-        _buildSummaryRow('Discount', -discount),
-        const Divider(),
-        _buildSummaryRow('Total Pay', total, isTotal: true),
-        const SizedBox(height: 15),
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: () {
-              // Checkout
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
+              Expanded(
+                flex: 1,
+                child: SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        backgroundColor: AppColors.primary),
+                    onPressed: () {},
+                    child: Text(
+                      'Apply',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                      // overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            child: Text(
-              'Checkout',
-              style: TextStyle(fontSize: 20, color: Colors.white),
+            ],
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          _buildSummaryRow('Subtotal', subtotal),
+          _buildSummaryRow('Delivery Fee', deliveryFee),
+          _buildSummaryRow('Discount', -discount),
+          const Divider(),
+          _buildSummaryRow('Total Pay', total, isTotal: true),
+          const SizedBox(height: 15),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {
+                // Checkout
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
+              child: Text(
+                'Checkout',
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

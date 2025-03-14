@@ -14,6 +14,7 @@ class AppBarHomeCustom extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       titleSpacing: 0,
+      scrolledUnderElevation: 0,
       toolbarHeight: Responsive.isDesktop(context) ? 90 : preferredSize.height,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,

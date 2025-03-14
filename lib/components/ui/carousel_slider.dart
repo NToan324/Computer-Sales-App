@@ -23,7 +23,6 @@ class _CarouselSliderCustomState extends State<CarouselSliderCustom> {
     var items = List.generate(
       widget.imagesUrl.length,
       (index) => Container(
-        margin: EdgeInsets.all(6.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
           image: DecorationImage(

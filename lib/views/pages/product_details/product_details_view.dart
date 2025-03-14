@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 
 class ProductDetailsView extends StatelessWidget {
   List<String> images = [
-    'assets/images/surface.jpeg',
-    'assets/images/surface.jpeg',
-    'assets/images/surface.jpeg',
+    'assets/images/laptop-popular-2.jpg',
+    'assets/images/laptop-mockup.jpg',
+    'assets/images/laptop-popular-2.jpg',
+    'assets/images/laptop-mockup.jpg',
+    'assets/images/laptop-popular-2.jpg',
+    'assets/images/laptop-mockup.jpg',
+    'assets/images/laptop-mockup.jpg',
   ];
   @override
   Widget build(BuildContext context) {
