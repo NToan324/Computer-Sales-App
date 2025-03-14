@@ -1,6 +1,5 @@
-import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/components/custom/cart.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
-import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 
 class AvatarWidget extends StatelessWidget {
@@ -18,29 +17,7 @@ class AvatarWidget extends StatelessWidget {
           Row(
             spacing: 10,
             children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, 'cart');
-                },
-                icon: Icon(
-                  FeatherIcons.shoppingCart,
-                  color: AppColors.primary,
-                  size: 30,
-                ),
-              ),
-              // Container(
-              //   width: Responsive.isDesktop(context) ? 50 : 40,
-              //   height: Responsive.isDesktop(context) ? 50 : 40,
-              //   decoration: BoxDecoration(
-              //       color: AppColors.primary, shape: BoxShape.circle),
-              //   child: IconButton(
-              //     onPressed: () {},
-              //     icon: Icon(
-              //       Icons.notifications_rounded,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // ),
+              CartWidget(),
               CircleAvatar(
                 backgroundImage: AssetImage(
                   'assets/images/avatar.jpeg',

@@ -1,6 +1,3 @@
-import 'dart:ui';
-
-import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBarMobile extends StatelessWidget
@@ -15,14 +12,6 @@ class CustomAppBarMobile extends StatelessWidget
       elevation: 0,
       backgroundColor: Colors.white,
       scrolledUnderElevation: 0,
-      // flexibleSpace: ClipRRect(
-      //   child: BackdropFilter(
-      //     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-      //     child: Container(
-      //       color: Colors.transparent,
-      //     ),
-      //   ),
-      // ),
       title: Text(
         title,
         style: const TextStyle(
@@ -31,12 +20,12 @@ class CustomAppBarMobile extends StatelessWidget
           color: Colors.black,
         ),
       ),
-      leading: BackButton(
-        color: Colors.black,
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
+      // leading: BackButton(
+      //   color: Colors.black,
+      //   onPressed: () {
+      //     Navigator.pop(context);
+      //   },
+      // ),
       centerTitle: true,
     );
   }

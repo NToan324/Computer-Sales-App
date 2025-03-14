@@ -1,5 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
+import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
@@ -8,14 +9,16 @@ class ProductListViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverGrid.builder(
+    return GridView.builder(
       itemCount: 10,
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: Responsive.isDesktop(context) ? 6 : 2,
         childAspectRatio: 0.5,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        mainAxisExtent: 400,
+        mainAxisExtent: 350,
       ),
       itemBuilder: (context, index) => ProductView(),
     );
@@ -109,7 +112,7 @@ class ProductView extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    '13,000,000 VND',
+                    formatMoney(5000000),
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.secondary,

@@ -78,7 +78,7 @@ flutter:
     - assets/icons/brand/
     - assets/icons/navbar/
     - assets/fonts/
-    # - assets/lotties/
+    - assets/lotties/
     - .env
   #   - images/a_dot_ham.jpeg
 

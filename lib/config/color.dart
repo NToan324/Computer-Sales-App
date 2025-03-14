@@ -2,10 +2,12 @@ import 'dart:ui';
 
 class AppColors {
   static const Color primary = Color(0xFFFF8108);
+  static const Color green = Color.fromARGB(255, 51, 149, 51);
+  static const Color greenPastel = Color.fromARGB(255, 212, 244, 177);
+
   static const Color secondary = Color.fromARGB(255, 237, 50, 50);
   static const Color violetPastel = Color.fromARGB(255, 216, 229, 255);
-  static const Color orangePastel = Color.fromARGB(255, 255, 234, 213);
-  static const Color greenPastel = Color(0xFFB1C29E);
+  static const Color orangePastel = Color.fromRGBO(255, 234, 213, 1);
   static const Color yellowPastel = Color(0xFFFCFFC1);
   static const Color bluePastel = Color(0xFFD4EBF8);
   static const Color white = Color.fromARGB(255, 255, 255, 255);
@@ -14,11 +16,9 @@ class AppColors {
   static const Color lightGrey = Color.fromARGB(255, 211, 211, 211);
   static const Color darkGrey = Color.fromARGB(255, 169, 169, 169);
   static const Color red = Color.fromARGB(255, 255, 0, 0);
-  static const Color green = Color.fromARGB(255, 0, 255, 0);
   static const Color blue = Color.fromARGB(255, 0, 0, 255);
   static const Color yellow = Color.fromARGB(255, 255, 255, 0);
   static const Color cyan = Color.fromARGB(255, 0, 255, 255);
-  static const Color magenta = Color.fromARGB(255, 255, 0, 255);
   static const Color orange = Color.fromARGB(255, 255, 165, 0);
   static const Color purple = Color.fromARGB(255, 128, 0, 128);
   static const Color brown = Color.fromARGB(255, 165, 42, 42);

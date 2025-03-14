@@ -40,7 +40,8 @@ class OrderView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
+      color: Colors.white,
       height: MediaQuery.of(context).size.height,
       child: TabBarView(
         children: [

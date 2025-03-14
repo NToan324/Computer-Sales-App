@@ -1,9 +1,10 @@
+import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/views/pages/notification/notification_view.dart';
 import 'package:flutter/material.dart';
-import 'package:computer_sales_app/models/notification.dart' as custom;
+import 'package:computer_sales_app/models/notification.dart';
 
 class NotificationListViewWidget extends StatefulWidget {
-  final List<custom.Notification> notificationList;
+  final List<NotificationModel> notificationList;
 
   const NotificationListViewWidget({super.key, required this.notificationList});
 
@@ -31,29 +32,73 @@ class NotificationListViewWidgetState
       separatorBuilder: (context, index) => const Divider(),
       itemCount: notificationList.length,
       itemBuilder: (context, index) {
-        return Expanded(
-          child: ListTile(
-            leading: notificationList[index].type == 'Order'
-                ? const Icon(Icons.shopping_cart)
-                : notificationList[index].type == 'FlashSale'
-                    ? const Icon(Icons.flash_on)
-                    : notificationList[index].type == 'Shipping'
-                        ? const Icon(Icons.local_shipping)
-                        : notificationList[index].type == 'NewProduct'
-                            ? const Icon(Icons.new_releases)
-                            : const Icon(Icons.discount),
-            title: Text(
-              notificationList[index].title,
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: Text(
-              notificationList[index].description,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 3,
-            ),
-            trailing: notificationList[index].isRead
-                ? const Icon(Icons.check_circle, color: Colors.green)
-                : const Icon(Icons.circle, color: Colors.red),
+        return Container(
+          height: 100,
+          color: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            spacing: 15,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Icon Leading
+              Icon(
+                notificationList[index].type == 'Order'
+                    ? Icons.shopping_cart
+                    : notificationList[index].type == 'FlashSale'
+                        ? Icons.flash_on
+                        : notificationList[index].type == 'Shipping'
+                            ? Icons.local_shipping
+                            : notificationList[index].type == 'NewProduct'
+                                ? Icons.new_releases
+                                : Icons.discount,
+                size: 30,
+              ),
+              Expanded(
+                child: Column(
+                  spacing: 10,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          notificationList[index].title,
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(formatDate(notificationList[index].createAt)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 250,
+                          child: Text(
+                            notificationList[index].description,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ),
+                        Icon(
+                          notificationList[index].isRead
+                              ? Icons.check_circle
+                              : Icons.circle,
+                          color: notificationList[index].isRead
+                              ? Colors.green
+                              : Colors.red,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },

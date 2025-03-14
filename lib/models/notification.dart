@@ -1,14 +1,15 @@
-class Notification {
+class NotificationModel {
   final String type;
   final String title;
   final String description;
   bool isRead;
-  final String date = DateTime.now().toString();
+  final String createAt;
 
-  Notification({
+  NotificationModel({
     required this.type,
     required this.title,
     required this.description,
     required this.isRead,
+    required this.createAt,
   });
 }

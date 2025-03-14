@@ -37,49 +37,42 @@ class _SearchProductWebState extends State<SearchProductWeb> {
         color: Colors.grey[100],
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Column(
+          child: ListView(
+            children: [
+              SearchField(
+                controller: _searchController,
+                autofocus: true,
+                onSubmitted: (query) {
+                  widget.onSearch(query);
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SearchField(
-                      controller: _searchController,
-                      autofocus: true,
-                      onSubmitted: (query) {
-                        widget.onSearch(query);
-                        Navigator.pop(context);
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Result for \"${_searchController.text}\"",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          Text(
-                            "1000 founds",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      "Result for \"${_searchController.text}\"",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    Text(
+                      "1000 founds",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ],
                 ),
               ),
-
-              ProductListViewWidget(), // Nếu nó sử dụng SliverGrid, đặt vào đây
+              const SizedBox(height: 10),
+              ProductListViewWidget(),
             ],
           ),
         ),

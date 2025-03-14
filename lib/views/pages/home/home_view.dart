@@ -12,28 +12,23 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.grey[100],
+      color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Column(
-                spacing: 20,
-                children: [
-                  Responsive.isTablet(context) || Responsive.isMobile(context)
-                      ? SearchWidget()
-                      : SizedBox(),
-                  BannerWidget(),
-                  CategoryWidget(),
-                  BrandWidget(),
-                ],
-              ),
+        padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+        child: ListView(
+          children: [
+            Column(
+              spacing: 15,
+              children: [
+                Responsive.isTablet(context) || Responsive.isMobile(context)
+                    ? SearchWidget()
+                    : SizedBox(),
+                BannerWidget(),
+                CategoryWidget(),
+                BrandWidget(),
+                ProductListViewWidget(),
+              ],
             ),
-            SliverToBoxAdapter(
-              child: SizedBox(height: 20),
-            ),
-            ProductListViewWidget(),
           ],
         ),
       ),
