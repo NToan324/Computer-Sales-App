@@ -23,11 +23,11 @@ class EmptyCartView extends StatelessWidget {
           SizedBox(height: 16.0),
           ElevatedButton(
             onPressed: () {},
-            child: Text("Go back to shopping"),
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(AppColors.primary),
               foregroundColor: WidgetStateProperty.all(Colors.white),
             ),
+            child: Text("Go back to shopping"),
           )
         ],
       ),

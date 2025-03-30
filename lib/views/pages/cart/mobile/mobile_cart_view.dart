@@ -1,7 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/models/item_cart.dart';
 import 'package:computer_sales_app/views/pages/cart/widgets/cart_item_widget.dart';
-import 'package:computer_sales_app/views/pages/cart/widgets/empty_cart_widget.dart';
 import 'package:computer_sales_app/views/pages/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/cart/widgets/remove_cart_widget.dart';
 import 'package:flutter/material.dart';
