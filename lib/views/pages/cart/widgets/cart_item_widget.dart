@@ -1,4 +1,3 @@
-import 'package:computer_sales_app/components/custom/checkbox_custom.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/item_cart.dart';
