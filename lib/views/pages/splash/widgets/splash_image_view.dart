@@ -11,7 +11,7 @@ class SplashImageViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
-      duration: 3600,
+      duration: 500,
       splash: Lottie.asset('assets/lotties/splash.json'),
       splashIconSize: 300,
       nextScreen: BottomNavigationBarCustom(),
