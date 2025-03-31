@@ -76,13 +76,17 @@ class NotificationListViewWidgetState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: 250,
-                          child: Text(
-                            notificationList[index].description,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            style: TextStyle(color: Colors.grey[600]),
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 800,
+                            ),
+                            child: Text(
+                              notificationList[index].description,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 3,
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
                           ),
                         ),
                         Icon(

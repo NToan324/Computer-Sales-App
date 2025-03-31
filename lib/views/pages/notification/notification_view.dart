@@ -181,32 +181,35 @@ class _NotificationViewState extends State<NotificationView> {
             width: Responsive.isMobile(context) ? 0 : 50,
           ),
           // Sidebar
-          Container(
-            width: Responsive.isMobile(context) ? 0 : 250,
-            height: Responsive.isMobile(context) ? 0 : 500,
-            color: AppColors.primary,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Sidebar",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+          if (!Responsive.isMobile(context))
+            Expanded(
+              child: Container(
+                width: Responsive.isMobile(context) ? 0 : 250,
+                height: Responsive.isMobile(context) ? 0 : 500,
+                color: AppColors.primary,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Sidebar",
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("Menu Item 1"),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("Menu Item 2"),
+                    ),
+                  ],
                 ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text("Menu Item 1"),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text("Menu Item 2"),
-                ),
-              ],
+              ),
             ),
-          ),
 
           SizedBox(
             width: Responsive.isMobile(context)
@@ -214,48 +217,51 @@ class _NotificationViewState extends State<NotificationView> {
                 : 100, // Khoảng cách giữa sidebar và nội dung chính
           ),
           // Notification Container
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: Responsive.isMobile(context)
+          Expanded(
+            flex: 4,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: Responsive.isMobile(context)
+                      ? null
+                      : BorderRadius.circular(10),
+                  border: Responsive.isMobile(context)
+                      ? null
+                      : Border.all(color: AppColors.grey),
+                ),
+                width: Responsive.isMobile(context) ? double.infinity : 1000,
+                height: Responsive.isMobile(context) ? double.infinity : 500,
+                margin: Responsive.isMobile(context)
                     ? null
-                    : BorderRadius.circular(10),
-                border: Responsive.isMobile(context)
-                    ? null
-                    : Border.all(color: AppColors.grey),
-              ),
-              width: Responsive.isMobile(context) ? double.infinity : 1000,
-              height: Responsive.isMobile(context) ? double.infinity : 500,
-              margin: Responsive.isMobile(context)
-                  ? null
-                  : const EdgeInsets.only(top: 50, bottom: 50, right: 50),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        notificationListKey.currentState?.markAllAsRead();
-                      },
-                      child: Text(
-                        "Mark all as read",
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppColors.black,
-                          fontWeight: FontWeight.bold,
+                    : const EdgeInsets.only(top: 50, bottom: 50, right: 50),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          notificationListKey.currentState?.markAllAsRead();
+                        },
+                        child: Text(
+                          "Mark all as read",
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppColors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: NotificationListViewWidget(
-                      key: notificationListKey,
-                      notificationList: notificationList,
+                    Expanded(
+                      child: NotificationListViewWidget(
+                        key: notificationListKey,
+                        notificationList: notificationList,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
