@@ -44,10 +44,10 @@ class _RemoveCartWidgetState extends State<RemoveCartWidget> {
             const Text(
               'Remove from cart?',
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-              ),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                  decoration: TextDecoration.none),
             ),
             const SizedBox(height: 10),
             const Divider(
@@ -64,6 +64,7 @@ class _RemoveCartWidgetState extends State<RemoveCartWidget> {
                 });
               },
               maxQuantity: widget.cartItems[widget.itemToRemove!].quantity,
+              isRemove: true,
             ),
             const SizedBox(height: 10),
             Row(

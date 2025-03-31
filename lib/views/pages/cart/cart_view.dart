@@ -18,13 +18,13 @@ class CartView extends StatelessWidget {
 List<CartItem> cartItems = [
   CartItem(
     name: 'Item 1dasdadasdasddasdsass312312312312312',
-    price: 1000000000.0,
+    price: 250000000.0,
     image: 'assets/images/laptop_banner.jpg',
     quantity: 4,
   ),
   CartItem(
     name: 'Item 2',
-    price: 20.0,
+    price: 2000000.0,
     image: 'assets/images/laptop_banner.jpg',
     quantity: 1,
   ),

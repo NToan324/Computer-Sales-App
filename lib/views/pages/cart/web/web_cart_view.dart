@@ -35,127 +35,122 @@ class _WebCartViewState extends State<WebCartView> {
         backgroundColor: AppColors.primary,
       ),
       resizeToAvoidBottomInset: false,
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Row(
-          spacing: 100,
-          children: [
-            SizedBox(width: 50),
-            Expanded(
-              flex: 2,
-              child: Container(
-                // Container for Cart
-                margin: EdgeInsets.only(top: 50, bottom: 50),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.grey, width: 0.5),
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.all(16.0),
-                            child: Text(
-                              "Cart",
-                              style: TextStyle(
-                                  fontSize: FontSizes.large,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        TextButton.icon(
-                          onPressed: () {
-                            clearAll();
-                          },
-                          label: Text("Clear all",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          icon: Icon(
-                            Icons.close,
-                            color: AppColors.secondary,
-                            weight: 700,
-                          ),
-                          style: ButtonStyle(
-                            foregroundColor:
-                                WidgetStateProperty.all(AppColors.secondary),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 16.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      spacing: 50,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                              margin: EdgeInsets.only(left: 16),
-                              child: Text("Product",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold))),
-                        ),
-                        Expanded(
-                            child: Text(
-                          "Quantity",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                        Expanded(
-                          child: Text("Price",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 16.0),
-                    Expanded(
-                      child: cartItems.isEmpty
-                          ? EmptyCartView()
-                          : ListView.builder(
-                              itemCount: cartItems.length,
-                              itemBuilder: (context, index) {
-                                final item = cartItems[index];
-
-                                return WebCartItemWidget(
-                                    item: item,
-                                    onQuantityChanged: (quantity) {
-                                      setState(() {
-                                        cartItems[index] = CartItem(
-                                          name: item.name,
-                                          price: item.price,
-                                          image: item.image,
-                                          quantity: quantity,
-                                        );
-                                      });
-                                    },
-                                    onRemove: () {
-                                      removeItem(index);
-                                    });
-                              },
-                            ),
-                    ),
-                  ],
-                ),
+      body: Row(
+        children: [
+          SizedBox(width: 150),
+          Expanded(
+            flex: 2,
+            child: Container(
+              // Container for Cart
+              margin: EdgeInsets.only(top: 50, bottom: 50),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.grey, width: 0.5),
+                borderRadius: BorderRadius.circular(16.0),
               ),
-            ),
-            Expanded(
-              flex: 1,
               child: Column(
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.all(16.0),
+                          child: Text(
+                            "Cart",
+                            style: TextStyle(
+                                fontSize: FontSizes.large,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: () {
+                          clearAll();
+                        },
+                        label: Text("Clear all",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        icon: Icon(
+                          Icons.close,
+                          color: AppColors.secondary,
+                          weight: 700,
+                        ),
+                        style: ButtonStyle(
+                          foregroundColor:
+                              WidgetStateProperty.all(AppColors.secondary),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                            margin: EdgeInsets.only(left: 16),
+                            child: Text("Product",
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                      ),
+                      SizedBox(width: 50),
+                      Expanded(
+                          child: Text(
+                        "Quantity",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                      SizedBox(width: 50),
+                      Expanded(
+                        child: Text("Price",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
                   Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 50),
-                      child: PromocodeSectionWidget(cartItems: cartItems),
-                    ),
+                    child: cartItems.isEmpty
+                        ? EmptyCartView()
+                        : ListView.builder(
+                            itemCount: cartItems.length,
+                            itemBuilder: (context, index) {
+                              final item = cartItems[index];
+
+                              return WebCartItemWidget(
+                                  item: item,
+                                  onQuantityChanged: (quantity) {
+                                    setState(() {
+                                      cartItems[index] = CartItem(
+                                        name: item.name,
+                                        price: item.price,
+                                        image: item.image,
+                                        quantity: quantity,
+                                      );
+                                    });
+                                  },
+                                  onRemove: () {
+                                    removeItem(index);
+                                  });
+                            },
+                          ),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 50),
-          ],
-        ),
+          ),
+          SizedBox(width: 100),
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(top: 50),
+                    child: PromocodeSectionWidget(cartItems: cartItems),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 150),
+        ],
       ),
     );
   }

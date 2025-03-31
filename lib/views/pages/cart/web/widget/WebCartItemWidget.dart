@@ -46,19 +46,17 @@ class WebCartItemWidget extends StatelessWidget {
                   ),
                   SizedBox(
                     width: 180,
-                    child: Expanded(
-                      child: Text(
-                        item.name,
-                        style: const TextStyle(
-                          fontSize: FontSizes.medium,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "Poppins",
-                          color: AppColors.black,
-                          decoration: TextDecoration.none,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 3,
+                    child: Text(
+                      item.name,
+                      style: const TextStyle(
+                        fontSize: FontSizes.medium,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Poppins",
+                        color: AppColors.black,
+                        decoration: TextDecoration.none,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
                     ),
                   ),
                   QuantitySelector(
@@ -67,24 +65,31 @@ class WebCartItemWidget extends StatelessWidget {
                     maxQuantity: maxQuantity,
                   ),
                   Spacer(),
+                  Spacer(),
                   Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                      width: 140,
+                    child: ConstrainedBox(
+                      constraints:
+                          const BoxConstraints(maxWidth: 140, minWidth: 140),
                       child: Center(
-                        child: Text(
-                          formatMoney(item.price),
-                          style: const TextStyle(
-                            fontSize: FontSizes.medium,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Poppins",
-                            color: AppColors.black,
-                            decoration: TextDecoration.none,
+                        child: FittedBox(
+                          fit: BoxFit.none,
+                          child: Text(
+                            formatMoney(item.price),
+                            style: const TextStyle(
+                              fontSize: FontSizes.medium,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Poppins",
+                              color: AppColors.black,
+                              decoration: TextDecoration.none,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
                       ),
                     ),
                   ),
+                  Spacer(),
                   Flexible(
                     child: IconButton(
                       icon: const Icon(
