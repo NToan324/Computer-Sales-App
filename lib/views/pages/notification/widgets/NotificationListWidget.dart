@@ -33,6 +33,7 @@ class NotificationListViewWidgetState
       itemCount: notificationList.length,
       itemBuilder: (context, index) {
         return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           height: 100,
           color: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -33,13 +33,14 @@ class MyApp extends StatelessWidget {
         //        //Cart
         'cart': (context) => const CartView()
       },
-       onGenerateRoute: (settings) {
+      onGenerateRoute: (settings) {
         if (settings.name == 'search-product') {
           final args = settings.arguments as String?; // Nhận tham số tìm kiếm
           return MaterialPageRoute(
             builder: (context) => SearchProductScreen(
               onSearch: (query) {},
-              initialQuery: args ?? "", // Truyền giá trị tìm kiếm vào SearchProductScreen
+              initialQuery:
+                  args ?? "", // Truyền giá trị tìm kiếm vào SearchProductScreen
             ),
           );
         }
