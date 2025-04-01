@@ -1,4 +1,5 @@
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/home/widgets/appBar_widget.dart';
@@ -93,23 +94,25 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       body: _pages[currentIndex]['page'] as Widget,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[200]!),
+          border: Border.all(color: Colors.grey.withAlpha(200)),
         ),
-        child: BottomAppBar(
-          color: Colors.white,
-          elevation: 10,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(
-                5,
-                (index) => _customItemNavBar(
-                      icons[index]['icon'] as IconData,
-                      icons[index]['label'] as String,
-                      index,
-                      currentIndex,
-                    )).toList(),
-          ),
-        ),
+        child: Responsive.isMobile(context)
+            ? BottomAppBar(
+                color: Colors.white,
+                elevation: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(
+                      5,
+                      (index) => _customItemNavBar(
+                            icons[index]['icon'] as IconData,
+                            icons[index]['label'] as String,
+                            index,
+                            currentIndex,
+                          )).toList(),
+                ),
+              )
+            : SizedBox(),
       ),
     );
   }

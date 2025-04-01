@@ -4,6 +4,7 @@ import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/search/search_screen.dart';
 import 'package:computer_sales_app/views/pages/search/widget/search_field.dart';
 import 'package:computer_sales_app/config/color.dart';
+
 class SearchWidget extends StatefulWidget {
   const SearchWidget({super.key});
 
@@ -13,7 +14,7 @@ class SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<SearchWidget> {
   final TextEditingController _searchController = TextEditingController();
-  List<String> _recentSearches = [
+  final List<String> _recentSearches = [
     "Laptop gaming",
     "Chuột không dây",
     "Bàn phím cơ",
@@ -25,20 +26,21 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   void _openSearchScreen({String? query}) {
     // Nếu đang ở chế độ desktop
-  if (Responsive.isDesktop(context)) {
-    if (query != null && query.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SearchProductScreen(
-            onSearch: (newQuery) {}, // Có thể thêm logic cập nhật nếu cần
-            initialQuery: query,
-          ),        ),
-      );
-    } else {
-      // Nếu không có từ khóa => Mở danh sách tìm kiếm gần đây
-      _showOverlay();
-    }
+    if (Responsive.isDesktop(context)) {
+      if (query != null && query.isNotEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchProductScreen(
+              onSearch: (newQuery) {}, // Có thể thêm logic cập nhật nếu cần
+              initialQuery: query,
+            ),
+          ),
+        );
+      } else {
+        // Nếu không có từ khóa => Mở danh sách tìm kiếm gần đây
+        _showOverlay();
+      }
     } else {
       Navigator.push(
         context,
@@ -57,7 +59,9 @@ class _SearchWidgetState extends State<SearchWidget> {
         onTap: _removeOverlay,
         child: Stack(
           children: [
-            Positioned.fill(child: Container(color: Colors.transparent)), // Click ngoài để đóng
+            Positioned.fill(
+                child: Container(
+                    color: Colors.transparent)), // Click ngoài để đóng
             Positioned(
               width: 400,
               child: CompositedTransformFollower(
@@ -78,17 +82,22 @@ class _SearchWidgetState extends State<SearchWidget> {
                       children: [
                         if (_recentSearches.isNotEmpty) ...[
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
                                   "Recent",
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 TextButton(
                                   onPressed: _clearAllSearches,
-                                  child: Text("Clear all", style: TextStyle(color: AppColors.primary)),
+                                  child: Text("Clear all",
+                                      style:
+                                          TextStyle(color: AppColors.primary)),
                                 ),
                               ],
                             ),
@@ -158,12 +167,11 @@ class _SearchWidgetState extends State<SearchWidget> {
                 : MediaQuery.of(context).size.width * 0.75,
             child: SearchField(
               controller: _searchController,
-              onTap:() => {
-                if (Responsive.isDesktop(context)) {
-                  _showOverlay()
-                } else {
-                  _openSearchScreen()
-                }
+              onTap: () => {
+                if (Responsive.isDesktop(context))
+                  {_showOverlay()}
+                else
+                  {_openSearchScreen()}
               },
               onSubmitted: (query) {
                 _searchController.text = query;
