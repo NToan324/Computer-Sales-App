@@ -78,15 +78,6 @@ List<NotificationModel> notificationList = [
   ),
 ];
 
-void main(List<String> args) {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: Scaffold(
-      body: NotificationView(),
-    ),
-  ));
-}
-
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
 
