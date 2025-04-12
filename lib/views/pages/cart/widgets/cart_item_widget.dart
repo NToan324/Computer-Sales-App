@@ -5,6 +5,7 @@ import 'package:computer_sales_app/views/pages/cart/widgets/quantity_widget.dart
 import 'package:flutter/material.dart';
 
 class CartItemWidget extends StatefulWidget {
+  final bool isRemove;
   final CartItem item;
   final ValueChanged<int> onQuantityChanged;
   final int? maxQuantity;
@@ -12,6 +13,7 @@ class CartItemWidget extends StatefulWidget {
     super.key,
     required this.item,
     required this.onQuantityChanged,
+    this.isRemove = false,
     this.maxQuantity,
   });
 
@@ -31,14 +33,6 @@ class _CartItemWidgetState extends State<CartItemWidget> {
         mainAxisSize: MainAxisSize.min,
         spacing: 10,
         children: [
-          // CheckBoxCustom(
-          //   value: _isCheck,
-          //   onChange: () {
-          //     setState(() {
-          //       _isCheck = !_isCheck;
-          //     });
-          //   },
-          // ),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -79,10 +73,10 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                           Text(
                             "Macbook Pro M1 2022",
                             style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.black,
-                            ),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.black,
+                                decoration: TextDecoration.none),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -91,6 +85,8 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                             style: const TextStyle(
                               fontSize: 16,
                               color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.none,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -98,11 +94,12 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                       ),
                     ),
                   ),
-                  QuantitySelector(
-                    initialQuantity: widget.item.quantity,
-                    onQuantityChanged: widget.onQuantityChanged,
-                    maxQuantity: widget.maxQuantity,
-                  ),
+                  if (!widget.isRemove)
+                    QuantitySelector(
+                      initialQuantity: widget.item.quantity,
+                      onQuantityChanged: widget.onQuantityChanged,
+                      maxQuantity: widget.maxQuantity,
+                    ),
                 ],
               ),
             ),
