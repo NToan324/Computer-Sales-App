@@ -3,6 +3,7 @@ enum PromotionType {
   amount,
 }
 
+
 extension PromotionTypeExtension on PromotionType {
   dynamic getPromotionValue(double value) {
     switch (this) {

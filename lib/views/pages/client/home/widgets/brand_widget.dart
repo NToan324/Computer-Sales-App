@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 
@@ -11,16 +13,13 @@ class BrandWidget extends StatefulWidget {
 class _BrandWidgetState extends State<BrandWidget> {
   final List<String> brands = [
     'All',
-    'Asus',
-    'Acer',
-    'Dell',
-    'HP',
-    'Lenovo',
-    'MSI',
-    'Apple',
+    'New',
+    'Low to High',
+    'High to Low',
+    'Rate',
   ];
 
-  List<bool> isSelectedList = List.generate(8, (index) => false);
+  int isSelectedList = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +32,9 @@ class _BrandWidgetState extends State<BrandWidget> {
         Text(
           'Product',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+              fontSize: lerpDouble(
+                  16, 18, (MediaQuery.of(context).size.width - 300) / 300),
+              fontWeight: FontWeight.bold),
         ),
         SizedBox(
           height: 50,
@@ -48,14 +47,14 @@ class _BrandWidgetState extends State<BrandWidget> {
                 onTap: () {
                   setState(
                     () {
-                      isSelectedList[index] = !isSelectedList[index];
+                      isSelectedList = index;
                     },
                   );
                 },
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 2),
                   decoration: BoxDecoration(
-                    color: isSelectedList[index]
+                    color: isSelectedList == index
                         ? AppColors.orangePastel
                         : Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -64,7 +63,7 @@ class _BrandWidgetState extends State<BrandWidget> {
                     child: Text(
                       brands[index],
                       style: TextStyle(
-                          color: isSelectedList[index]
+                          color: isSelectedList == index
                               ? AppColors.primary
                               : Colors.black,
                           fontWeight: FontWeight.w600),

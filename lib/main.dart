@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Poppins'),
       home: SplashView(),
       routes: {
         //Login
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         'product-details': (context) => ProductDetailsView(),
 
         //Search
-        //        //Cart
+        //Cart
         'cart': (context) => const CartView()
       },
       onGenerateRoute: (settings) {

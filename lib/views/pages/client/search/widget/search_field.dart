@@ -25,7 +25,7 @@ class SearchField extends StatelessWidget {
       autofocus: autofocus,
       onTap: onTap,
       decoration: InputDecoration(
-        fillColor: BackgroundColor.secondary,
+        fillColor: Colors.white,
         filled: true,
         contentPadding: const EdgeInsets.symmetric(
           vertical: 10,
@@ -33,6 +33,7 @@ class SearchField extends StatelessWidget {
         ),
         hintText: hintText,
         labelStyle: const TextStyle(color: Colors.black54),
+        hoverColor: Colors.white,
         suffixIcon: IconButton(
           icon: const Icon(
             FeatherIcons.search,

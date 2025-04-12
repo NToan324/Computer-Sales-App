@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:computer_sales_app/config/color.dart';
-import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/models/product_card.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -80,53 +80,77 @@ class _CategoryWidgetState extends State<CategoryWidget> {
             Text(
               'Categories',
               style: TextStyle(
-                  fontSize: FontSizes.large, fontWeight: FontWeight.bold),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  isSeeAll = !isSeeAll;
-                });
-              },
-              child: Text(
-                isSeeAll ? 'See less' : 'See all',
-                style: TextStyle(
-                  color: Colors.black.withAlpha(100),
-                ),
+                fontSize: lerpDouble(
+                    16, 18, (MediaQuery.of(context).size.width - 300) / 300),
+                fontWeight: FontWeight.bold,
               ),
             ),
+            if (!Responsive.isDesktop(context))
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    isSeeAll = !isSeeAll;
+                  });
+                },
+                child: Text(
+                  isSeeAll ? 'See less' : 'See all',
+                  style: TextStyle(
+                    color: Colors.black.withAlpha(100),
+                  ),
+                ),
+              )
           ],
         ),
         GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
+            crossAxisCount: Responsive.isDesktop(context)
+                ? categoriesIcon.length
+                : Responsive.isTablet(context)
+                    ? 6
+                    : 4,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: isSeeAll ? categoriesIcon.length : 4,
+          itemCount: isSeeAll
+              ? categoriesIcon.length
+              : (Responsive.isDesktop(context)
+                  ? categoriesIcon.length
+                  : (Responsive.isTablet(context) ? 6 : 4)),
           itemBuilder: (context, index) => ListCategoryWidget(
             isHoverButton: isHoverButton,
             icon: categoriesIcon.values.elementAt(index),
             text: categoriesIcon.keys.elementAt(index),
           ),
         ),
-        Text(
-          'Popular',
-          style:
-              TextStyle(fontSize: FontSizes.large, fontWeight: FontWeight.bold),
-        ),
         SizedBox(
-          height: 270,
-          child: ListView.separated(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) => ProductCardWidget(
-              productsPromotion: productsPromotion[index],
-            ),
-            separatorBuilder: (context, index) => SizedBox(width: 30),
-            itemCount: productsPromotion.length,
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 30,
+            children: [
+              Text(
+                'Popular',
+                style: TextStyle(
+                    fontSize: lerpDouble(16, 18,
+                        (MediaQuery.of(context).size.width - 300) / 300),
+                    fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 270,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) => ProductCardWidget(
+                    productsPromotion: productsPromotion[index],
+                  ),
+                  separatorBuilder: (context, index) => SizedBox(width: 30),
+                  itemCount: productsPromotion.length,
+                ),
+              )
+            ],
           ),
         )
       ],
@@ -160,7 +184,9 @@ class _ListCategoryWidgetState extends State<ListCategoryWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: EdgeInsets.all(15),
+          width: 50,
+          height: 50,
+          padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
             color:
                 widget.isHoverButton ? AppColors.orangePastel : AppColors.white,
