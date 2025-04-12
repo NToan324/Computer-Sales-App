@@ -1,11 +1,11 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
-import 'package:computer_sales_app/views/pages/home/home_view.dart';
-import 'package:computer_sales_app/views/pages/home/widgets/appBar_widget.dart';
-import 'package:computer_sales_app/views/pages/notification/notification_view.dart';
-import 'package:computer_sales_app/views/pages/order/order_view.dart';
-import 'package:computer_sales_app/views/pages/order/widget/appBar_widget.dart';
+import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
+import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
+import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
+import 'package:computer_sales_app/views/pages/client/order/order_view.dart';
+import 'package:computer_sales_app/views/pages/client/order/widget/appBar_widget.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 
