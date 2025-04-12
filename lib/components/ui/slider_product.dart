@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
-import 'package:computer_sales_app/views/pages/product_details/widgets/preview_image.dart';
+import 'package:computer_sales_app/views/pages/client/product_details/widgets/preview_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
