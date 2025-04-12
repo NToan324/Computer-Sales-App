@@ -31,6 +31,9 @@ class HomeView extends StatelessWidget {
                     BannerWidget(),
                     CategoryWidget(),
                     BrandWidget(),
+                    SizedBox(
+                      height: 16,
+                    ),
                     ProductListViewWidget(),
                   ],
                 ),
