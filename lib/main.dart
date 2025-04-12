@@ -1,4 +1,5 @@
 
+import 'package:computer_sales_app/views/pages/admin/admin_screen.dart';
 import 'package:computer_sales_app/views/pages/client/cart/cart_view.dart';
 import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
@@ -33,8 +34,13 @@ class MyApp extends StatelessWidget {
         'product-details': (context) => ProductDetailsView(),
 
         //Search
+        //        //Cart
+        'cart': (context) => const CartView(),
+
+        //Admin
+        'admin': (context) => const AdminScreen(),
         //Cart
-        'cart': (context) => const CartView()
+
       },
       onGenerateRoute: (settings) {
         if (settings.name == 'search-product') {
