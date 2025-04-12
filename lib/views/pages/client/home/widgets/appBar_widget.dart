@@ -1,9 +1,10 @@
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/header/header_view.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/avatar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/location_widget.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/search_widget.dart';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class AppBarHomeCustom extends StatelessWidget implements PreferredSizeWidget {
   const AppBarHomeCustom({super.key});
@@ -20,13 +21,32 @@ class AppBarHomeCustom extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          LocationWidget(),
+          Responsive.isDesktop(context)
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 32),
+                  child: Row(children: [
+                    SvgPicture.asset(
+                      'assets/images/firebase-svgrepo-com.svg',
+                      width: 50,
+                      height: 50,
+                    ),
+                    Text(
+                      'ELap Commerce',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+                )
+              : const LocationWidget(),
           Responsive.isDesktop(context)
               ? Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SearchWidget(),
+                      HeaderView(),
+                      // SearchWidget(),
                     ],
                   ),
                 )
@@ -34,7 +54,12 @@ class AppBarHomeCustom extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        AvatarWidget(),
+        Padding(
+          padding: Responsive.isDesktop(context)
+              ? EdgeInsets.only(right: 32)
+              : EdgeInsets.all(0),
+          child: AvatarWidget(),
+        ),
       ],
     );
   }

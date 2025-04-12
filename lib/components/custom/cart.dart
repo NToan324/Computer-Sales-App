@@ -13,8 +13,8 @@ class CartWidget extends StatelessWidget {
       },
       icon: Icon(
         FeatherIcons.shoppingCart,
-        color: AppColors.primary,
-        size: 30,
+        color: Colors.black,
+        size: 25,
       ),
     );
   }

@@ -42,7 +42,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildRecentSearches() {
-    if (_recentSearches.isEmpty || searchQuery.isNotEmpty) return const SizedBox();
+    if (_recentSearches.isEmpty || searchQuery.isNotEmpty)
+      return const SizedBox();
     return Column(
       children: _recentSearches.map((search) {
         return ListTile(
@@ -69,68 +70,78 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       backgroundColor: BackgroundColor.secondary,
       appBar: AppBar(
-        title: const Text('Search', style: TextStyle(fontWeight: FontWeight.bold)),
+        title:
+            const Text('Search', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
-
       body: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SearchField(
-              controller: _searchController,
-              autofocus: true,
-              onSubmitted: _updateSearch, // Cập nhật từ khóa tìm kiếm
-            ),
-          ),
-          if (_recentSearches.isNotEmpty && searchQuery.isEmpty)
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SearchField(
+                controller: _searchController,
+                autofocus: true,
+                onSubmitted: _updateSearch, // Cập nhật từ khóa tìm kiếm
+              ),
+            ),
+            if (_recentSearches.isNotEmpty && searchQuery.isEmpty)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Recent",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextButton(
+                      onPressed: _clearAllSearches,
+                      child: Text("Clear all",
+                          style: TextStyle(
+                              fontSize: 18, color: AppColors.primary)),
+                    ),
+                  ],
+                ),
+              ),
+            if (searchQuery.isEmpty)
+              _buildRecentSearches()
+            else
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Recent",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  TextButton(
-                    onPressed: _clearAllSearches,
-                    child: Text("Clear all", style: TextStyle(fontSize: 18, color: AppColors.primary)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Results for "$searchQuery"',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          '10 Found', // Thay thế bằng số thực tế
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal:
+                            16), // Thêm padding vào ProductListViewWidget
+                    child: const ProductListViewWidget(),
                   ),
                 ],
               ),
-            ),
-          if (searchQuery.isEmpty)
-            _buildRecentSearches()
-          else
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Results for "$searchQuery"',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        '10 Found', // Thay thế bằng số thực tế
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16), // Thêm padding vào ProductListViewWidget
-                  child: const ProductListViewWidget(),
-                ),
-              ],
-            ),
           ],
         ),
       ),

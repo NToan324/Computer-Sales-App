@@ -14,10 +14,10 @@ class ProductListViewWidget extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: Responsive.isDesktop(context) ? 6 : 2,
+        crossAxisCount: Responsive.isDesktop(context) ? 4 : 2,
         childAspectRatio: 0.5,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+        crossAxisSpacing: 20,
+        mainAxisSpacing: 20,
         mainAxisExtent: 350,
       ),
       itemBuilder: (context, index) => ProductView(),

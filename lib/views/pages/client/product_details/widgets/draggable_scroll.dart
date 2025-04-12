@@ -7,8 +7,8 @@ class DraggableScrollCustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.6,
+      initialChildSize: 0.5,
+      minChildSize: 0.5,
       maxChildSize: 0.8,
       builder: (context, scrollController) {
         return Container(
