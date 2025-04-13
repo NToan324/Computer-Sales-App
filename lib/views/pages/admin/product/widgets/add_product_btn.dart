@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'product_form.dart'; // import widget ProductForm bạn vừa tách
 
 class AddProductButton extends StatelessWidget {
   const AddProductButton({Key? key}) : super(key: key);
@@ -7,8 +8,22 @@ class AddProductButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: () {
-        // Xử lý khi nhấn thêm sản phẩm ở đây
-        print("Thêm sản phẩm");
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              contentPadding: const EdgeInsets.all(16),
+              content: ProductForm(
+                buttonLabel: "Add Product",
+                onSubmit: (productData) {
+                  // Xử lý logic thêm sản phẩm ở đây
+                  print("Đã thêm sản phẩm: $productData");
+                  Navigator.of(context).pop();
+                },
+              ),
+            );
+          },
+        );
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.green, // Màu nền xanh

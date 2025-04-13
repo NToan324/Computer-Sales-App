@@ -1,4 +1,3 @@
-import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 
@@ -75,6 +74,7 @@ class _ProductTableState extends State<ProductTable> {
           width: colWidths[index],
           child: Text(
             headers[index],
+            textAlign: TextAlign.center,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         );
@@ -182,8 +182,8 @@ class _ProductTableState extends State<ProductTable> {
               ];
 
         final headers = isMobile
-            ? ["#", "Product", "Price"]
-            : ["#", "Product", "Stock", "Original Price", "Selling Price", "Status"];
+            ? ["Number", "Product", "Price"]
+            : ["Number", "Product", "Stock", "Original Price", "Selling Price", "Status"];
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -192,7 +192,7 @@ class _ProductTableState extends State<ProductTable> {
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
+                color: Colors.grey.withValues(alpha: 0.2),
                 spreadRadius: 2,
                 blurRadius: 5,
                 offset: const Offset(0, 3),
