@@ -9,6 +9,7 @@ import 'package:computer_sales_app/views/pages/admin/coupon/coupon_screen.dart';
 import 'package:computer_sales_app/views/pages/admin/support/support_screen.dart';
 import 'package:computer_sales_app/components/custom/sidebar.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
 
@@ -51,45 +52,47 @@ class _AdminScreenState extends State<AdminScreen> {
     });
   }
 
-
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-       appBar: Responsive.isMobile(context)
-        ? AppBar(
-            title: const Text("Admin Panel", style: TextStyle(color: Colors.white),),
-            backgroundColor: AppColors.primary,
-            iconTheme: const IconThemeData(color: Colors.white),
-          )
-        : null,
-        drawer: Responsive.isMobile(context)
-        ? Drawer(
-            width: 250,
-            child: CustomSidebar(
-              selectedMenu: _selectedMenu,
-              onMenuTap: (menu) {
-                _onMenuTap(menu);
-                Navigator.pop(context); // Đóng Drawer sau khi chọn
-              },
-            ),
-          )
-        : null,
-        body: Responsive.isDesktop(context)
-        ? Row(
-            children: [
-              // Sidebar bên trái
-              CustomSidebar(
+      appBar: Responsive.isMobile(context)
+          ? AppBar(
+              title: const Text(
+                "Admin Panel",
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: AppColors.primary,
+              iconTheme: const IconThemeData(color: Colors.white),
+            )
+          : null,
+      drawer: Responsive.isMobile(context)
+          ? Drawer(
+              width: 250,
+              child: CustomSidebar(
                 selectedMenu: _selectedMenu,
-                onMenuTap: _onMenuTap,
+                onMenuTap: (menu) {
+                  _onMenuTap(menu);
+                  Navigator.pop(context); // Đóng Drawer sau khi chọn
+                },
               ),
-              // Nội dung chính
-              Expanded(
-                child: _currentScreen,
-              ),
-            ],
-          )
-        : _currentScreen, // Mobile/tablet chỉ hiển thị nội dung chính  
+            )
+          : null,
+      body: Responsive.isDesktop(context)
+          ? Row(
+              children: [
+                // Sidebar bên trái
+                CustomSidebar(
+                  selectedMenu: _selectedMenu,
+                  onMenuTap: _onMenuTap,
+                ),
+                // Nội dung chính
+                Expanded(
+                  child: _currentScreen,
+                ),
+              ],
+            )
+          : _currentScreen, // Mobile/tablet chỉ hiển thị nội dung chính
     );
   }
 }
