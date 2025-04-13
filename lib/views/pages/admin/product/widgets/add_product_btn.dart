@@ -12,14 +12,35 @@ class AddProductButton extends StatelessWidget {
           context: context,
           builder: (context) {
             return AlertDialog(
-              contentPadding: const EdgeInsets.all(16),
-              content: ProductForm(
-                buttonLabel: "Add Product",
-                onSubmit: (productData) {
-                  // Xử lý logic thêm sản phẩm ở đây
-                  print("Đã thêm sản phẩm: $productData");
-                  Navigator.of(context).pop();
-                },
+              backgroundColor: Colors.white,
+              title: const Text(
+                "Add Product",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: Theme(
+                data: Theme.of(context).copyWith(
+                  inputDecorationTheme: const InputDecorationTheme(
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.orange, width: 2),
+                    ),
+                    labelStyle: TextStyle(color: Colors.black),
+                    floatingLabelStyle: TextStyle(color: Colors.orange),
+                  ),
+                   
+                ),
+                child: ProductForm(
+                  buttonLabel: "Add Product",
+                  onSubmit: (productData) {
+                    // Xử lý logic thêm sản phẩm ở đây
+                    print("Đã thêm sản phẩm: $productData");
+                    Navigator.of(context).pop();
+                  },
+                ),
               ),
             );
           },

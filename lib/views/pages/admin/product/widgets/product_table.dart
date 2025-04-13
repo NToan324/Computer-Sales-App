@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'product_form.dart'; // Import widget ProductForm
 
 class ProductTable extends StatefulWidget {
   const ProductTable({Key? key}) : super(key: key);
@@ -41,7 +42,6 @@ class _ProductTableState extends State<ProductTable> {
     },
   ];
 
-
   List<Map<String, dynamic>> get filteredProducts {
     if (_searchController.text.isEmpty) {
       return products;
@@ -65,9 +65,71 @@ class _ProductTableState extends State<ProductTable> {
     }
   }
 
+  void _showProductForm(Map<String, dynamic> product) {
+    final TextEditingController nameController =
+        TextEditingController(text: product['name']);
+    final TextEditingController stockController =
+        TextEditingController(text: product['stock'].toString());
+    final TextEditingController originalPriceController =
+        TextEditingController(text: product['originalPrice'].toString());
+    final TextEditingController sellingPriceController =
+        TextEditingController(text: product['sellingPrice'].toString());
+    String status = product['status'];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            product['name'],
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              inputDecorationTheme: const InputDecorationTheme(
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.orange, width: 2),
+                ),
+                labelStyle: TextStyle(color: Colors.black),
+                floatingLabelStyle: TextStyle(color: Colors.orange),
+              ),
+            ),
+            child: ProductForm(
+              buttonLabel: "Save",
+              initialProduct: {
+                'name': product['name'],
+                'stock': product['stock'],
+                'originalPrice': product['originalPrice'],
+                'sellingPrice': product['sellingPrice'],
+                'status': product['status'],
+              },
+              onSubmit: (updatedProductData) {
+                setState(() {
+                  product['name'] = updatedProductData['name'];
+                  product['stock'] = updatedProductData['stock'];
+                  product['originalPrice'] = updatedProductData['originalPrice'];
+                  product['sellingPrice'] = updatedProductData['sellingPrice'];
+                  product['status'] = updatedProductData['status'];
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   TableRow buildHeaderRow(List<String> headers, List<double> colWidths) {
     return TableRow(
-      decoration: const BoxDecoration(color: Color.fromARGB(255, 240, 240, 240)),
+      decoration:
+          const BoxDecoration(color: Color.fromARGB(255, 240, 240, 240)),
       children: List.generate(headers.length, (index) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
@@ -83,81 +145,94 @@ class _ProductTableState extends State<ProductTable> {
   }
 
   TableRow buildProductRow(Map<String, dynamic> product, List<double> colWidths) {
-  final isMobile = Responsive.isMobile(context);
-  return TableRow(
-    children: isMobile
-        ? [
-            cellText(product['id'].toString(), colWidths[0]),
-            productCell(product, colWidths[1]),
-            cellText("\$${product['sellingPrice']}", colWidths[2]),
-          ]
-        : [
-            cellText(product['id'].toString(), colWidths[0]),
-            productCell(product, colWidths[1]),
-            cellText(product['stock'].toString(), colWidths[2]),
-            cellText("\$${product['originalPrice']}", colWidths[3]),
-            cellText("\$${product['sellingPrice']}", colWidths[4]),
-            Container(
-              width: colWidths[5],
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Chip(
-                label: Text(
-                  product['status'],
-                  style: const TextStyle(color: Colors.white),
-                ),
-                backgroundColor: _getStatusColor(product['status']),
-              ),
-            ),
-          ],
-      );
-    }
-
-
-  Widget cellText(String text, double width) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      child: Text(text),
-    );
-  }
-  Widget productCell(Map<String, dynamic> product, double width) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      child: Row(
-        children: [
-          // Ảnh sản phẩm
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              product['imageUrl'],
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Tên + ID
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product['name'],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              Text(
-                "ID: ${product['id']}",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
+    final isMobile = Responsive.isMobile(context);
+    
+    return TableRow(
+      children: isMobile
+          ? [
+              cellText(product['id'].toString(), colWidths[0]),
+              productCell(product, colWidths[1]),
+              cellText("\$${product['sellingPrice']}", colWidths[2]),
+            ]
+          : [
+              cellText(product['id'].toString(), colWidths[0]),
+              productCell(product, colWidths[1]),
+              cellText(product['stock'].toString(), colWidths[2]),
+              cellText("\$${product['originalPrice']}", colWidths[3]),
+              cellText("\$${product['sellingPrice']}", colWidths[4]),
+              Container(
+                width: colWidths[5],
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Chip(
+                  label: Text(
+                    product['status'],
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: _getStatusColor(product['status']),
                 ),
               ),
             ],
-          ),
-        ],
+    );
+  }
+
+  Widget cellText(String text, double width) {
+    return GestureDetector(
+      onTap: () {
+        final product = products.firstWhere(
+          (p) => p['id'].toString() == text,
+          orElse: () => {},
+        );
+        if (product.isNotEmpty) _showProductForm(product);
+      },
+      child: Container(
+        width: width,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        child: Text(text),
+      ),
+    );
+  }
+
+  Widget productCell(Map<String, dynamic> product, double width) {
+    return GestureDetector(
+      onTap: () {
+        _showProductForm(product);
+      },
+      child: Container(
+        width: width,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                product['imageUrl'],
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product['name'],
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  "ID: ${product['id']}",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -169,21 +244,27 @@ class _ProductTableState extends State<ProductTable> {
         final isMobile = Responsive.isMobile(context);
         final tableWidth = constraints.maxWidth;
 
-        /// Tùy vào isMobile mà chia cột
         final List<double> colWidths = isMobile
             ? [tableWidth * 0.08, tableWidth * 0.45, tableWidth * 0.3]
             : [
-                tableWidth * 0.06, // #
-                tableWidth * 0.3,  // Product
-                tableWidth * 0.12, // Stock
-                tableWidth * 0.15, // Original Price
-                tableWidth * 0.15, // Selling Price
-                tableWidth * 0.15, // Status
+                tableWidth * 0.1,
+                tableWidth * 0.3,
+                tableWidth * 0.12,
+                tableWidth * 0.15,
+                tableWidth * 0.15,
+                tableWidth * 0.15,
               ];
 
         final headers = isMobile
             ? ["Number", "Product", "Price"]
-            : ["Number", "Product", "Stock", "Original Price", "Selling Price", "Status"];
+            : [
+                "Number",
+                "Product",
+                "Stock",
+                "Original Price",
+                "Selling Price",
+                "Status"
+              ];
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -192,7 +273,7 @@ class _ProductTableState extends State<ProductTable> {
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.2),
+                color: Colors.grey.withAlpha(50),
                 spreadRadius: 2,
                 blurRadius: 5,
                 offset: const Offset(0, 3),
@@ -216,7 +297,8 @@ class _ProductTableState extends State<ProductTable> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 12),
                         hintText: "Search by name",
                         prefixIcon: const Icon(Icons.search, size: 18),
                         border: OutlineInputBorder(
@@ -241,7 +323,7 @@ class _ProductTableState extends State<ProductTable> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: SizedBox(
-                  width: tableWidth-40,
+                  width: tableWidth - 40,
                   child: Table(
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: {
@@ -250,12 +332,9 @@ class _ProductTableState extends State<ProductTable> {
                     },
                     border: TableBorder.all(color: Colors.grey.shade300),
                     children: [
-                      /// Header row
                       buildHeaderRow(headers, colWidths),
-                  
-                      /// Data rows
-                      ...filteredProducts.map((product) =>
-                          buildProductRow(product, colWidths)),
+                      ...filteredProducts
+                          .map((product) => buildProductRow(product, colWidths)),
                     ],
                   ),
                 ),
