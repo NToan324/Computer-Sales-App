@@ -1,4 +1,3 @@
-
 import 'package:computer_sales_app/views/pages/admin/admin_screen.dart';
 import 'package:computer_sales_app/views/pages/client/cart/cart_view.dart';
 import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
@@ -9,7 +8,6 @@ import 'package:computer_sales_app/views/pages/client/product_details/product_de
 import 'package:computer_sales_app/views/pages/client/search/search_product_screen.dart';
 import 'package:computer_sales_app/views/pages/client/splash/splash_view.dart';
 import 'package:flutter/material.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -40,7 +38,6 @@ class MyApp extends StatelessWidget {
         //Admin
         'admin': (context) => const AdminScreen(),
         //Cart
-
       },
       onGenerateRoute: (settings) {
         if (settings.name == 'search-product') {

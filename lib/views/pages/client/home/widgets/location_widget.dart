@@ -27,7 +27,7 @@ class LocationWidget extends StatelessWidget {
                 size: IconSize.large,
               ),
               Text(
-                TextHelper.textLimit('District 7, Ho Chi Minh City', 30),
+                TextHelper.textLimit('District 7, Ho Chi Minh City', 20),
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: FontSizes.medium,

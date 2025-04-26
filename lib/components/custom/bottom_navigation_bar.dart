@@ -94,7 +94,13 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       body: _pages[currentIndex]['page'] as Widget,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.withAlpha(200)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(100),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Responsive.isMobile(context)
             ? BottomAppBar(

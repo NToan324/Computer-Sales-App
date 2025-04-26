@@ -101,6 +101,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
               )
           ],
         ),
+        // Danh mục sản phẩm
         GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: Responsive.isDesktop(context)
@@ -108,7 +109,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
                 : Responsive.isTablet(context)
                     ? 6
                     : 4,
-            crossAxisSpacing: 10,
+            crossAxisSpacing: 5,
             mainAxisSpacing: 10,
           ),
           shrinkWrap: true,
