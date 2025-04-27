@@ -55,8 +55,8 @@ class OrderView extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withAlpha(25), // Màu bóng nhẹ
-                    blurRadius: 15, // Độ mờ của bóng
-                    spreadRadius: 3, // Độ lan của bóng
+                    blurRadius: 10, // Độ mờ của bóng
+                    spreadRadius: 2, // Độ lan của bóng
                     offset: const Offset(0, 4), // Bóng đổ xuống dưới
                   ),
                 ],
