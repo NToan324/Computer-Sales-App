@@ -1,7 +1,9 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
-import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
+import 'package:computer_sales_app/views/pages/client/Chat/widgets/chat_body.dart';
+import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_appbar.dart';
+import 'package:computer_sales_app/views/pages/client/home/widgets/home_body.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
 import 'package:computer_sales_app/views/pages/client/order/order_view.dart';
@@ -21,7 +23,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
   final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
   final List<Map<String, dynamic>> _pages = [
     {
-      'page': HomeView(),
+      'page': HomeBody(),
       'appBar': AppBarHomeCustom(),
     },
     {
@@ -33,8 +35,8 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       'appBar': AppBarOrderCustom(),
     },
     {
-      'page': Text('Message'),
-      'appBar': AppBar(title: Text('Message')),
+      'page': ChatBody(),
+      'appBar': ChatAppBar(),
     },
     {
       'page': Text('Profile'),
@@ -80,7 +82,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
     },
     {
       'icon': FeatherIcons.messageCircle,
-      'label': 'Calendar',
+      'label': 'Message',
     },
     {
       'icon': Icons.person_outline_rounded,
@@ -94,7 +96,13 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       body: _pages[currentIndex]['page'] as Widget,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.withAlpha(200)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(100),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Responsive.isMobile(context)
             ? BottomAppBar(

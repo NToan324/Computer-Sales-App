@@ -1,9 +1,7 @@
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/color_version.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/color_version.dart';
 
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/description_product.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/review.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/title_product.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/version_product.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/title_product.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/version_product.dart';
 import 'package:flutter/material.dart';
 
 class InformationProduct extends StatelessWidget {
@@ -22,7 +20,6 @@ class InformationProduct extends StatelessWidget {
       padding: EdgeInsets.zero,
       shrinkWrap: true,
       children: [
-        Reviews(),
         SizedBox(
           height: 15,
         ),
@@ -41,7 +38,6 @@ class InformationProduct extends StatelessWidget {
         SizedBox(
           height: 15,
         ),
-        DescriptionProduct(),
       ],
     );
   }

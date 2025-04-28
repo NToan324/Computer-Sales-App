@@ -81,31 +81,47 @@ class ProductView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     spacing: 5,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: AppColors.orangePastel,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          'Ram 8GB',
-                          style: TextStyle(
-                            fontSize: FontSizes.small,
-                            color: AppColors.primary,
+                      Flexible(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: 70, // tối đa 70
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: AppColors.orangePastel,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              'Ram 8GB',
+                              style: TextStyle(
+                                fontSize: FontSizes.small,
+                                color: AppColors.primary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: AppColors.orangePastel,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          'SSD 512GB',
-                          style: TextStyle(
-                            fontSize: FontSizes.small,
-                            color: AppColors.primary,
+                      Flexible(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: 90,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: AppColors.orangePastel,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              'SSD 512GB',
+                              style: TextStyle(
+                                fontSize: FontSizes.small,
+                                color: AppColors.primary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
@@ -117,9 +133,12 @@ class ProductView extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: AppColors.secondary,
                         fontSize: FontSizes.medium),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  Wrap(
+                  Row(
                     spacing: 5,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -132,7 +151,12 @@ class ProductView extends StatelessWidget {
                           Text('4.5'),
                         ],
                       ),
-                      Text('23 Reviews'),
+                      Expanded(
+                        child: Text(
+                          '23 Reviews',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ],

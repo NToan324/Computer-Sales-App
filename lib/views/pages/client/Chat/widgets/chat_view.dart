@@ -1,15 +1,16 @@
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
-import 'package:computer_sales_app/views/pages/client/home/widgets/home_body.dart';
 import 'package:flutter/material.dart';
+import 'chat_appbar.dart';
+import '../../Chat/widgets/chat_body.dart';
 
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class ChatView extends StatelessWidget {
+  const ChatView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarHomeCustom(),
-      body: const HomeBody(),
+      body: const ChatBody(),
     );
   }
 }
