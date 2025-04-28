@@ -15,9 +15,8 @@ class HeaderView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildHeaderItem("Home", context, "home"),
-          _buildHeaderItem("Products", context, "product-details"),
-          _buildHeaderItem("Messages", context, "chat"),
-          _buildHeaderItem("Order", context, "chat"),
+          _buildHeaderItem("Product", context, "product"),
+          _buildHeaderItem("Chat", context, "chat"),
         ],
       ),
     );

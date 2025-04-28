@@ -3,12 +3,12 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/color_version.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/description_product.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/product_preview_section.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/quantity.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/title_product.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/version_product.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/color_version.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/description_product.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/product_preview_section.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/quantity.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/title_product.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/version_product.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 

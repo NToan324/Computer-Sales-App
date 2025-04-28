@@ -1,12 +1,13 @@
 import 'package:computer_sales_app/views/pages/admin/admin_screen.dart';
-import 'package:computer_sales_app/views/pages/client/Chat/widgets/chat_view.dart';
+import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_view.dart';
 import 'package:computer_sales_app/views/pages/client/cart/cart_view.dart';
 import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/verifyotp_view.dart';
 import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
-import 'package:computer_sales_app/views/pages/client/product_details/product_details_view.dart';
+import 'package:computer_sales_app/views/pages/client/product/product_details_view.dart';
+import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:computer_sales_app/views/pages/client/search/search_product_screen.dart';
 import 'package:computer_sales_app/views/pages/client/splash/splash_view.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,8 @@ class MyApp extends StatelessWidget {
         'change-password': (context) => CreateNewPasswordView(),
 
         //Home
-        'home': (context) => const HomeView(),
+        'home': (context) => HomeView(),
+        'product': (context) => ProductPageView(),
         'product-details': (context) => ProductDetailsView(),
         'chat': (context) => ChatView(),
         'notifications': (context) => NotificationView(),

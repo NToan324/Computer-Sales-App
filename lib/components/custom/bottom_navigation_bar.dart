@@ -2,7 +2,7 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/client/Chat/widgets/chat_body.dart';
-import 'package:computer_sales_app/views/pages/client/Chat/widgets/chat_appbar.dart';
+import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_appbar.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/home_body.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
