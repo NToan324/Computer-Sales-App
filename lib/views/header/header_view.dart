@@ -12,35 +12,36 @@ class HeaderView extends StatelessWidget {
         color: Colors.white,
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 10,
-            children: [
-              _buildHeaderItem("Home"),
-              _buildHeaderItem("Products"),
-              _buildHeaderItem("Deals"),
-              _buildHeaderItem("Cart"),
-              _buildHeaderItem("Profile"),
-            ],
-          ),
+          _buildHeaderItem("Home", context, "home"),
+          _buildHeaderItem("Products", context, "product-details"),
+          _buildHeaderItem("Messages", context, "chat"),
+          _buildHeaderItem("Order", context, "chat"),
         ],
       ),
     );
   }
 
-  // Widget tạo từng mục trong header
-  Widget _buildHeaderItem(String label) {
+  Widget _buildHeaderItem(String label, BuildContext context, [String? route]) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          if (route != null) {
+            if (ModalRoute.of(context)?.settings.name != route) {
+              Navigator.pushNamed(context, route);
+            }
+          }
+        },
         child: Text(
           label,
           style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 16,
-              color: label == 'Home' ? AppColors.primary : Colors.black54),
+              color: ModalRoute.of(context)?.settings.name == route
+                  ? AppColors.primary
+                  : Colors.black54),
         ),
       ),
     );
