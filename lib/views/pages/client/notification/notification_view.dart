@@ -1,5 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/notification/widgets/NotificationListWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/models/notification.dart';
@@ -148,24 +149,27 @@ class _NotificationViewState extends State<NotificationView> {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        title: const Text("Notification"),
-        backgroundColor: AppColors.primary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-          MouseRegion(
-            onEnter: (_) => showOverlay(context),
-            onExit: (_) => removeOverlay(),
-            child: IconButton(
-              icon: Icon(Icons.notifications, size: 30),
-              onPressed: () {},
-            ),
-          )
-        ],
-      ),
+      appBar: !Responsive.isMobile(context)
+          ? AppBar(
+              automaticallyImplyLeading: false,
+              title: const Text("Notification"),
+              backgroundColor: AppColors.primary,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {},
+                ),
+                MouseRegion(
+                  onEnter: (_) => showOverlay(context),
+                  onExit: (_) => removeOverlay(),
+                  child: IconButton(
+                    icon: Icon(Icons.notifications, size: 30),
+                    onPressed: () {},
+                  ),
+                )
+              ],
+            )
+          : AppBarHomeCustom(),
       body: Row(
         children: [
           SizedBox(

@@ -1,4 +1,4 @@
-import 'package:computer_sales_app/views/pages/client/product_details/widgets/information_product.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/information_product.dart';
 import 'package:flutter/material.dart';
 
 class DraggableScrollCustom extends StatelessWidget {
