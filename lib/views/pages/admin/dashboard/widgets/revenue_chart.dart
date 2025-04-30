@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class RevenueChart extends StatelessWidget {
-  const RevenueChart({Key? key}) : super(key: key);
+  const RevenueChart({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class RevenueChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Container(
+          SizedBox(
             height: 250,
             child: BarChart(
               BarChartData(

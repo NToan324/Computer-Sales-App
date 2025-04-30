@@ -2,7 +2,6 @@ import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/header/header_view.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/avatar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/location_widget.dart';
-import 'package:computer_sales_app/views/pages/client/home/widgets/search_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

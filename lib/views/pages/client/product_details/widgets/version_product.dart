@@ -1,6 +1,5 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
-import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 class VersionProduct extends StatelessWidget {

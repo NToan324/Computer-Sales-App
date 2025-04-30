@@ -116,7 +116,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                               onPressed: () => _removeRecentSearch(search),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),

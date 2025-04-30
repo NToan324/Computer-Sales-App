@@ -133,7 +133,7 @@ class _NotificationViewState extends State<NotificationView> {
         ),
       ),
     );
-    overlay?.insert(overlayEntry!);
+    overlay.insert(overlayEntry!);
   }
 
   void removeOverlay() {

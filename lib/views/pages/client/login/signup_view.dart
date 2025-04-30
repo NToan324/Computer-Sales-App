@@ -1,15 +1,69 @@
-import 'package:computer_sales_app/views/pages/client/login/widgets/text_field.dart';
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
+import 'package:computer_sales_app/services/auth.service.dart';
 import 'widgets/button.dart';
+import 'widgets/text_field.dart';
+import 'verifyemail_view.dart';
 
-class SignUpView extends StatelessWidget {
-  SignUpView({super.key});
-  final userNameController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmedpasswordController = TextEditingController();
-  //Sign user in method
-  void signUp(BuildContext context) {
-    print('Sign Up');
+class SignUpView extends StatefulWidget {
+  const SignUpView({super.key});
+
+  @override
+  State<SignUpView> createState() => _SignUpViewState();
+}
+
+class _SignUpViewState extends State<SignUpView> {
+  final _userNameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmedpasswordController = TextEditingController();
+  bool _loading = false;
+
+  Future<void> signUp() async {
+    final email = _userNameController.text.trim();
+    final pass = _passwordController.text.trim();
+    final confirm = _confirmedpasswordController.text.trim();
+
+    if (email.isEmpty || pass.isEmpty || confirm.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    if (pass != confirm) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      final auth = AuthService();
+
+      final response = await auth.signup(
+        name: email, 
+        phone: email, 
+        password: pass,
+      );
+
+      // Lấy thông tin từ response (ví dụ như id, phone, name, role)
+      final userId = response['data']['id']; // Lấy userId từ phản hồi
+
+      // Sau khi đăng ký thành công, chuyển sang trang xác thực email
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VerifyEmailView(userId: userId), // Truyền userId cho trang xác thực
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign up failed: $e')),
+      );
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
   @override
@@ -67,27 +121,27 @@ class SignUpView extends StatelessWidget {
                     MyTextField(
                       hintText: 'Email',
                       prefixIcon: Icons.email,
-                      controller: userNameController,
+                      controller: _userNameController,
                       obscureText: false,
                     ),
                     const SizedBox(height: 15),
                     MyTextField(
                       hintText: 'Password',
                       prefixIcon: Icons.lock,
-                      controller: passwordController,
+                      controller: _passwordController,
                       obscureText: true,
                     ),
                     const SizedBox(height: 15),
                     MyTextField(
-                      hintText: 'Password',
+                      hintText: 'Confirm Password',
                       prefixIcon: Icons.lock,
-                      controller: confirmedpasswordController,
+                      controller: _confirmedpasswordController,
                       obscureText: true,
                     ),
                     const SizedBox(height: 40),
                     MyButton(
                       text: 'Sign Up',
-                      onTap: signUp,
+                      onTap: _loading ? null : (_) => signUp(),
                     ),
                     const SizedBox(height: 40),
                   ],

@@ -20,6 +20,8 @@ class ProductDetailsView extends StatelessWidget {
     'assets/images/laptop-mockup.jpg',
     'assets/images/laptop-mockup.jpg',
   ];
+
+  ProductDetailsView({super.key});
   @override
   Widget build(BuildContext context) {
     double isWrap = MediaQuery.of(context).size.width;

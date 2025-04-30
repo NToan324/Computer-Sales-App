@@ -3,7 +3,7 @@ import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 class PreviewImage extends StatefulWidget {
-  PreviewImage({
+  const PreviewImage({
     super.key,
     this.direction = Axis.horizontal,
     required this.imagesUrl,

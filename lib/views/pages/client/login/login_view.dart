@@ -3,7 +3,7 @@ import "package:computer_sales_app/views/pages/client/login/signup_view.dart";
 import "package:computer_sales_app/views/pages/client/login/verifyemail_view.dart";
 import "package:computer_sales_app/views/pages/client/login/widgets/button.dart";
 import "package:computer_sales_app/views/pages/client/login/widgets/text_field.dart";
-
+import "package:computer_sales_app/services/auth.service.dart";
 import "package:flutter/material.dart";
 
 class LoginView extends StatelessWidget {
@@ -12,8 +12,26 @@ class LoginView extends StatelessWidget {
   final passwordController = TextEditingController();
 
   // Sign user in method
-  void signIn(BuildContext context) {
-    Navigator.pushNamed(context, 'home');
+  void signIn(BuildContext context) async {
+    final authService = AuthService();
+    final id  = userNameController.text.trim();    // email hoặc phone
+    final pw  = passwordController.text.trim();
+
+    if (id.isEmpty || pw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter both email and password')),
+      );
+      return;
+    }
+
+    try {
+      await authService.login(id, pw);  // <-- positional args
+      Navigator.pushReplacementNamed(context, 'home');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
   }
 
   @override
@@ -86,10 +104,19 @@ class LoginView extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 30.0),
                       child: GestureDetector(
                         onTap: () {
+                          final identifier = userNameController.text.trim();
+                          if (identifier.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter your email or phone first')),
+                            );
+                            return;
+                          }
+                          // Điều hướng tới VerifyEmailView, truyền identifier làm userId
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => VerifyEmailView()),
+                              builder: (_) => VerifyEmailView(userId: identifier),
+                            ),
                           );
                         },
                         child: Text(
