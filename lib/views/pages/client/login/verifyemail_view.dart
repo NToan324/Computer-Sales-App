@@ -29,7 +29,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       final auth = AuthService();
       // Gọi API forgotPassword để gửi OTP tới email
       final otpData = await auth.forgotPassword(widget.userId);
-      final userId = otpData['data']['id'] as String;
+      final userId = otpData as String;
       // Điều hướng đến trang nhập OTP với userId
       Navigator.pushNamed(context, 'verify-otp', arguments: userId);
     } catch (e) {
