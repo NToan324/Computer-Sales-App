@@ -6,79 +6,108 @@ import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:dio/dio.dart';
 
 class BaseClient {
+  static const String baseUrl = 'http://localhost:3000/';
   static const int timeOutDuration = 30;
-  //GET
-  Future<dynamic> get(String baseUrl, String api) async {
-    var uri = Uri.parse(baseUrl + api); //http://localhost:3000/api
-    final dio = Dio();
+
+  final Dio dio = Dio(
+    BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: const Duration(seconds: timeOutDuration),
+      receiveTimeout: const Duration(seconds: timeOutDuration),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    ),
+  );
+
+  // GET
+  Future<dynamic> get(String api) async {
     try {
-      var response = await dio
-          .get(uri.toString())
-          .timeout(const Duration(seconds: timeOutDuration));
-      return _processReponse(response);
+      final response = await dio.get(api);
+      return _processResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection', uri.toString());
+      throw FetchDataException('No Internet connection', api);
     } on TimeoutException {
-      throw ApiNotRespondingException(
-          'API not responded in time', uri.toString());
+      throw ApiNotRespondingException('API not responded in time', api);
     }
   }
 
-  //POST
-  Future<dynamic> post(String baseUrl, String api, dynamic payloadObj) async {
-    var uri = Uri.parse(baseUrl + api); //http://localhost:3000/api
-    final dio = Dio();
-    var payload = json.encode(payloadObj);
+  // POST
+  Future<dynamic> post(String api, dynamic payloadObj) async {
     try {
-      var response = await dio
-          .post(uri.toString(), data: payload)
-          .timeout(const Duration(seconds: timeOutDuration));
-      // var response = await http
-      //     .post(uri, body: payload)
-      //     .timeout(const Duration(seconds: TIME_OUT_DURATION));
-      return _processReponse(response);
+      final response = await dio.post(api, data: json.encode(payloadObj));
+      return _processResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection', uri.toString());
+      throw FetchDataException('No Internet connection', api);
     } on TimeoutException {
-      throw ApiNotRespondingException(
-          'API not responded in time', uri.toString());
+      throw ApiNotRespondingException('API not responded in time', api);
     }
   }
 
-  //DELETE
-  Future<dynamic> delete(String baseUrl, String api, {String? id}) async {
-    var uri = Uri.parse('$baseUrl$api${id != null ? '/$id' : ''}');
-    final dio = Dio();
+  // PUT
+  Future<dynamic> put(String api, dynamic payloadObj) async {
     try {
-      var response = await dio
-          .delete(uri.toString())
-          .timeout(const Duration(seconds: timeOutDuration));
-      // var response = await http
-      //     .delete(uri)
-      //     .timeout(const Duration(seconds: TIME_OUT_DURATION));
-      return _processReponse(response);
+      final response = await dio.put(api, data: json.encode(payloadObj));
+      return _processResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection', uri.toString());
+      throw FetchDataException('No Internet connection', api);
     } on TimeoutException {
-      throw ApiNotRespondingException(
-          'API not responded in time', uri.toString());
+      throw ApiNotRespondingException('API not responded in time', api);
     }
   }
 
-  //OTHERS
+  // PATCH
+  Future<dynamic> patch(String api, dynamic payloadObj) async {
+    try {
+      final response = await dio.patch(api, data: json.encode(payloadObj));
+      return _processResponse(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection', api);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API not responded in time', api);
+    }
+  }
 
-  dynamic _processReponse(Response response) {
-    switch (response.statusCode) {
+  // DELETE
+  Future<dynamic> delete(String api, {String? id}) async {
+    final fullPath = id != null ? '$api/$id' : api;
+    try {
+      final response = await dio.delete(fullPath);
+      return _processResponse(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection', fullPath);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API not responded in time', fullPath);
+    }
+  }
+
+  // RESPONSE HANDLER
+  dynamic _processResponse(Response response) {
+    final statusCode = response.statusCode ?? 0;
+
+    switch (statusCode) {
       case 200:
-        var responseJson = response.data;
-        return responseJson;
+      case 201:
+        return response.data;
       case 400:
-        throw BadRequestException(
-            utf8.decode(response.data), response.requestOptions.path);
+        final message = _parseErrorMessage(response.data);
+        throw BadRequestException(message, response.requestOptions.path);
+      case 401:
+      case 403:
+        final message = _parseErrorMessage(response.data);
+        throw UnAuthorizedException(message, response.requestOptions.path);
       case 500:
-        throw FetchDataException('Error occured: ${response.statusCode}',
-            response.requestOptions.uri.toString());
       default:
+        throw FetchDataException(
+          'Error occurred: $statusCode',
+          response.requestOptions.uri.toString(),
+        );
     }
+  }
+
+  String _parseErrorMessage(dynamic data) {
+    if (data is String) return data;
+    if (data is Map && data['message'] != null) return data['message'];
+    return 'Unexpected error';
   }
 }
