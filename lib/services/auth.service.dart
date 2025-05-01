@@ -9,33 +9,31 @@ class AuthService extends BaseClient {
 
   // Đăng ký tài khoản mới
   Future<Map<String, dynamic>> signup({
-      required String name,
-      required String phone,
-      required String email,
-      required String address,
-      required String password,
-    }) async {
-      final res = await post('auth/signup', {
-        'name': name,
-        'phone': phone,
-        'email': email,
-        'address': address, 
-        'password': password,
-      });
-      return res['data'];
-  } 
-
-  Future<Map<String, dynamic>> login(String identifier, String password) async {
-    final res = await post('auth/login', {
-      'email' : identifier,
+    required String name,
+    required String phone,
+    required String email,
+    required String address,
+    required String password,
+  }) async {
+    final res = await post('auth/signup', {
+      'name': name,
+      'phone': phone,
+      'email': email,
+      'address': address,
       'password': password,
     });
-    print("Response: " + res);
+    return res['data'];
+  }
+
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final res = await post('auth/login', {
+      'email': email,
+      'password': password,
+    });
     await _storage.write(key: 'access_token', value: res['accessToken']);
     await _storage.write(key: 'refresh_token', value: res['refreshToken']);
     return res['user'];
   }
-
 
   // Quên mật khẩu
   Future<void> forgotPassword(String identifier) async {
@@ -54,6 +52,10 @@ class AuthService extends BaseClient {
       'otp_code': otpCode,
       'id': id,
     });
+  }
+
+  Future<void> check() async {
+    await get('product');
   }
 
   // Reset mật khẩu

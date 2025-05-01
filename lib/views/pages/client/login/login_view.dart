@@ -15,30 +15,20 @@ class LoginView extends StatelessWidget {
   // Sign user in method
   void signIn(BuildContext context) async {
     final authService = AuthService();
-    final id = userNameController.text.trim(); // email hoặc phone
-    final pw = passwordController.text.trim();
-    print("Sign in tapped");
-    print("ID: $id, Password: $pw");
-    if (id.isEmpty || pw.isEmpty) {
+    final email = userNameController.text.trim(); // email hoặc phone
+    final password = passwordController.text.trim();
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter both email and password')),
       );
       return;
     }
-    
+
     try {
-        print("Attempting to login with ID: $id and Password: $pw");
-        await authService.login(id, pw);
-        print("Login successful");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login successful")),
-        );
-        Navigator.pushReplacementNamed(context, 'home');
+      await authService.login(email, password);
+      Navigator.pushReplacementNamed(context, 'home');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-      print("Login failed: $e");
+      print('error: $e');
     }
   }
 

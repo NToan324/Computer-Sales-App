@@ -6,48 +6,52 @@ import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class BaseClient {
- static const String baseUrl = 'http://localhost:3000/';
+  static const String baseUrl = 'http://localhost:3000/';
   static const int timeOutDuration = 30;
 
-  late Dio dio;
-  final FlutterSecureStorage _storage = FlutterSecureStorage();
+  late Dio dio = Dio(BaseOptions(
+    baseUrl: baseUrl,
+    connectTimeout: Duration(seconds: timeOutDuration),
+    receiveTimeout: Duration(seconds: timeOutDuration),
+  ));
+  // final FlutterSecureStorage _storage = FlutterSecureStorage();
 
-  BaseClient({Dio? dioParam}) {
-    dio = dioParam ?? Dio(BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: Duration(seconds: timeOutDuration),
-      receiveTimeout: Duration(seconds: timeOutDuration),
-    ));
+  // BaseClient({Dio? dioParam}) {
+  //   dio = dioParam ??
+  //       Dio(BaseOptions(
+  //         baseUrl: baseUrl,
+  //         connectTimeout: Duration(seconds: timeOutDuration),
+  //         receiveTimeout: Duration(seconds: timeOutDuration),
+  //       ));
 
-    dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        final excludes = [
-          'login',
-          'signup',
-          'forgot-password',
-          'verify-otp',
-        ];
-        if(!excludes.any((path) => options.path.contains(path))) {
-          final token = await _storage.read(key: 'access_token');
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          handler.next(options);
-        }
-      },
-      onError: (e, handler) async {
-        if (e.response?.statusCode == 401) {
-          // Xử lý refresh token nếu cần
-        }
-        handler.next(e);
-      },
-    ));
-  }
+  //   dio.interceptors.add(InterceptorsWrapper(
+  //     onRequest: (options, handler) async {
+  //       final excludes = [
+  //         'login',
+  //         'signup',
+  //         'forgot-password',
+  //         'verify-otp',
+  //       ];
+  //       if (!excludes.any((path) => options.path.contains(path))) {
+  //         final token = await _storage.read(key: 'access_token');
+  //         if (token != null) {
+  //           options.headers['Authorization'] = 'Bearer $token';
+  //         }
+  //         handler.next(options);
+  //       }
+  //     },
+  //     onError: (e, handler) async {
+  //       if (e.response?.statusCode == 401) {
+  //         // Xử lý refresh token nếu cần
+  //       }
+  //       handler.next(e);
+  //     },
+  //   ));
+  // }
 
   // GET Request
   Future<dynamic> get(String api) async {
     final uri = Uri.parse('$baseUrl$api');
-    print('GET request: $uri');
     try {
       final response = await dio.get(uri.toString());
       return _processResponse(response);
@@ -63,7 +67,6 @@ class BaseClient {
     final uri = Uri.parse('$baseUrl$api');
     try {
       final response = await dio.post(uri.toString(), data: body);
-      print("Response: " + response.data.toString());
       return _processResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', api);
