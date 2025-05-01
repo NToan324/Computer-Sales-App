@@ -7,11 +7,11 @@ class DailyProgress extends StatelessWidget {
   final String maxValue;
 
   const DailyProgress({
-    Key? key,
+    super.key,
     required this.progress,
     required this.currentValue,
     required this.maxValue,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

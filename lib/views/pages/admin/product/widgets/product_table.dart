@@ -3,7 +3,7 @@ import 'package:computer_sales_app/utils/responsive.dart';
 import 'product_form.dart'; // Import widget ProductForm
 
 class ProductTable extends StatefulWidget {
-  const ProductTable({Key? key}) : super(key: key);
+  const ProductTable({super.key});
 
   @override
   State<ProductTable> createState() => _ProductTableState();

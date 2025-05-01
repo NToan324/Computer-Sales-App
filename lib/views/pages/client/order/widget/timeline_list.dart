@@ -6,7 +6,7 @@ class TimelineList extends StatelessWidget {
   final List<Map<String, String>> orders;
   final String state;
   
-  TimelineList({super.key, required this.orders, required this.state});
+  const TimelineList({super.key, required this.orders, required this.state});
 
   @override
   Widget build(BuildContext context) {

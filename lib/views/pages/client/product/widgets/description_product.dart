@@ -2,7 +2,7 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 
 class DescriptionProduct extends StatefulWidget {
-  DescriptionProduct({super.key});
+  const DescriptionProduct({super.key});
 
   @override
   State<DescriptionProduct> createState() => _DescriptionProductState();

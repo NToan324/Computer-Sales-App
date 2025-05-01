@@ -10,7 +10,7 @@ import 'package:computer_sales_app/views/pages/admin/support/support_screen.dart
 import 'package:computer_sales_app/components/custom/sidebar.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 class AdminScreen extends StatefulWidget {
-  const AdminScreen({Key? key}) : super(key: key);
+  const AdminScreen({super.key});
 
   @override
   _AdminScreenState createState() => _AdminScreenState();

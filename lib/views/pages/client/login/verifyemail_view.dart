@@ -1,88 +1,71 @@
-// TODO Implement this library.
-import 'package:computer_sales_app/views/pages/client/login/widgets/text_field.dart';
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
+import 'package:computer_sales_app/services/auth.service.dart';
 import 'widgets/button.dart';
+import 'widgets/text_field.dart';
 
-class VerifyEmailView extends StatelessWidget {
-  VerifyEmailView({super.key});
-  final userNameController = TextEditingController();
+class VerifyEmailView extends StatefulWidget {
+  final String userId; // Dùng userId làm tham số
+  const VerifyEmailView({super.key, required this.userId});
 
-  //Sign user in method
-  void sendCode(BuildContext context) {
-    Navigator.pushNamed(context, 'verify-otp');
+  @override
+  State<VerifyEmailView> createState() => _VerifyEmailViewState();
+}
+
+class _VerifyEmailViewState extends State<VerifyEmailView> {
+  final _emailCtrl = TextEditingController();
+  bool _loading = false;
+
+  Future<void> _sendCode() async {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter email')),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      final auth = AuthService();
+      // Gọi API forgotPassword để gửi OTP tới email
+      final otpData = await auth.forgotPassword(widget.userId);
+      final userId = otpData as String;
+      // Điều hướng đến trang nhập OTP với userId
+      Navigator.pushNamed(context, 'verify-otp', arguments: userId);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Send code failed: $e')),
+      );
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Quay lại trang Login
-          },
-        ),
-      ),
+  Widget build(BuildContext ctx) => Scaffold(
+    appBar: AppBar(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Container(
-              width: 400,
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Verify email',
-                      style: TextStyle(
-                        fontSize: 40,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      'Please enter email to send otp code',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: const Color.fromARGB(255, 159, 159, 159),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                      height: 1,
-                      width: 150,
-                      color: const Color.fromARGB(255, 159, 159, 159),
-                    ),
-                    const SizedBox(height: 60),
-                    MyTextField(
-                      hintText: 'Email',
-                      prefixIcon: Icons.email,
-                      controller: userNameController,
-                      obscureText: false,
-                    ),
-                    const SizedBox(height: 60),
-                    MyButton(
-                      text: 'Send code',
-                      onTap: sendCode,
-                    ),
-                    const SizedBox(height: 100),
-                  ],
-                ),
-              ),
-            ),
+      leading: BackButton(color: Colors.black),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          const Text('Verify Email', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 24),
+          MyTextField(
+            hintText: 'Email',
+            prefixIcon: Icons.email,
+            controller: _emailCtrl,
+            obscureText: false,
           ),
-        ),
+          const SizedBox(height: 32),
+          MyButton(
+            text: 'Send Code',
+            onTap: _loading ? null : (_) => _sendCode(),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
 }

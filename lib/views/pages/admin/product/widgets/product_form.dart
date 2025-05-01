@@ -8,12 +8,12 @@ class ProductForm extends StatefulWidget {
   final Map<String, dynamic>? initialProduct;
 
   const ProductForm({
-    Key? key,
+    super.key,
     required this.onSubmit,
     this.onDelete, // Optional delete function
     required this.buttonLabel,
     this.initialProduct,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductForm> createState() => _ProductFormState();

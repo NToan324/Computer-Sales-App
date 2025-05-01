@@ -6,7 +6,7 @@ import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
  
   @override

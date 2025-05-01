@@ -6,10 +6,10 @@ class CustomSidebar extends StatelessWidget {
   final Function(String) onMenuTap;
 
   const CustomSidebar({
-    Key? key,
+    super.key,
     required this.selectedMenu,
     required this.onMenuTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class CustomSidebar extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            Container(
+            SizedBox(
               height: 150, // Chiều cao cố định cho header
               child: Center(
                 child: Row(
@@ -118,7 +118,7 @@ class CustomSidebar extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children:[
-        Container(
+        SizedBox(
         width: 220,
         child: ListTile(
           leading: Icon(

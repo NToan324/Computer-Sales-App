@@ -1,93 +1,81 @@
+// lib/services/base_client.dart
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:dio/dio.dart';
+import 'package:computer_sales_app/services/app_exceptions.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class BaseClient {
-  static const String baseUrl = 'http://localhost:3000/';
+ static const String baseUrl = 'http://localhost:3000/';
   static const int timeOutDuration = 30;
 
-  final Dio dio = Dio(
-    BaseOptions(
+  late Dio dio;
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+
+  BaseClient({Dio? dioParam}) {
+    dio = dioParam ?? Dio(BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: timeOutDuration),
-      receiveTimeout: const Duration(seconds: timeOutDuration),
-      headers: {
-        'Content-Type': 'application/json',
+      connectTimeout: Duration(seconds: timeOutDuration),
+      receiveTimeout: Duration(seconds: timeOutDuration),
+    ));
+
+    dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final excludes = [
+          'login',
+          'signup',
+          'forgot-password',
+          'verify-otp',
+        ];
+        if(!excludes.any((path) => options.path.contains(path))) {
+          final token = await _storage.read(key: 'access_token');
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          handler.next(options);
+        }
       },
-    ),
-  );
+      onError: (e, handler) async {
+        if (e.response?.statusCode == 401) {
+          // Xử lý refresh token nếu cần
+        }
+        handler.next(e);
+      },
+    ));
+  }
 
-  // GET
+  // GET Request
   Future<dynamic> get(String api) async {
+    final uri = Uri.parse('$baseUrl$api');
+    print('GET request: $uri');
     try {
-      final response = await dio.get(api);
+      final response = await dio.get(uri.toString());
       return _processResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', api);
     } on TimeoutException {
-      throw ApiNotRespondingException('API not responded in time', api);
+      throw ApiNotRespondingException('API timeout', uri.toString());
     }
   }
 
-  // POST
-  Future<dynamic> post(String api, dynamic payloadObj) async {
+  // POST Request
+  Future<dynamic> post(String api, Map<String, dynamic> body) async {
+    final uri = Uri.parse('$baseUrl$api');
     try {
-      final response = await dio.post(api, data: json.encode(payloadObj));
+      final response = await dio.post(uri.toString(), data: body);
+      print("Response: " + response.data.toString());
       return _processResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', api);
     } on TimeoutException {
-      throw ApiNotRespondingException('API not responded in time', api);
+      throw ApiNotRespondingException('API timeout', uri.toString());
     }
   }
 
-  // PUT
-  Future<dynamic> put(String api, dynamic payloadObj) async {
-    try {
-      final response = await dio.put(api, data: json.encode(payloadObj));
-      return _processResponse(response);
-    } on SocketException {
-      throw FetchDataException('No Internet connection', api);
-    } on TimeoutException {
-      throw ApiNotRespondingException('API not responded in time', api);
-    }
-  }
-
-  // PATCH
-  Future<dynamic> patch(String api, dynamic payloadObj) async {
-    try {
-      final response = await dio.patch(api, data: json.encode(payloadObj));
-      return _processResponse(response);
-    } on SocketException {
-      throw FetchDataException('No Internet connection', api);
-    } on TimeoutException {
-      throw ApiNotRespondingException('API not responded in time', api);
-    }
-  }
-
-  // DELETE
-  Future<dynamic> delete(String api, {String? id}) async {
-    final fullPath = id != null ? '$api/$id' : api;
-    try {
-      final response = await dio.delete(fullPath);
-      return _processResponse(response);
-    } on SocketException {
-      throw FetchDataException('No Internet connection', fullPath);
-    } on TimeoutException {
-      throw ApiNotRespondingException('API not responded in time', fullPath);
-    }
-  }
-
-  // RESPONSE HANDLER
+  // Handle response based on status code
   dynamic _processResponse(Response response) {
-    final statusCode = response.statusCode ?? 0;
-
-    switch (statusCode) {
+    switch (response.statusCode) {
       case 200:
-      case 201:
         return response.data;
       case 400:
         final message = _parseErrorMessage(response.data);
@@ -97,11 +85,11 @@ class BaseClient {
         final message = _parseErrorMessage(response.data);
         throw UnAuthorizedException(message, response.requestOptions.path);
       case 500:
+        throw FetchDataException('Error occurred: ${response.statusCode}',
+            response.requestOptions.uri.toString());
       default:
         throw FetchDataException(
-          'Error occurred: $statusCode',
-          response.requestOptions.uri.toString(),
-        );
+            'Something went wrong', response.requestOptions.uri.toString());
     }
   }
 

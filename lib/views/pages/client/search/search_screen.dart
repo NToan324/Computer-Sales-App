@@ -42,8 +42,9 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildRecentSearches() {
-    if (_recentSearches.isEmpty || searchQuery.isNotEmpty)
+    if (_recentSearches.isEmpty || searchQuery.isNotEmpty) {
       return const SizedBox();
+    }
     return Column(
       children: _recentSearches.map((search) {
         return ListTile(

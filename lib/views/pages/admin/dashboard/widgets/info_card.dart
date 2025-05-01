@@ -5,11 +5,11 @@ class InfoCard extends StatelessWidget {
   final Color color;
 
   const InfoCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 
 class CustomerTable extends StatefulWidget {
-  const CustomerTable({Key? key}) : super(key: key);
+  const CustomerTable({super.key});
 
   @override
   State<CustomerTable> createState() => _CustomerTableState();

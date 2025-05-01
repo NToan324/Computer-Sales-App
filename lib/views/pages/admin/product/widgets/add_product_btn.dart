@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'product_form.dart'; // import widget ProductForm bạn vừa tách
 
 class AddProductButton extends StatelessWidget {
-  const AddProductButton({Key? key}) : super(key: key);
+  const AddProductButton({super.key});
 
   @override
   Widget build(BuildContext context) {
