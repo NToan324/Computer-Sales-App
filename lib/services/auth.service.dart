@@ -14,7 +14,7 @@ class AuthService extends BaseClient {
     String? email,
     required String password,
   }) async {
-    final res = await super.post('signup', {
+    final res = await post('auth/signup', {
       'name': name,
       'phone': phone,
       if (email != null) 'email': email,
@@ -24,25 +24,34 @@ class AuthService extends BaseClient {
   }
 
   // Đăng nhập
+  // Future<void> login(String identifier, String password) async {
+  //   final res = await post('login', {
+  //     identifier.contains('@') ? 'email' : 'phone': identifier,
+  //     'password': password,
+  //   });
+  //   // Lưu token vào secure storage
+  //   print('Login response: $res');
+  //   await _storage.write(key: 'access_token', value: res['accessToken']);
+  //   await _storage.write(key: 'refresh_token', value: res['refreshToken']);
+  // }
   Future<void> login(String identifier, String password) async {
-    final res = await super.post('login', {
-      identifier.contains('@') ? 'email' : 'phone': identifier,
-      'password': password,
-    });
-    // Lưu token vào secure storage
-    await _storage.write(key: 'access_token', value: res['accessToken']);
-    await _storage.write(key: 'refresh_token', value: res['refreshToken']);
+      final res = await post('auth/login', {
+        identifier.contains('@') ? 'email' : 'phone': identifier,
+        'password': password,
+      });
+      await _storage.write(key: 'access_token', value: res['accessToken']);
+      await _storage.write(key: 'refresh_token', value: res['refreshToken']);    
   }
 
   // Lấy thông tin người dùng
   Future<Map<String, dynamic>> getProfile() async {
-    final res = await super.get('me');
+    final res = await get('auth/me');
     return res;
   }
 
   // Quên mật khẩu
   Future<void> forgotPassword(String identifier) async {
-    await super.post('forgot-password', {
+    await post('auth/forgot-password', {
       identifier.contains('@') ? 'email' : 'phone': identifier,
     });
     // Xử lý nếu cần
@@ -53,7 +62,7 @@ class AuthService extends BaseClient {
     required String otpCode,
     required String id,
   }) async {
-    await super.post('verify-otp', {
+    await post('auth/verify-otp', {
       'otp_code': otpCode,
       'id': id,
     });
@@ -64,7 +73,7 @@ class AuthService extends BaseClient {
     required String id,
     required String newPassword,
   }) async {
-    await super.post('reset-password', {
+    await post('auth/reset-password', {
       'id': id,
       'password': newPassword,
     });

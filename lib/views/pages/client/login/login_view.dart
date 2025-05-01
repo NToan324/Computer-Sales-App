@@ -4,6 +4,7 @@ import "package:computer_sales_app/views/pages/client/login/verifyemail_view.dar
 import "package:computer_sales_app/views/pages/client/login/widgets/button.dart";
 import "package:computer_sales_app/views/pages/client/login/widgets/text_field.dart";
 import "package:computer_sales_app/services/auth.service.dart";
+// import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
 import "package:flutter/material.dart";
 
 class LoginView extends StatelessWidget {
@@ -14,9 +15,9 @@ class LoginView extends StatelessWidget {
   // Sign user in method
   void signIn(BuildContext context) async {
     final authService = AuthService();
-    final id  = userNameController.text.trim();    // email hoặc phone
-    final pw  = passwordController.text.trim();
-
+    final id = userNameController.text.trim(); // email hoặc phone
+    final pw = passwordController.text.trim();
+    print("Sign in tapped");
     if (id.isEmpty || pw.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter both email and password')),
@@ -25,8 +26,14 @@ class LoginView extends StatelessWidget {
     }
 
     try {
-      await authService.login(id, pw);  // <-- positional args
-      Navigator.pushReplacementNamed(context, 'home');
+        print("Login started...");
+        await authService.login(id, pw);
+        print("Login success, navigating...");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login successful")),
+        );
+        Navigator.pushReplacementNamed(context, 'home');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
@@ -107,7 +114,9 @@ class LoginView extends StatelessWidget {
                           final identifier = userNameController.text.trim();
                           if (identifier.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Please enter your email or phone first')),
+                              const SnackBar(
+                                  content: Text(
+                                      'Please enter your email or phone first')),
                             );
                             return;
                           }
@@ -115,7 +124,8 @@ class LoginView extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => VerifyEmailView(userId: identifier),
+                              builder: (_) =>
+                                  VerifyEmailView(userId: identifier),
                             ),
                           );
                         },
@@ -132,7 +142,7 @@ class LoginView extends StatelessWidget {
                   const SizedBox(height: 40),
                   MyButton(
                     text: 'Sign In',
-                    onTap: signIn,
+                    onTap: (ctx) => signIn(ctx),
                   ),
                   const SizedBox(height: 40),
                   Row(
