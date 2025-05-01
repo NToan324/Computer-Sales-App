@@ -196,13 +196,13 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
 }
 
 void _openReviewDialog(BuildContext context) {
-  int _selectedRating = 0;
-  bool _showForm = false;
-  TextEditingController _commentController = TextEditingController();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
-  bool _agreePolicy = false;
-  bool _recommend = false;
+  int selectedRating = 0;
+  bool showForm = false;
+  TextEditingController commentController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  bool agreePolicy = false;
+  bool recommend = false;
 
   showDialog(
     context: context,
@@ -246,7 +246,7 @@ void _openReviewDialog(BuildContext context) {
                           children: [
                             IconButton(
                               icon: Icon(
-                                index < _selectedRating
+                                index < selectedRating
                                     ? Icons.star
                                     : Icons.star_border,
                                 color: Colors.orange,
@@ -254,8 +254,8 @@ void _openReviewDialog(BuildContext context) {
                               ),
                               onPressed: () {
                                 setState(() {
-                                  _selectedRating = index + 1;
-                                  _showForm = _selectedRating > 0;
+                                  selectedRating = index + 1;
+                                  showForm = selectedRating > 0;
                                 });
                               },
                             ),
@@ -275,9 +275,9 @@ void _openReviewDialog(BuildContext context) {
                       }),
                     ),
                     SizedBox(height: 24),
-                    if (_showForm) ...[
+                    if (showForm) ...[
                       TextField(
-                        controller: _commentController,
+                        controller: commentController,
                         maxLines: 3,
                         decoration: InputDecoration(
                           hintText: 'Mời bạn chia sẻ thêm cảm nhận...',
@@ -296,10 +296,10 @@ void _openReviewDialog(BuildContext context) {
                             fontSize: 14,
                           ),
                         ),
-                        value: _recommend,
+                        value: recommend,
                         onChanged: (val) {
                           setState(() {
-                            _recommend = val ?? false;
+                            recommend = val ?? false;
                           });
                         },
                         controlAffinity: ListTileControlAffinity.leading,
@@ -309,7 +309,7 @@ void _openReviewDialog(BuildContext context) {
                         children: [
                           Expanded(
                             child: TextField(
-                              controller: _nameController,
+                              controller: nameController,
                               decoration: InputDecoration(
                                 hintText: 'Họ tên (bắt buộc)',
                                 hintStyle: TextStyle(
@@ -322,7 +322,7 @@ void _openReviewDialog(BuildContext context) {
                           SizedBox(width: 8),
                           Expanded(
                             child: TextField(
-                              controller: _phoneController,
+                              controller: phoneController,
                               decoration: InputDecoration(
                                 hintText: 'Số điện thoại (bắt buộc)',
                                 hintStyle: TextStyle(
@@ -350,10 +350,10 @@ void _openReviewDialog(BuildContext context) {
                             ],
                           ),
                         ),
-                        value: _agreePolicy,
+                        value: agreePolicy,
                         onChanged: (val) {
                           setState(() {
-                            _agreePolicy = val ?? false;
+                            agreePolicy = val ?? false;
                           });
                         },
                         controlAffinity: ListTileControlAffinity.leading,
@@ -368,9 +368,9 @@ void _openReviewDialog(BuildContext context) {
                           ),
                         ),
                         onPressed: () {
-                          if (_agreePolicy &&
-                              _nameController.text.isNotEmpty &&
-                              _phoneController.text.isNotEmpty) {
+                          if (agreePolicy &&
+                              nameController.text.isNotEmpty &&
+                              phoneController.text.isNotEmpty) {
                             Navigator.of(context).pop();
                           } else {}
                         },

@@ -9,45 +9,33 @@ class AuthService extends BaseClient {
 
   // Đăng ký tài khoản mới
   Future<Map<String, dynamic>> signup({
-    required String name,
-    required String phone,
-    String? email,
-    required String password,
-  }) async {
-    final res = await post('auth/signup', {
-      'name': name,
-      'phone': phone,
-      if (email != null) 'email': email,
-      'password': password,
-    });
-    return res;
-  }
-
-  // Đăng nhập
-  // Future<void> login(String identifier, String password) async {
-  //   final res = await post('login', {
-  //     identifier.contains('@') ? 'email' : 'phone': identifier,
-  //     'password': password,
-  //   });
-  //   // Lưu token vào secure storage
-  //   print('Login response: $res');
-  //   await _storage.write(key: 'access_token', value: res['accessToken']);
-  //   await _storage.write(key: 'refresh_token', value: res['refreshToken']);
-  // }
-  Future<void> login(String identifier, String password) async {
-      final res = await post('auth/login', {
-        identifier.contains('@') ? 'email' : 'phone': identifier,
+      required String name,
+      required String phone,
+      required String email,
+      required String address,
+      required String password,
+    }) async {
+      final res = await post('auth/signup', {
+        'name': name,
+        'phone': phone,
+        'email': email,
+        'address': address, 
         'password': password,
       });
-      await _storage.write(key: 'access_token', value: res['accessToken']);
-      await _storage.write(key: 'refresh_token', value: res['refreshToken']);    
+      return res['data'];
+  } 
+
+  Future<Map<String, dynamic>> login(String identifier, String password) async {
+    final res = await post('auth/login', {
+      'email' : identifier,
+      'password': password,
+    });
+    print("Response: " + res);
+    await _storage.write(key: 'access_token', value: res['accessToken']);
+    await _storage.write(key: 'refresh_token', value: res['refreshToken']);
+    return res['user'];
   }
 
-  // Lấy thông tin người dùng
-  Future<Map<String, dynamic>> getProfile() async {
-    final res = await get('auth/me');
-    return res;
-  }
 
   // Quên mật khẩu
   Future<void> forgotPassword(String identifier) async {
@@ -69,11 +57,11 @@ class AuthService extends BaseClient {
   }
 
   // Reset mật khẩu
-  Future<void> resetPassword({
+  Future<void> forgetPasswordReset({
     required String id,
     required String newPassword,
   }) async {
-    await post('auth/reset-password', {
+    await post('auth/forgot-password-reset', {
       'id': id,
       'password': newPassword,
     });

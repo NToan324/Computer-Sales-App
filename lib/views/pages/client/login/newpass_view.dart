@@ -39,7 +39,7 @@ class CreateNewPasswordView extends StatelessWidget {
     try {
       final auth = AuthService();
       // Gọi API để reset mật khẩu
-      await auth.resetPassword(id: '', newPassword: password);  // Pass the user ID here as needed
+      await auth.forgetPasswordReset(id: '', newPassword: password);  // Pass the user ID here as needed
       // Nếu thành công, chuyển hướng hoặc thông báo cho người dùng
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password updated successfully')),

@@ -47,6 +47,7 @@ class BaseClient {
   // GET Request
   Future<dynamic> get(String api) async {
     final uri = Uri.parse('$baseUrl$api');
+    print('GET request: $uri');
     try {
       final response = await dio.get(uri.toString());
       return _processResponse(response);
@@ -62,6 +63,7 @@ class BaseClient {
     final uri = Uri.parse('$baseUrl$api');
     try {
       final response = await dio.post(uri.toString(), data: body);
+      print("Response: " + response.data.toString());
       return _processResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection', api);

@@ -9,7 +9,6 @@ import 'package:computer_sales_app/views/pages/client/notification/notification_
 import 'package:computer_sales_app/views/pages/client/product/product_details_view.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:computer_sales_app/views/pages/client/search/search_product_screen.dart';
-import 'package:computer_sales_app/views/pages/client/splash/splash_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
