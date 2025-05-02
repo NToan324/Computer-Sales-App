@@ -29,33 +29,14 @@ class _RemoveCartWidgetState extends State<RemoveCartWidget> {
       left: 0.0,
       right: 0.0,
       child: Container(
-        padding:
-            const EdgeInsets.only(bottom: 30, left: 20, right: 20, top: 20),
+        padding: const EdgeInsets.only(top: 16, bottom: 16),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          spacing: 10,
           children: [
-            const Text(
-              'Remove from cart?',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                  decoration: TextDecoration.none),
-            ),
-            const SizedBox(height: 10),
-            const Divider(
-              indent: 0,
-              endIndent: 0,
-              thickness: 1,
-            ),
-            const SizedBox(height: 5),
             CartItemWidget(
               item: widget.cartItems[widget.itemToRemove!],
               onQuantityChanged: (newQuantity) {
@@ -66,12 +47,12 @@ class _RemoveCartWidgetState extends State<RemoveCartWidget> {
               maxQuantity: widget.cartItems[widget.itemToRemove!].quantity,
               isRemove: true,
             ),
-            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(
                   width: 150,
+                  height: 40,
                   child: ElevatedButton(
                     onPressed: widget.cancelRemoveItem,
                     style: ElevatedButton.styleFrom(
@@ -91,16 +72,17 @@ class _RemoveCartWidgetState extends State<RemoveCartWidget> {
                 ),
                 SizedBox(
                   width: 150,
+                  height: 40,
                   child: ElevatedButton(
                     onPressed: widget.removeItem,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: Text(
-                      'Yes, Remove',
+                      'Remove',
                       style: TextStyle(
                         color: AppColors.white,
                       ),

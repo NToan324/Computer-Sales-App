@@ -15,17 +15,10 @@ class CustomAppBarMobile extends StatelessWidget
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontSize: 18,
           color: Colors.black,
         ),
       ),
-      // leading: BackButton(
-      //   color: Colors.black,
-      //   onPressed: () {
-      //     Navigator.pop(context);
-      //   },
-      // ),
       centerTitle: true,
     );
   }

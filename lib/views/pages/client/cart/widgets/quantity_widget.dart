@@ -59,7 +59,8 @@ class _QuantitySelectorState extends State<QuantitySelector> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
-      spacing: 12,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 10,
       children: [
         Container(
           decoration: BoxDecoration(
@@ -76,15 +77,12 @@ class _QuantitySelectorState extends State<QuantitySelector> {
             constraints: const BoxConstraints(),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            '$_quantity',
-            style: const TextStyle(
-              fontSize: 20,
-              fontFamily: "Poppins",
-              color: AppColors.black,
-            ),
+        Text(
+          '$_quantity',
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: "Poppins",
+            color: AppColors.black,
           ),
         ),
         Container(
