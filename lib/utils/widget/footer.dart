@@ -12,12 +12,12 @@ class FooterWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'heilsa',
+            'SHEIDTECH',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
           Text(
-            '©2019 SworKit® by Nexercise, Inc.',
+            '©2025 SworKit® by Nexercise, Inc.',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
           Text(

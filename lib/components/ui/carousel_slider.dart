@@ -36,7 +36,7 @@ class _CarouselSliderCustomState extends State<CarouselSliderCustom> {
     return Column(
       spacing: 10,
       children: [
-        if (Responsive.isMobile(context))
+        if (!Responsive.isDesktop(context))
           SizedBox(
             height: 10,
           ),

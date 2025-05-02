@@ -160,11 +160,12 @@ class _SearchWidgetState extends State<SearchWidget> {
         mainAxisAlignment: Responsive.isDesktop(context)
             ? MainAxisAlignment.start
             : MainAxisAlignment.spaceBetween,
+        spacing: 10,
         children: [
           SizedBox(
             width: Responsive.isDesktop(context)
                 ? 400
-                : MediaQuery.of(context).size.width * 0.75,
+                : MediaQuery.of(context).size.width * 0.7,
             child: SearchField(
               controller: _searchController,
               onTap: () => {
@@ -179,7 +180,6 @@ class _SearchWidgetState extends State<SearchWidget> {
               },
             ),
           ),
-          const SizedBox(width: 10),
           Container(
             width: 50,
             height: 50,

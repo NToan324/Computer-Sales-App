@@ -26,7 +26,6 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
     _searchController.text = widget.initialQuery;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +38,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
           child: Column(
             children: [
               // Thêm ô nhập tìm kiếm
-
               const SizedBox(height: 10),
-              
               // Hiển thị lịch sử tìm kiếm gần đây
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -77,10 +74,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
 
               // Danh sách sản phẩm tìm thấy
               Expanded(
-                child: SingleChildScrollView(
-                  child: ProductListViewWidget()
-                  )
-                ),
+                  child: SingleChildScrollView(child: ProductListViewWidget())),
             ],
           ),
         ),

@@ -6,9 +6,11 @@ import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/verifyotp_view.dart';
 import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
+import 'package:computer_sales_app/views/pages/client/payment/pament_view.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_details_view.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:computer_sales_app/views/pages/client/search/search_product_screen.dart';
+import 'package:computer_sales_app/views/pages/client/splash/splash_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Poppins'),
-      home: LoginView(),
+      home: SplashView(),
       routes: {
         //Login
         'login': (context) => LoginView(),
@@ -36,6 +38,7 @@ class MyApp extends StatelessWidget {
         'product-details': (context) => ProductDetailsView(),
         'chat': (context) => ChatView(),
         'notifications': (context) => NotificationView(),
+        'payment': (context) => PaymentView(),
 
         //Search
         'cart': (context) => const CartView(),
