@@ -16,7 +16,7 @@ class AuthService extends BaseClient {
     required String password,
   }) async {
     final res = await post('auth/signup', {
-      'name': name,
+      'fullName': name,
       'phone': phone,
       'email': email,
       'address': address,
@@ -36,11 +36,11 @@ class AuthService extends BaseClient {
   }
 
   // Quên mật khẩu
-  Future<void> forgotPassword(String identifier) async {
-    await post('auth/forgot-password', {
-      identifier.contains('@') ? 'email' : 'phone': identifier,
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    final res = await post('auth/forgot-password', {
+     'email': email,
     });
-    // Xử lý nếu cần
+    return res['data'];
   }
 
   // Kiểm tra mã OTP
@@ -50,13 +50,10 @@ class AuthService extends BaseClient {
   }) async {
     await post('auth/verify-otp', {
       'otp_code': otpCode,
-      'id': id,
+      'user_id': id,
     });
   }
 
-  Future<void> check() async {
-    await get('product');
-  }
 
   // Reset mật khẩu
   Future<void> forgetPasswordReset({

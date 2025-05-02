@@ -63,20 +63,37 @@ class BaseClient {
   }
 
   // POST Request
-  Future<dynamic> post(String api, Map<String, dynamic> body) async {
-    final uri = Uri.parse('$baseUrl$api');
-    try {
-      final response = await dio.post(uri.toString(), data: body);
-      return _processResponse(response);
-    } on SocketException {
-      throw FetchDataException('No Internet connection', api);
-    } on TimeoutException {
-      throw ApiNotRespondingException('API timeout', uri.toString());
+Future<dynamic> post(String api, Map<String, dynamic> body) async {
+  final uri = Uri.parse('$baseUrl$api');
+  try {
+    final response = await dio.post(uri.toString(), data: body);
+    return _processResponse(response);
+  } on DioException catch (e) {
+    if (e.response != null) {
+      // Nếu có phản hồi từ server, xử lý như bình thường
+      return _processResponse(e.response!);
+    } else {
+      // Nếu không có phản hồi (lỗi mạng, timeout, v.v.)
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout) {
+        throw ApiNotRespondingException('API timeout', uri.toString());
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw FetchDataException('No Internet connection', api);
+      } else {
+        throw FetchDataException('Unexpected error: ${e.message}', api);
+      }
     }
+  } on SocketException {
+    throw FetchDataException('No Internet connection', api);
+  } on TimeoutException {
+    throw ApiNotRespondingException('API timeout', uri.toString());
   }
+}
 
   // Handle response based on status code
   dynamic _processResponse(Response response) {
+    print(response.data);
     switch (response.statusCode) {
       case 200:
         return response.data;
@@ -97,8 +114,31 @@ class BaseClient {
   }
 
   String _parseErrorMessage(dynamic data) {
-    if (data is String) return data;
-    if (data is Map && data['message'] != null) return data['message'];
-    return 'Unexpected error';
+    // In dữ liệu để debug
+    print('Error data: $data');
+
+    // Kiểm tra nếu data là String
+    if (data is String) {
+      return data;
+    }
+
+    // Kiểm tra các trường hợp phổ biến
+    if (data is Map) {
+      // Trường hợp có 'message'
+      if (data['message'] is String) {
+        return data['message'];
+      }
+      // Trường hợp có 'error' là một Map và chứa 'message'
+      if (data['error'] is Map && data['error']['message'] is String) {
+        return data['error']['message'];
+      }
+      // Trường hợp chỉ có 'error' là chuỗi
+      if (data['error'] is String) {
+        return data['error'];
+      }
+    }
+
+    // Trả về thông báo mặc định nếu không phân tích được
+    return 'Unexpected error occurred';
   }
 }

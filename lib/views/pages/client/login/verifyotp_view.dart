@@ -1,15 +1,22 @@
+import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/services/auth.service.dart';
 import 'widgets/button.dart';
 import 'widgets/otp_input.dart';
 
-class VerifyOtpView extends StatelessWidget {
-final otp1Controller = TextEditingController();
+class VerifyOtpView extends StatefulWidget {
+  VerifyOtpView({super.key});
+
+  @override
+  _VerifyOtpViewState createState() => _VerifyOtpViewState();
+}
+
+class _VerifyOtpViewState extends State<VerifyOtpView> {
+  final otp1Controller = TextEditingController();
   final otp2Controller = TextEditingController();
   final otp3Controller = TextEditingController();
   final otp4Controller = TextEditingController();
-
-  VerifyOtpView({super.key});
+  bool _isLoading = false; // Thêm trạng thái loading
 
   void verifyOtp(BuildContext context) async {
     final userId = ModalRoute.of(context)!.settings.arguments as String;
@@ -26,20 +33,25 @@ final otp1Controller = TextEditingController();
       return;
     }
 
+    setState(() => _isLoading = true);
+
     try {
       final auth = AuthService();
       await auth.verifyOtp(otpCode: otpCode, id: userId);
+      // Thêm độ trễ 1 giây để hiển thị hiệu ứng loading
+      await Future.delayed(const Duration(milliseconds: 1000));
       Navigator.pushNamed(context, 'change-password', arguments: userId);
-    } catch (e) {
+    } on BadRequestException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to verify OTP: $e')),
+        SnackBar(content: Text(e.message)),
       );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -47,7 +59,7 @@ final otp1Controller = TextEditingController();
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Quay lại trang trước
+            Navigator.pop(context);
           },
         ),
       ),
@@ -98,9 +110,10 @@ final otp1Controller = TextEditingController();
                     ],
                   ),
                   const SizedBox(height: 60),
-                   MyButton(
+                  MyButton(
                     text: 'Verify OTP',
-                    onTap: verifyOtp // <- sửa email => userId
+                    onTap: (_) => verifyOtp(context),
+                    isLoading: _isLoading, // Truyền trạng thái loading
                   ),
                   const SizedBox(height: 100),
                 ],

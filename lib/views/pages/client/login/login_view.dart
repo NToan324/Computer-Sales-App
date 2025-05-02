@@ -1,4 +1,5 @@
 import "package:computer_sales_app/config/color.dart";
+import "package:computer_sales_app/services/app_exceptions.dart";
 import "package:computer_sales_app/views/pages/client/login/signup_view.dart";
 import "package:computer_sales_app/views/pages/client/login/verifyemail_view.dart";
 import "package:computer_sales_app/views/pages/client/login/widgets/button.dart";
@@ -7,28 +8,37 @@ import "package:computer_sales_app/services/auth.service.dart";
 // import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
 import "package:flutter/material.dart";
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   LoginView({super.key});
+
+  @override
+  _LoginViewState createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
   final userNameController = TextEditingController();
   final passwordController = TextEditingController();
-
+  bool _loading = false;
   // Sign user in method
   void signIn(BuildContext context) async {
+    setState(() => _loading = true);
     final authService = AuthService();
     final email = userNameController.text.trim(); // email hoặc phone
     final password = passwordController.text.trim();
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter both email and password')),
-      );
-      return;
-    }
 
     try {
       await authService.login(email, password);
+      await Future.delayed(const Duration(milliseconds: 1000));
       Navigator.pushReplacementNamed(context, 'home');
-    } catch (e) {
-      print('error: $e');
+    } on BadRequestException catch (e) {
+      // Ensure Snackbar is called with a valid context
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    }finally {
+      setState(() {
+        _loading = false; // Tắt loading
+      });
     }
   }
 
@@ -100,31 +110,32 @@ class LoginView extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 30.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          final identifier = userNameController.text.trim();
-                          if (identifier.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Please enter your email or phone first')),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            final identifier = userNameController.text.trim();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    VerifyEmailView(userId: identifier),
+                              ),
                             );
-                            return;
-                          }
-                          // Điều hướng tới VerifyEmailView, truyền identifier làm userId
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  VerifyEmailView(userId: identifier),
+                          },
+                          borderRadius: BorderRadius.circular(4),
+                          splashColor: AppColors.primary.withOpacity(0.3), // Hiệu ứng sóng
+                          highlightColor: AppColors.primary.withOpacity(0.1), // Hiệu ứng nhấn giữ
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14,
+                              ),
                             ),
-                          );
-                        },
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -133,6 +144,7 @@ class LoginView extends StatelessWidget {
                   const SizedBox(height: 40),
                   MyButton(
                     text: 'Sign In',
+                    isLoading: _loading,
                     onTap: (ctx) => signIn(ctx),
                   ),
                   const SizedBox(height: 40),
@@ -146,19 +158,27 @@ class LoginView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 5),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SignUpView()),
-                          );
-                        },
-                        child: Text(
-                          "Sign up",
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.bold,
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignUpView()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(4),
+                          splashColor: Colors.orange.withOpacity(0.3),
+                          highlightColor: Colors.orange.withOpacity(0.1),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            child: Text(
+                              "Sign up",
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
