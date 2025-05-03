@@ -117,7 +117,7 @@ class _LoginViewState extends State<LoginView> {
               onPressed: () => Navigator.pop(context),
             ),
             Text(
-              'Home',
+              'Back',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -126,8 +126,8 @@ class _LoginViewState extends State<LoginView> {
           ],
         ),
       ),
-      body: SafeArea(
-        child: Center(
+      body: Center(
+        child: SafeArea(
           child: SingleChildScrollView(
             child: Container(
               width: 400,
@@ -138,27 +138,23 @@ class _LoginViewState extends State<LoginView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.orange,
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
-                  ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Sign In',
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Hi, Welcome Back!',
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 159, 159, 159),
-                      fontSize: 14,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(left: 20),
+                        width: 250,
+                        child: Text(
+                          'Let\'s Get You Sign In !',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 30),
                   MyTextField(
@@ -212,7 +208,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 10),
                   MyButton(
                     text: 'Sign In',
                     isLoading: _loading,

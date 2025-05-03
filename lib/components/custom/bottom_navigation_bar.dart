@@ -6,9 +6,9 @@ import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_appbar.d
 import 'package:computer_sales_app/views/pages/client/home/widgets/home_body.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
-import 'package:computer_sales_app/views/pages/client/order/order_view.dart';
-import 'package:computer_sales_app/views/pages/client/order/widget/appBar_widget.dart';
+import 'package:computer_sales_app/views/pages/client/profile/widgets/profile_body.dart';
 import 'package:feather_icons/feather_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigationBarCustom extends StatefulWidget {
@@ -31,16 +31,12 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       'appBar': CustomAppBarMobile(title: 'Notification'),
     },
     {
-      'page': OrderView(),
-      'appBar': AppBarOrderCustom(),
-    },
-    {
       'page': ChatBody(),
       'appBar': ChatAppBar(),
     },
     {
-      'page': Text('Profile'),
-      'appBar': AppBar(title: Text('Profile')),
+      'page': ProfileBody(),
+      'appBar': CustomAppBarMobile(title: 'Profile'),
     },
   ];
 
@@ -69,23 +65,19 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
 
   final List<Map<String, dynamic>> icons = [
     {
-      'icon': Icons.home_outlined,
+      'icon': CupertinoIcons.home,
       'label': 'Home',
     },
     {
-      'icon': Icons.notifications_none_outlined,
+      'icon': CupertinoIcons.bell,
       'label': 'Notification',
-    },
-    {
-      'icon': Icons.add_to_photos_outlined,
-      'label': 'Calendar',
     },
     {
       'icon': FeatherIcons.messageCircle,
       'label': 'Message',
     },
     {
-      'icon': Icons.person_outline_rounded,
+      'icon': CupertinoIcons.person,
       'label': 'Profile',
     },
   ];
@@ -111,7 +103,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(
-                      5,
+                      icons.length,
                       (index) => _customItemNavBar(
                             icons[index]['icon'] as IconData,
                             icons[index]['label'] as String,

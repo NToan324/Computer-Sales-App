@@ -109,7 +109,7 @@ class _SignUpViewState extends State<SignUpView> {
               onPressed: () => Navigator.pop(context),
             ),
             Text(
-              'Login',
+              'Back',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -132,23 +132,16 @@ class _SignUpViewState extends State<SignUpView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 20,
                 children: [
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                   SizedBox(
-                    width: 300,
+                    width: 200,
                     child: const Text(
-                      'Fill the form below to create an account',
-                      textAlign: TextAlign.center,
+                      'Create Account',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 159, 159, 159),
-                        fontSize: 16,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                   MyTextField(
