@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/services/auth.service.dart';
 import 'widgets/button.dart';
@@ -47,20 +48,20 @@ class _SignUpViewState extends State<SignUpView> {
       await auth.signup(
         name: name,
         email: email,
-        phone: email,
+        phone: phone,
         address: address,
         password: pass,
       );
-
+      await Future.delayed(const Duration(milliseconds: 1000));
       // Lấy thông tin từ response (ví dụ như id, phone, name, role)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Sign up successful')),
       );
       // Sau khi đăng ký thành công, chuyển sang trang xác thực email
       Navigator.pop(context);
-    } catch (e) {
+    }on BadRequestException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        SnackBar(content: Text(e.message)),
       );
     } finally {
       setState(() => _loading = false);
@@ -157,6 +158,7 @@ class _SignUpViewState extends State<SignUpView> {
                       ? const CircularProgressIndicator()
                       : MyButton(
                           text: 'Đăng Ký',
+                          isLoading: _loading,
                           onTap: (_) => signUp(),
                         ),
                   const SizedBox(height: 20),
