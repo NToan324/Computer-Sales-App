@@ -3,104 +3,137 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BaseClient {
   static const String baseUrl = 'http://localhost:3000/';
   static const int timeOutDuration = 30;
+  late Dio dio;
 
-  late Dio dio = Dio(BaseOptions(
-    baseUrl: baseUrl,
-    connectTimeout: Duration(seconds: timeOutDuration),
-    receiveTimeout: Duration(seconds: timeOutDuration),
-  ));
-  // final FlutterSecureStorage _storage = FlutterSecureStorage();
+  BaseClient() {
+    dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: timeOutDuration),
+        receiveTimeout: const Duration(seconds: timeOutDuration),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
 
-  // BaseClient({Dio? dioParam}) {
-  //   dio = dioParam ??
-  //       Dio(BaseOptions(
-  //         baseUrl: baseUrl,
-  //         connectTimeout: Duration(seconds: timeOutDuration),
-  //         receiveTimeout: Duration(seconds: timeOutDuration),
-  //       ));
+    dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('access_token');
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        handler.next(options);
+      },
+    ));
 
-  //   dio.interceptors.add(InterceptorsWrapper(
-  //     onRequest: (options, handler) async {
-  //       final excludes = [
-  //         'login',
-  //         'signup',
-  //         'forgot-password',
-  //         'verify-otp',
-  //       ];
-  //       if (!excludes.any((path) => options.path.contains(path))) {
-  //         final token = await _storage.read(key: 'access_token');
-  //         if (token != null) {
-  //           options.headers['Authorization'] = 'Bearer $token';
-  //         }
-  //         handler.next(options);
-  //       }
-  //     },
-  //     onError: (e, handler) async {
-  //       if (e.response?.statusCode == 401) {
-  //         // Xử lý refresh token nếu cần
-  //       }
-  //       handler.next(e);
-  //     },
-  //   ));
-  // }
+    dio.options.validateStatus = (status) {
+      if (status != null) {
+        return status >= 200 && status < 300;
+      }
+      return false;
+    };
+  }
+
+  Future<dynamic> _handleDioException(DioException e) async {
+    if (e.response != null) {
+      return _processResponse(e.response!);
+    } else {
+      throw FetchDataException('An error occurred', e.requestOptions.path);
+    }
+  }
 
   // GET Request
   Future<dynamic> get(String api) async {
     final uri = Uri.parse('$baseUrl$api');
     try {
       final response = await dio.get(uri.toString());
-      return _processResponse(response);
+      return response.data;
     } on SocketException {
       throw FetchDataException('No Internet connection', api);
     } on TimeoutException {
       throw ApiNotRespondingException('API timeout', uri.toString());
+    } on DioException catch (e) {
+      return _handleDioException(e);
     }
   }
 
   // POST Request
-Future<dynamic> post(String api, Map<String, dynamic> body) async {
-  final uri = Uri.parse('$baseUrl$api');
-  try {
-    final response = await dio.post(uri.toString(), data: body);
-    return _processResponse(response);
-  } on DioException catch (e) {
-    if (e.response != null) {
-      // Nếu có phản hồi từ server, xử lý như bình thường
-      return _processResponse(e.response!);
-    } else {
-      // Nếu không có phản hồi (lỗi mạng, timeout, v.v.)
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        throw ApiNotRespondingException('API timeout', uri.toString());
-      } else if (e.type == DioExceptionType.connectionError) {
-        throw FetchDataException('No Internet connection', api);
-      } else {
-        throw FetchDataException('Unexpected error: ${e.message}', api);
-      }
+  Future<dynamic> post(String api, Map<String, dynamic> body) async {
+    final uri = Uri.parse('$baseUrl$api');
+    try {
+      final response = await dio.post(uri.toString(), data: body);
+      return response.data;
+    } on SocketException {
+      throw FetchDataException('No Internet connection', api);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API timeout', uri.toString());
+    } on DioException catch (e) {
+      return _handleDioException(e);
     }
-  } on SocketException {
-    throw FetchDataException('No Internet connection', api);
-  } on TimeoutException {
-    throw ApiNotRespondingException('API timeout', uri.toString());
   }
-}
 
-  // Handle response based on status code
+  // PUT Request
+  Future<dynamic> put(String api, Map<String, dynamic> body) async {
+    final uri = Uri.parse('$baseUrl$api');
+    try {
+      final response = await dio.put(uri.toString(), data: body);
+      return response.data;
+    } on SocketException {
+      throw FetchDataException('No Internet connection', api);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API timeout', uri.toString());
+    } on DioException catch (e) {
+      return _handleDioException(e);
+    }
+  }
+
+  // DELETE Request
+  Future<dynamic> delete(String api) async {
+    final uri = Uri.parse('$baseUrl$api');
+    try {
+      final response = await dio.delete(uri.toString());
+      return response.data;
+    } on SocketException {
+      throw FetchDataException('No Internet connection', api);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API timeout', uri.toString());
+    } on DioException catch (e) {
+      return _handleDioException(e);
+    }
+  }
+
+  // PATCH Request
+  Future<dynamic> patch(String api, Map<String, dynamic> body) async {
+    final uri = Uri.parse('$baseUrl$api');
+    try {
+      final response = await dio.patch(uri.toString(), data: body);
+      return response.data;
+    } on SocketException {
+      throw FetchDataException('No Internet connection', api);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API timeout', uri.toString());
+    } on DioException catch (e) {
+      return _handleDioException(e);
+    }
+  }
+
+  // Xử lý phản hồi dựa trên mã trạng thái
   dynamic _processResponse(Response response) {
-    print(response.data);
     switch (response.statusCode) {
-      case 200:
-        return response.data;
       case 400:
         final message = _parseErrorMessage(response.data);
         throw BadRequestException(message, response.requestOptions.path);
       case 401:
+        final message = _parseErrorMessage(response.data);
+        throw UnAuthorizedException(message, response.requestOptions.path);
       case 403:
         final message = _parseErrorMessage(response.data);
         throw UnAuthorizedException(message, response.requestOptions.path);
@@ -113,32 +146,23 @@ Future<dynamic> post(String api, Map<String, dynamic> body) async {
     }
   }
 
+  // Phân tích thông báo lỗi từ phản hồi
   String _parseErrorMessage(dynamic data) {
-    // In dữ liệu để debug
-    print('Error data: $data');
-
-    // Kiểm tra nếu data là String
     if (data is String) {
       return data;
     }
-
-    // Kiểm tra các trường hợp phổ biến
     if (data is Map) {
-      // Trường hợp có 'message'
       if (data['message'] is String) {
         return data['message'];
       }
-      // Trường hợp có 'error' là một Map và chứa 'message'
       if (data['error'] is Map && data['error']['message'] is String) {
         return data['error']['message'];
       }
-      // Trường hợp chỉ có 'error' là chuỗi
       if (data['error'] is String) {
         return data['error'];
       }
     }
 
-    // Trả về thông báo mặc định nếu không phân tích được
     return 'Unexpected error occurred';
   }
 }

@@ -1,13 +1,22 @@
 import 'package:computer_sales_app/components/custom/cart.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
+import 'package:computer_sales_app/provider/user_provider.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:feather_icons/feather_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AvatarWidget extends StatelessWidget {
   const AvatarWidget({
     super.key,
+    this.userName,
+    this.userId,
   });
 
+  final String? userName;
+  final String? userId;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -39,43 +48,40 @@ class AvatarWidget extends StatelessWidget {
                     0, 50), // Điều chỉnh vị trí của menu (dịch xuống dưới)
                 itemBuilder: (BuildContext context) {
                   return [
-                    PopupMenuItem<String>(
-                      value: 'profile',
-                      child: Row(
-                        children: [
-                          Icon(FeatherIcons.user),
-                          SizedBox(width: 8),
-                          Text('Thông tin cá nhân'),
-                        ],
+                    if (userId != null)
+                      PopupMenuItem<String>(
+                        value: 'profile',
+                        child: Row(
+                          children: [
+                            Icon(CupertinoIcons.person),
+                            SizedBox(width: 8),
+                            Text('Profile'),
+                          ],
+                        ),
                       ),
-                    ),
                     PopupMenuItem<String>(
                       value: 'notifications',
                       child: Row(
                         children: [
-                          Icon(FeatherIcons.bell),
+                          Icon(CupertinoIcons.bell),
                           SizedBox(width: 8),
-                          Text('Thông báo'),
+                          Text('Notifications'),
                         ],
                       ),
                     ),
                     PopupMenuItem<String>(
-                      value: 'login',
+                      value: userId != null ? 'logout' : 'login',
                       child: Row(
                         children: [
-                          Icon(FeatherIcons.logIn),
+                          Icon(
+                            userId != null
+                                ? Icons.logout_rounded
+                                : CupertinoIcons.arrow_right_circle,
+                          ),
                           SizedBox(width: 8),
-                          Text('Đăng nhập'),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'signup',
-                      child: Row(
-                        children: [
-                          Icon(FeatherIcons.userPlus),
-                          SizedBox(width: 8),
-                          Text('Đăng ký'),
+                          Text(
+                            userId != null ? 'Logout' : 'Login',
+                          ),
                         ],
                       ),
                     ),
@@ -94,11 +100,10 @@ class AvatarWidget extends StatelessWidget {
   }
 
   // Xử lý sự kiện khi người dùng chọn một tùy chọn trong menu
-  void _handleMenuSelection(String value, BuildContext context) {
+  void _handleMenuSelection(String value, BuildContext context) async {
     switch (value) {
       case 'profile':
         // Điều hướng đến trang thông tin cá nhân
-
         break;
       case 'notifications':
         if (Responsive.isDesktop(context)) {
@@ -110,8 +115,19 @@ class AvatarWidget extends StatelessWidget {
         Navigator.of(context).pushNamed('login');
         // Điều hướng đến trang đăng nhập
         break;
-      case 'signup':
-        // Điều hướng đến trang đăng ký
+      case 'logout':
+        // Xử lý đăng xuất
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('access_token');
+        await prefs.remove('user');
+        // Xóa thông tin người dùng khỏi provider
+        if (context.mounted) {
+          final userProvider =
+              Provider.of<UserProvider>(context, listen: false);
+          userProvider.clearUser();
+          showCustomSnackBar(context, 'Sign out successfully',
+              type: SnackBarType.success);
+        }
         break;
       default:
         break;

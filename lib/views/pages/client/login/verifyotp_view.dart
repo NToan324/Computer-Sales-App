@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/services/auth.service.dart';
@@ -27,9 +28,7 @@ class _VerifyOtpViewState extends State<VerifyOtpView> {
         otp4Controller.text;
 
     if (otpCode.length < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid OTP')),
-      );
+      showCustomSnackBar(context, 'Please enter a valid OTP');
       return;
     }
 
@@ -39,12 +38,9 @@ class _VerifyOtpViewState extends State<VerifyOtpView> {
       final auth = AuthService();
       await auth.verifyOtp(otpCode: otpCode, id: userId);
       // Thêm độ trễ 1 giây để hiển thị hiệu ứng loading
-      await Future.delayed(const Duration(milliseconds: 1000));
       Navigator.pushNamed(context, 'change-password', arguments: userId);
     } on BadRequestException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
+      showCustomSnackBar(context, '${e.message}');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -57,7 +53,7 @@ class _VerifyOtpViewState extends State<VerifyOtpView> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -76,31 +72,38 @@ class _VerifyOtpViewState extends State<VerifyOtpView> {
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 20,
                 children: [
+                  Image(
+                    image: AssetImage(
+                      'assets/images/email-verification.png',
+                    ),
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
                   const Text(
-                    'Verify OTP',
+                    'OTP Verification',
                     style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 28,
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 5),
                   const Text(
-                    'Enter the 4-digit OTP sent to your email',
+                    'Enter the 4 digit OTP sent to your email',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Color.fromARGB(255, 159, 159, 159),
                       fontSize: 14,
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  const Divider(color: Color.fromARGB(255, 159, 159, 159)),
-                  const SizedBox(height: 40),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(child: OtpInput(controller: otp1Controller, autoFocus: true)),
+                      Flexible(
+                          child: OtpInput(
+                              controller: otp1Controller, autoFocus: true)),
                       const SizedBox(width: 20),
                       Flexible(child: OtpInput(controller: otp2Controller)),
                       const SizedBox(width: 20),
@@ -109,7 +112,6 @@ class _VerifyOtpViewState extends State<VerifyOtpView> {
                       Flexible(child: OtpInput(controller: otp4Controller)),
                     ],
                   ),
-                  const SizedBox(height: 60),
                   MyButton(
                     text: 'Verify OTP',
                     onTap: (_) => verifyOtp(context),

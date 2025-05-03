@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 
 class MyButton extends StatelessWidget {
@@ -16,39 +17,42 @@ class MyButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: isLoading || onTap == null ? null : () => onTap!(context),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isLoading || onTap == null ? null : () => onTap!(context),
-          borderRadius: BorderRadius.circular(10),
-          splashColor: Colors.white.withOpacity(0.3), // Hiệu ứng sóng
-          highlightColor: Colors.orange.withOpacity(0.7), // Hiệu ứng nhấn giữ
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.symmetric(horizontal: 25.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.orange,
-            ),
-            child: Center(
-              child: isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Text(
-                      text,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                    ),
-            ),
+      child: InkWell(
+        onTap: isLoading || onTap == null ? null : () => onTap!(context),
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          width: 350,
+          padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.symmetric(horizontal: 25.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: isLoading ? Colors.black12 : AppColors.primary,
           ),
+          child: Center(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 20,
+            children: [
+              if (isLoading)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                ),
+              Text(
+                text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          )),
         ),
       ),
     );

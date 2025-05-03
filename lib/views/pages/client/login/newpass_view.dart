@@ -1,8 +1,9 @@
+import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/services/auth.service.dart';
 import 'widgets/button.dart';
-import 'widgets/text_field.dart';
 
 class CreateNewPasswordView extends StatefulWidget {
   CreateNewPasswordView({super.key});
@@ -22,22 +23,22 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
     final userId = ModalRoute.of(context)!.settings.arguments as String;
 
     if (password.isEmpty || confirmedPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in both fields')),
+      showCustomSnackBar(
+        context,
+        'Please enter all fields',
       );
       return;
     }
 
     if (password != confirmedPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      showCustomSnackBar(context, 'Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must be at least 6 characters')),
+      showCustomSnackBar(
+        context,
+        'Password must be at least 6 characters long',
       );
       return;
     }
@@ -47,16 +48,11 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
     try {
       final auth = AuthService();
       await auth.forgetPasswordReset(id: userId, newPassword: password);
-      // Thêm độ trễ 1 giây để hiển thị hiệu ứng loading
-      await Future.delayed(const Duration(milliseconds: 1000));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password updated successfully')),
-      );
+      showCustomSnackBar(context, 'Password reset successfully',
+          type: SnackBarType.success);
       Navigator.pushReplacementNamed(context, 'login');
     } on BadRequestException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
+      showCustomSnackBar(context, '${e.message}');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -69,7 +65,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () {
             Navigator.pushReplacementNamed(context, 'login');
           },
@@ -81,7 +77,6 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
           child: SingleChildScrollView(
             child: Container(
               width: 400,
-              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -89,51 +84,45 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 20,
                   children: [
                     const Text(
-                      'New Password',
+                      'Reset Password',
                       style: TextStyle(
-                        fontSize: 40,
+                        fontSize: 28,
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    const Text(
-                      'Your new password must be different from previously used passwords.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 159, 159, 159),
-                        fontSize: 14,
+                    SizedBox(
+                      width: 300,
+                      child: const Text(
+                        'Your new password must be different from previously used passwords.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 159, 159, 159),
+                          fontSize: 14,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 15),
-                    Container(
-                      height: 1,
-                      width: 150,
-                      color: const Color.fromARGB(255, 159, 159, 159),
-                    ),
-                    const SizedBox(height: 60),
                     MyTextField(
                       hintText: 'Password',
                       prefixIcon: Icons.lock,
                       controller: passwordController,
                       obscureText: true,
                     ),
-                    const SizedBox(height: 15),
                     MyTextField(
                       hintText: 'Confirm Password',
                       prefixIcon: Icons.lock,
                       controller: confirmedpasswordController,
                       obscureText: true,
                     ),
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 10),
                     MyButton(
-                      text: 'Create New Password',
+                      text: 'Reset Password',
                       onTap: (_) => newPass(context),
                       isLoading: _isLoading, // Truyền trạng thái loading
                     ),
-                    const SizedBox(height: 100),
                   ],
                 ),
               ),

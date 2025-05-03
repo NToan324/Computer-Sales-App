@@ -1,6 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:feather_icons/feather_icons.dart';
 
 class SearchField extends StatelessWidget {
   final TextEditingController controller;
@@ -32,11 +32,15 @@ class SearchField extends StatelessWidget {
           horizontal: 20,
         ),
         hintText: hintText,
+        hintStyle: TextStyle(
+          color: Colors.black54,
+          fontSize: 14,
+        ),
         labelStyle: const TextStyle(color: Colors.black54),
         hoverColor: Colors.white,
         suffixIcon: IconButton(
           icon: const Icon(
-            FeatherIcons.search,
+            CupertinoIcons.search,
             size: 30,
           ),
           onPressed: () {

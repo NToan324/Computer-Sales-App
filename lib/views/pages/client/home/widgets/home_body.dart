@@ -8,11 +8,18 @@ import 'package:computer_sales_app/views/pages/client/home/widgets/search_widget
 
 import 'package:flutter/material.dart';
 
-class HomeBody extends StatelessWidget {
+class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
 
   @override
+  State<HomeBody> createState() => _HomeBodyState();
+}
+
+class _HomeBodyState extends State<HomeBody> {
+  @override
   Widget build(BuildContext context) {
+    // Get the user data from provider
+
     return Container(
       color: Colors.white,
       child: ListView(

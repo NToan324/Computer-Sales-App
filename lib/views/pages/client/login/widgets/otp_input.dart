@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -20,9 +21,10 @@ class OtpInput extends StatelessWidget {
         controller: controller,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        maxLength: 10,
-        autofocus: autoFocus, // Tự động focus ô đầu tiên
+        maxLength: 1,
+        autofocus: autoFocus, 
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        cursorColor: AppColors.primary,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly, // Chỉ cho nhập số
         ],
@@ -33,7 +35,7 @@ class OtpInput extends StatelessWidget {
             borderSide: BorderSide(color: Colors.grey),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
+            borderSide: BorderSide(color: AppColors.primary),
             borderRadius: BorderRadius.circular(12),
           ),
         ),

@@ -1,4 +1,4 @@
-import 'package:computer_sales_app/components/custom/dialog_helper.dart';
+import 'package:computer_sales_app/components/custom/dialog.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
 
 mixin BaseController {

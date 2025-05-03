@@ -1,45 +1,105 @@
-import "package:computer_sales_app/config/color.dart";
-import "package:computer_sales_app/services/app_exceptions.dart";
-import "package:computer_sales_app/views/pages/client/login/signup_view.dart";
-import "package:computer_sales_app/views/pages/client/login/verifyemail_view.dart";
-import "package:computer_sales_app/views/pages/client/login/widgets/button.dart";
-import "package:computer_sales_app/views/pages/client/login/widgets/text_field.dart";
-import "package:computer_sales_app/services/auth.service.dart";
-// import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
-import "package:flutter/material.dart";
+import 'dart:convert';
+
+import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/provider/user_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/services/app_exceptions.dart';
+import 'package:computer_sales_app/services/auth.service.dart';
+import 'package:computer_sales_app/views/pages/client/login/signup_view.dart';
+import 'package:computer_sales_app/views/pages/client/login/verifyemail_view.dart';
+import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginView extends StatefulWidget {
-  LoginView({super.key});
+  const LoginView({super.key});
 
   @override
   _LoginViewState createState() => _LoginViewState();
 }
 
 class _LoginViewState extends State<LoginView> {
-  final userNameController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+
   bool _loading = false;
-  // Sign user in method
-  void signIn(BuildContext context) async {
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
+  void _focusAndShowError(FocusNode node, String message) {
+    FocusScope.of(context).requestFocus(node);
+    showCustomSnackBar(context, message, type: SnackBarType.error);
+  }
+
+  Future<void> signIn() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty) {
+      _focusAndShowError(_emailFocus, 'Please enter your email');
+      return;
+    }
+
+    if (password.isEmpty) {
+      _focusAndShowError(_passwordFocus, 'Please enter your password');
+      return;
+    }
+
+    if (password.length < 6) {
+      _focusAndShowError(
+          _passwordFocus, 'Password must be at least 6 characters');
+      return;
+    }
     setState(() => _loading = true);
     final authService = AuthService();
-    final email = userNameController.text.trim(); // email hoặc phone
-    final password = passwordController.text.trim();
 
     try {
-      await authService.login(email, password);
-      await Future.delayed(const Duration(milliseconds: 1000));
-      Navigator.pushReplacementNamed(context, 'home');
+      final response = await authService.login(email, password);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('access_token', response['access_token']);
+      await prefs.setString('user', jsonEncode(response['user']));
+      //Store user in provider
+      if (mounted) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(response['user']);
+        Navigator.pushReplacementNamed(context, 'home');
+      }
+      // Navigate to the home screen
     } on BadRequestException catch (e) {
-      // Ensure Snackbar is called with a valid context
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
-    }finally {
-      setState(() {
-        _loading = false; // Tắt loading
-      });
+      if (mounted) {
+        showCustomSnackBar(context, e.message, type: SnackBarType.error);
+      }
+    } finally {
+      setState(() => _loading = false);
     }
+  }
+
+  Future<void> _isLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('access_token');
+    if (accessToken != null) {
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, 'home');
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _isLogin();
   }
 
   @override
@@ -47,12 +107,30 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+              onPressed: () => Navigator.pop(context),
+            ),
+            Text(
+              'Home',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             child: Container(
               width: 400,
-              padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -60,49 +138,42 @@ class _LoginViewState extends State<LoginView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.orange,
-                    child: Icon(
-                      Icons.person,
-                      size: 50,
-                      color: Colors.white,
-                    ),
+                    child: Icon(Icons.person, size: 50, color: Colors.white),
                   ),
-                  Text(
+                  const SizedBox(height: 10),
+                  const Text(
                     'Sign In',
                     style: TextStyle(
-                      fontSize: 40,
-                      color: Colors.black,
+                      fontSize: 28,
+                      color: AppColors.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 5),
-                  Text(
-                    'Hi Welcome Back!',
+                  const Text(
+                    'Hi, Welcome Back!',
                     style: TextStyle(
-                      color: const Color.fromARGB(255, 159, 159, 159),
+                      color: Color.fromARGB(255, 159, 159, 159),
                       fontSize: 14,
                     ),
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                    height: 1,
-                    width: 150,
-                    color: const Color.fromARGB(255, 159, 159, 159),
                   ),
                   const SizedBox(height: 30),
                   MyTextField(
                     hintText: 'Email',
                     prefixIcon: Icons.email,
-                    controller: userNameController,
+                    controller: _emailController,
+                    focusNode: _emailFocus,
                     obscureText: false,
                   ),
                   const SizedBox(height: 15),
                   MyTextField(
                     hintText: 'Password',
                     prefixIcon: Icons.lock,
-                    controller: passwordController,
+                    controller: _passwordController,
+                    focusNode: _passwordFocus,
                     obscureText: true,
                   ),
                   const SizedBox(height: 10),
@@ -114,7 +185,7 @@ class _LoginViewState extends State<LoginView> {
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: () {
-                            final identifier = userNameController.text.trim();
+                            final identifier = _emailController.text.trim();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -124,10 +195,10 @@ class _LoginViewState extends State<LoginView> {
                             );
                           },
                           borderRadius: BorderRadius.circular(4),
-                          splashColor: AppColors.primary.withOpacity(0.3), // Hiệu ứng sóng
-                          highlightColor: AppColors.primary.withOpacity(0.1), // Hiệu ứng nhấn giữ
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
+                          splashColor: AppColors.primary.withAlpha(20),
+                          highlightColor: AppColors.primary.withAlpha(20),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             child: Text(
                               'Forgot Password?',
@@ -145,46 +216,42 @@ class _LoginViewState extends State<LoginView> {
                   MyButton(
                     text: 'Sign In',
                     isLoading: _loading,
-                    onTap: (ctx) => signIn(ctx),
+                    onTap: (_) => signIn(),
                   ),
                   const SizedBox(height: 40),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(
-                        child: Text(
-                          "Don't have an account?",
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                      const Text(
+                        "Don't have an account?",
+                        style: TextStyle(color: Colors.black),
                       ),
                       const SizedBox(width: 5),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => SignUpView()),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(4),
-                          splashColor: Colors.orange.withOpacity(0.3),
-                          highlightColor: Colors.orange.withOpacity(0.1),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            child: Text(
-                              "Sign up",
-                              style: TextStyle(
-                                color: Colors.orange,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const SignUpView(),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(4),
+                        splashColor: Colors.orange.withAlpha(20),
+                        highlightColor: Colors.orange.withAlpha(20),
+                        child: const Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Text(
+                            "Sign up",
+                            style: TextStyle(
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
                 ],
               ),
             ),

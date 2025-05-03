@@ -1,13 +1,17 @@
+import 'package:computer_sales_app/components/custom/myTextField.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect.dart';
 
 class PaymentDetails extends StatelessWidget {
   final double totalAmount;
 
-  const PaymentDetails({super.key, required this.totalAmount});
+  PaymentDetails({super.key, required this.totalAmount});
+  final TextEditingController _emailController = TextEditingController();
+  final FocusNode _emailFocus = FocusNode();
+  final TextEditingController _addressControler = TextEditingController();
+  final FocusNode _addressFocus = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -37,63 +41,64 @@ class PaymentDetails extends StatelessWidget {
           // Customer Name
           const Text('Customer Name'),
           const SizedBox(height: 4),
-          TextFormField(
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              hintText: 'Enter your full name',
-              hintStyle: const TextStyle(fontSize: 14),
-              prefixIcon: const Icon(
-                Icons.person_outline_rounded,
-                size: 20,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primary, width: 2.0),
-              ),
-            ),
+          MyTextField(
+            hintText: 'Full name',
+            prefixIcon: Icons.person_outline_rounded,
+            controller: _emailController,
+            focusNode: _emailFocus,
+            obscureText: false,
           ),
           const SizedBox(height: 16),
-
           // Shipping Address
           const Text('Shipping Address'),
           const SizedBox(height: 4),
-          TextFormField(
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              hintText: 'Enter your address',
-              hintStyle: const TextStyle(fontSize: 14),
-              prefixIcon: const Icon(
-                Icons.location_on_outlined,
-                size: 20,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primary, width: 2.0),
-              ),
-            ),
+          MyTextField(
+            hintText: 'Address',
+            prefixIcon: Icons.location_on_outlined,
+            controller: _addressControler,
+            focusNode: _addressFocus,
+            obscureText: false,
           ),
           const SizedBox(height: 16),
 
           // Payment Method
           const Text('Payment Method'),
           const SizedBox(height: 4),
-          DropdownButtonFormField<String>(
-            dropdownColor: Colors.white,
-            items: const [
-              DropdownMenuItem(
-                value: 'cash',
-                child: Text('Cash', style: TextStyle(fontSize: 14)),
-              ),
-              DropdownMenuItem(
-                value: 'bank_transfer',
-                child: Text('Bank Transfer', style: TextStyle(fontSize: 14)),
-              )
-            ],
-            onChanged: (value) {},
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              hintText: 'Select payment method',
-              hintStyle: const TextStyle(fontSize: 14),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primary, width: 2.0),
+          Container(
+            color: Colors.white,
+            child: DropdownButtonFormField<String>(
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              items: const [
+                DropdownMenuItem(
+                  value: 'cash',
+                  child: Text('Cash', style: TextStyle(fontSize: 14)),
+                ),
+                DropdownMenuItem(
+                  value: 'bank_transfer',
+                  child: Text('Bank Transfer', style: TextStyle(fontSize: 14)),
+                )
+              ],
+              onChanged: (value) {},
+              decoration: InputDecoration(
+                prefixIcon: const Icon(
+                  Icons.payment_outlined,
+                  color: Colors.grey,
+                ),
+                fillColor: Colors.white,
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(color: Colors.grey, width: 1),
+                ),
+                hintText: 'Select payment method',
+                hintStyle: const TextStyle(fontSize: 14),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: AppColors.primary,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
           ),

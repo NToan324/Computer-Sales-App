@@ -1,13 +1,75 @@
 import 'package:computer_sales_app/config/color.dart';
-import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/config/icon.dart';
 import 'package:computer_sales_app/helpers/text_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 
-class LocationWidget extends StatelessWidget {
+class LocationWidget extends StatefulWidget {
   const LocationWidget({
     super.key,
   });
+
+  @override
+  State<LocationWidget> createState() => _LocationWidgetState();
+}
+
+class _LocationWidgetState extends State<LocationWidget> {
+  String _location = 'Finding location...';
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
+  Future<void> getLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        _location = "Please enable location services";
+      });
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() {
+          _location = "Location permissions are denied";
+        });
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        _location = "Location permissions are permanently denied";
+      });
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
+    );
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+
+    Placemark place = placemarks[0];
+    setState(() {
+      _location =
+          "${place.street}, ${place.subAdministrativeArea}, ${place.locality}";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +89,10 @@ class LocationWidget extends StatelessWidget {
                 size: IconSize.large,
               ),
               Text(
-                TextHelper.textLimit('District 7, Ho Chi Minh City', 20),
+                TextHelper.textLimit(_location, 30),
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: FontSizes.medium,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
