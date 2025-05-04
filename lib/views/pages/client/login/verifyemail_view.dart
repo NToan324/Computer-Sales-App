@@ -29,15 +29,17 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       final auth = AuthService();
       final otpData = await auth.forgotPassword(email);
       final userId = otpData['id'];
-      // Thêm độ trễ 1 giây để hiển thị hiệu ứng loading
-      await Future.delayed(const Duration(milliseconds: 1000));
-      showCustomSnackBar(context, 'Code sent to your email',
-          type: SnackBarType.success);
+      if (mounted) {
+        showCustomSnackBar(context, 'Code sent to your email',
+            type: SnackBarType.success);
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, 'verify-otp', arguments: userId);
       });
     } on BadRequestException catch (e) {
-      showCustomSnackBar(context, e.message);
+      if (mounted) {
+        showCustomSnackBar(context, e.message);
+      }
     } finally {
       setState(() => _loading = false);
     }
@@ -94,10 +96,13 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               controller: _emailCtrl,
               obscureText: false,
             ),
-            MyButton(
-              text: 'Send Code',
-              onTap: (_) => _sendCode(),
-              isLoading: _loading,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: MyButton(
+                text: 'Send Code',
+                onTap: (_) => _sendCode(),
+                isLoading: _loading,
+              ),
             ),
           ],
         ),

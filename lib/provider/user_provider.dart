@@ -5,12 +5,14 @@ class UserProvider with ChangeNotifier {
   String? _phone;
   String? _name;
   String? _role;
+  String? _address;
   int? _point;
 
   String? get id => _id;
   String? get phone => _phone;
   String? get name => _name;
   String? get role => _role;
+  String? get address => _address;
   int? get point => _point;
 
   void setUser(Map<String, dynamic> user) {
@@ -19,6 +21,12 @@ class UserProvider with ChangeNotifier {
     _name = user['name'];
     _role = user['role'];
     _point = user['point'];
+    _address = user['address'];
+    notifyListeners();
+  }
+
+  void setAddress(String address) {
+    _address = address;
     notifyListeners();
   }
 
@@ -28,6 +36,7 @@ class UserProvider with ChangeNotifier {
     _name = null;
     _role = null;
     _point = null;
+    _address = null;
     notifyListeners();
   }
 }

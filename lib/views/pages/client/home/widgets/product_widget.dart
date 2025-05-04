@@ -315,8 +315,7 @@ class ProductView extends StatelessWidget {
                   Text(
                     description,
                     style: TextStyle(
-                        fontSize: FontSizes.small,
-                        color: AppColors.primary),
+                        fontSize: FontSizes.small, color: AppColors.primary),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),

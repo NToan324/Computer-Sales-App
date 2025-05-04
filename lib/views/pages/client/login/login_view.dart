@@ -209,10 +209,13 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  MyButton(
-                    text: 'Sign In',
-                    isLoading: _loading,
-                    onTap: (_) => signIn(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: MyButton(
+                      text: 'Sign In',
+                      isLoading: _loading,
+                      onTap: (_) => signIn(),
+                    ),
                   ),
                   const SizedBox(height: 40),
                   Row(

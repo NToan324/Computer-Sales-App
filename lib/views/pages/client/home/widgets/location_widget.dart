@@ -4,6 +4,7 @@ import 'package:computer_sales_app/helpers/text_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationWidget extends StatefulWidget {
   const LocationWidget({
@@ -65,10 +66,15 @@ class _LocationWidgetState extends State<LocationWidget> {
     );
 
     Placemark place = placemarks[0];
-    setState(() {
-      _location =
-          "${place.street}, ${place.subAdministrativeArea}, ${place.locality}";
-    });
+    if (mounted) {
+      setState(() {
+        _location =
+            "${place.street}, ${place.subAdministrativeArea}, ${place.locality}";
+      });
+    }
+    //Save location to shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('location_current', _location);
   }
 
   @override

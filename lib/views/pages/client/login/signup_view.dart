@@ -173,10 +173,13 @@ class _SignUpViewState extends State<SignUpView> {
                     obscureText: true,
                   ),
                   const SizedBox(height: 20),
-                  MyButton(
-                    text: 'Sign Up',
-                    isLoading: _loading,
-                    onTap: (_) => signUp(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: MyButton(
+                      text: 'Sign Up',
+                      isLoading: _loading,
+                      onTap: (_) => signUp(),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Row(

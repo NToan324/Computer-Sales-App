@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
@@ -7,6 +10,9 @@ import 'package:computer_sales_app/views/pages/client/login/widgets/otp_input.da
 import 'package:computer_sales_app/views/pages/client/profile/widgets/listTile_custom.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyAccountView extends StatefulWidget {
   const MyAccountView({super.key});
@@ -41,6 +47,14 @@ class _MyAccountView extends State<MyAccountView> {
               context,
               MaterialPageRoute(
                 builder: (context) => ChangePassword(),
+              ),
+            );
+          }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddressPage(),
               ),
             );
           }
@@ -224,10 +238,13 @@ class _PersonelInformationState extends State<PersonelInformation> {
               SizedBox(
                 height: 10,
               ),
-              MyButton(
-                text: 'Change Information',
-                isLoading: _loading,
-                onTap: (_) => {},
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: MyButton(
+                  text: 'Change Information',
+                  isLoading: _loading,
+                  onTap: (_) => {},
+                ),
               ),
             ],
           ),
@@ -309,6 +326,363 @@ class _ChangePasswordState extends State<ChangePassword> {
                   isLoading: false,
                   onTap: (_) => {},
                 ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+//Address
+class AddressPage extends StatefulWidget {
+  const AddressPage({super.key});
+
+  @override
+  State<AddressPage> createState() => _AddressPageState();
+}
+
+class _AddressPageState extends State<AddressPage> {
+  List<dynamic> provinces = [];
+  List<dynamic> districts = [];
+  List<dynamic> wards = [];
+  String? selectedProvinceCode;
+  String? selectedDistrictCode;
+  String? selectedWardCode;
+  String currentAddress = '';
+  String _addressOption = 'current';
+  bool _addNewAddress = false;
+  List<String> savedAddresses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadSavedLocation();
+    fetchProvinces();
+    getSavedAddresses();
+  }
+
+  Future<void> loadSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currentAddress = prefs.getString('location_current') ?? 'No address set';
+    });
+  }
+
+  Future<void> getSavedAddresses() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> checkSavedAddresses =
+        prefs.getStringList('manual_location') ?? [];
+    if (!checkSavedAddresses.contains(currentAddress)) {
+      checkSavedAddresses.add(currentAddress);
+      await prefs.setStringList('manual_location', checkSavedAddresses);
+    }
+    setState(() {
+      savedAddresses = checkSavedAddresses;
+    });
+  }
+
+  Future<void> fetchProvinces() async {
+    try {
+      final res = await http
+          .get(Uri.parse('https://provinces.open-api.vn/api/?depth=1'));
+      if (res.statusCode == 200) {
+        setState(() {
+          provinces = jsonDecode(utf8.decode(res.bodyBytes));
+        });
+      } else {
+        throw Exception('Failed to load provinces');
+      }
+    } catch (e) {
+      debugPrint('Error loading provinces: $e');
+    }
+  }
+
+  Future<void> fetchDistricts(String provinceCode) async {
+    try {
+      final res = await http.get(Uri.parse(
+          'https://provinces.open-api.vn/api/p/$provinceCode?depth=2'));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        setState(() {
+          districts = data['districts'];
+        });
+      } else {
+        throw Exception('Failed to load districts');
+      }
+    } catch (e) {
+      debugPrint('Error loading districts: $e');
+    }
+  }
+
+  Future<void> fetchWards(String districtCode) async {
+    try {
+      final res = await http.get(Uri.parse(
+          'https://provinces.open-api.vn/api/d/$districtCode?depth=2'));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        setState(() {
+          wards = data['wards'];
+        });
+      } else {
+        throw Exception('Failed to load wards');
+      }
+    } catch (e) {
+      debugPrint('Error loading wards: $e');
+    }
+  }
+
+  Future<void> saveLocationToPreferences(String newAddress) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> savedAddresses = prefs.getStringList('manual_location') ?? [];
+    prefs.setStringList('manual_location', savedAddresses);
+    if (!savedAddresses.contains(newAddress)) {
+      savedAddresses.add(newAddress);
+      await prefs.setStringList('manual_location', savedAddresses);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBarMobile(title: 'Address'),
+      body: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          color: Colors.white,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Display current location
+                Card(
+                  color: Colors.white,
+                  elevation: 0,
+                  child: ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red.withAlpha(50),
+                      ),
+                      child: Icon(
+                        Icons.location_on,
+                        color: Colors.red,
+                      ),
+                    ),
+                    title: Text('Current Location'),
+                    subtitle: Text(currentAddress),
+                  ),
+                ),
+                if (savedAddresses.isNotEmpty)
+                  const SizedBox(
+                    height: 16,
+                  ),
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    'Select your address',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black54),
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+                ...savedAddresses.map((address) {
+                  return Card(
+                    color: Colors.white,
+                    child: ListTile(
+                      title: Text('Location'),
+                      subtitle: Text(address),
+                      trailing: Radio<String>(
+                        value: address,
+                        groupValue: currentAddress,
+                        onChanged: (value) {
+                          setState(() {
+                            currentAddress = value!;
+                            _addressOption = 'saved';
+                          });
+                        },
+                        activeColor: AppColors.primary,
+                      ),
+                    ),
+                  );
+                }),
+                // New address button
+                ListTile(
+                  title: Text(
+                    'Add An Address',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  trailing: Icon(
+                    _addNewAddress
+                        ? CupertinoIcons.chevron_up
+                        : CupertinoIcons.add,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _addNewAddress = !_addNewAddress;
+                    });
+                  },
+                ),
+
+                if (_addNewAddress)
+                  Column(
+                    children: [
+                      DropdownButtonFormField<String>(
+                        dropdownColor: Colors.white,
+                        elevation: 0,
+                        decoration: const InputDecoration(
+                          labelText: 'Province',
+                          labelStyle: TextStyle(
+                            color: Colors.black54,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black26, width: 1),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black26, width: 1),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                        ),
+                        value: selectedProvinceCode,
+                        items: provinces.map<DropdownMenuItem<String>>((prov) {
+                          return DropdownMenuItem<String>(
+                            value: prov['code'].toString(),
+                            child: Text(prov['name']),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedProvinceCode = value;
+                            selectedDistrictCode = null;
+                            selectedWardCode = null;
+                            districts = [];
+                            wards = [];
+                          });
+                          if (value != null) fetchDistricts(value);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // Dropdown for District selection
+                      DropdownButtonFormField<String>(
+                        dropdownColor: Colors.white,
+                        elevation: 0,
+                        decoration: const InputDecoration(
+                          labelText: 'District',
+                          labelStyle: TextStyle(
+                            color: Colors.black54,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black26, width: 1),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black26, width: 1),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                        ),
+                        value: selectedDistrictCode,
+                        items: districts.map<DropdownMenuItem<String>>((dist) {
+                          return DropdownMenuItem<String>(
+                            value: dist['code'].toString(),
+                            child: Text(dist['name']),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedDistrictCode = value;
+                            selectedWardCode = null;
+                            wards = [];
+                          });
+                          if (value != null) fetchWards(value);
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Dropdown for Ward selection
+                      DropdownButtonFormField<String>(
+                        dropdownColor: Colors.white,
+                        elevation: 0,
+                        decoration: const InputDecoration(
+                          labelText: 'Ward',
+                          labelStyle: TextStyle(
+                            color: Colors.black54,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black26, width: 1),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black26, width: 1),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                        ),
+                        value: selectedWardCode,
+                        items: wards.map<DropdownMenuItem<String>>((ward) {
+                          return DropdownMenuItem<String>(
+                            value: ward['code'].toString(),
+                            child: Text(ward['name']),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedWardCode = value;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+                      // Save address button
+                      MyButton(
+                        text: 'Add location',
+                        onTap: (_) async {
+                          String getNameByCode(
+                              List<dynamic> list, String? code) {
+                            return list.firstWhere(
+                              (item) => item['code'].toString() == code,
+                              orElse: () => {'name': 'Unknown'},
+                            )['name'];
+                          }
+
+                          String newAddress =
+                              '${getNameByCode(wards, selectedWardCode)}, ${getNameByCode(districts, selectedDistrictCode)}, ${getNameByCode(provinces, selectedProvinceCode)}';
+
+                          saveLocationToPreferences(newAddress);
+                          await getSavedAddresses();
+                          setState(() {
+                            _addNewAddress = false;
+                            selectedProvinceCode = null;
+                            selectedDistrictCode = null;
+                            selectedWardCode = null;
+                            districts = [];
+                            wards = [];
+                          });
+                        },
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),

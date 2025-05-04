@@ -22,7 +22,6 @@ class MyButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.all(10),
-          margin: const EdgeInsets.symmetric(horizontal: 25.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: isLoading ? Colors.black12 : AppColors.primary,
