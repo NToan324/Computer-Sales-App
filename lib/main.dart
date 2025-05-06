@@ -6,7 +6,6 @@ import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/verifyotp_view.dart';
-import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
 import 'package:computer_sales_app/views/pages/client/payment/pament_view.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_details_view.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
@@ -44,7 +43,6 @@ class MyApp extends StatelessWidget {
         'product': (context) => ProductPageView(),
         'product-details': (context) => ProductDetailsView(),
         'chat': (context) => ChatView(),
-        'notifications': (context) => NotificationView(),
         'payment': (context) => PaymentView(),
 
         //Search

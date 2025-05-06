@@ -146,49 +146,59 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
           },
         ),
 
-        const SizedBox(height: 8),
-        // Nút xem thêm / thu gọn
+        const SizedBox(height: 20),
         if (allReviews.length > 2)
-          Align(
-            alignment: Alignment.centerRight,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      _showAll = !_showAll;
-                    });
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 10,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _showAll = !_showAll;
+                      });
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColors.primary),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      backgroundColor: Colors.white,
+                    ),
+                    child: Text(
+                      _showAll ? 'Collapse' : 'View 100 reviews',
+                      style: TextStyle(color: AppColors.primary),
                     ),
                   ),
-                  child: Text(
-                    _showAll ? 'Thu gọn' : 'Xem thêm',
-                    style: TextStyle(color: AppColors.primary),
-                  ),
                 ),
-                SizedBox(width: 8),
-                OutlinedButton(
-                  onPressed: () {
-                    _openReviewDialog(context);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              ),
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _openReviewDialog(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      side: BorderSide(
+                        color: AppColors.primary,
+                      ),
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Write a review',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  child: Text(
-                    'Viết đánh giá',
-                    style: TextStyle(color: AppColors.primary),
-                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           )
       ],
     );
@@ -209,185 +219,222 @@ void _openReviewDialog(BuildContext context) {
     builder: (context) {
       return Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Đánh giá sản phẩm',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 16),
-                    Image.network(
-                      'https://cdn.tgdd.vn/Products/Images/44/302209/TimerThumb/hp-pavilion-15-eg2088tu-i7-7c0r0pa-(10).jpg',
-                      height: 100,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Laptop HP Pavilion 15 eg2088TU i7 1260P/16GB/512GB/Win11 (7C0R0PA)',
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        return Column(
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                index < selectedRating
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                color: Colors.orange,
-                                size: 32,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 600),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Đánh giá sản phẩm',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 16),
+                      Image.network(
+                        'https://cdn.tgdd.vn/Products/Images/44/302209/TimerThumb/hp-pavilion-15-eg2088tu-i7-7c0r0pa-(10).jpg',
+                        height: 100,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Laptop HP Pavilion 15 eg2088TU i7 1260P/16GB/512GB/Win11 (7C0R0PA)',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(5, (index) {
+                          return Column(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  index < selectedRating
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.orange,
+                                  size: 32,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    selectedRating = index + 1;
+                                    showForm = selectedRating > 0;
+                                  });
+                                },
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  selectedRating = index + 1;
-                                  showForm = selectedRating > 0;
-                                });
-                              },
+                              SizedBox(height: 4),
+                              Text(
+                                [
+                                  'Rất tệ',
+                                  'Tệ',
+                                  'Tạm ổn',
+                                  'Tốt',
+                                  'Rất tốt'
+                                ][index],
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+                      SizedBox(height: 24),
+                      if (showForm) ...[
+                        TextField(
+                          controller: commentController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            hintText: 'Mời bạn chia sẻ thêm cảm nhận...',
+                            border: OutlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: AppColors.grey,
+                              ),
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              [
-                                'Rất tệ',
-                                'Tệ',
-                                'Tạm ổn',
-                                'Tốt',
-                                'Rất tốt'
-                              ][index],
-                              style: TextStyle(fontSize: 14),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        CheckboxListTile(
+                          title: Text(
+                            'Tôi sẽ giới thiệu sản phẩm cho bạn bè, người thân',
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                          value: recommend,
+                          checkColor: Colors.white,
+                          activeColor: AppColors.primary,
+                          onChanged: (val) {
+                            setState(() {
+                              recommend = val ?? false;
+                            });
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: nameController,
+                                decoration: InputDecoration(
+                                  hintText: 'Họ tên (bắt buộc)',
+                                  hintStyle: TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.grey,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: TextField(
+                                controller: phoneController,
+                                decoration: InputDecoration(
+                                  hintText: 'Số điện thoại (bắt buộc)',
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.grey,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                  hintStyle: TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.phone,
+                              ),
                             ),
                           ],
-                        );
-                      }),
-                    ),
-                    SizedBox(height: 24),
-                    if (showForm) ...[
-                      TextField(
-                        controller: commentController,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          hintText: 'Mời bạn chia sẻ thêm cảm nhận...',
-                          border: OutlineInputBorder(),
-                          hintStyle: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
                         ),
-                      ),
-                      SizedBox(height: 16),
-                      CheckboxListTile(
-                        title: Text(
-                          'Tôi sẽ giới thiệu sản phẩm cho bạn bè, người thân',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
-                        value: recommend,
-                        onChanged: (val) {
-                          setState(() {
-                            recommend = val ?? false;
-                          });
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: nameController,
-                              decoration: InputDecoration(
-                                hintText: 'Họ tên (bắt buộc)',
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
+                        SizedBox(height: 8),
+                        CheckboxListTile(
+                          title: RichText(
+                            text: TextSpan(
+                              text: 'Tôi đồng ý với ',
+                              style: TextStyle(color: Colors.black),
+                              children: [
+                                TextSpan(
+                                  text: 'Chính sách xử lý dữ liệu cá nhân',
+                                  style: TextStyle(color: Colors.blue),
                                 ),
-                                border: OutlineInputBorder(),
-                              ),
+                                TextSpan(text: ' của Thế Giới Di Động'),
+                              ],
                             ),
                           ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: TextField(
-                              controller: phoneController,
-                              decoration: InputDecoration(
-                                hintText: 'Số điện thoại (bắt buộc)',
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                                border: OutlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.phone,
+                          checkColor: Colors.white,
+                          activeColor: AppColors.primary,
+                          value: agreePolicy,
+                          onChanged: (val) {
+                            setState(() {
+                              agreePolicy = val ?? false;
+                            });
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                        SizedBox(height: 16),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(double.infinity, 48),
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      CheckboxListTile(
-                        title: RichText(
-                          text: TextSpan(
-                            text: 'Tôi đồng ý với ',
-                            style: TextStyle(color: Colors.black),
-                            children: [
-                              TextSpan(
-                                text: 'Chính sách xử lý dữ liệu cá nhân',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              TextSpan(text: ' của Thế Giới Di Động'),
-                            ],
+                          onPressed: () {
+                            if (agreePolicy &&
+                                nameController.text.isNotEmpty &&
+                                phoneController.text.isNotEmpty) {
+                              Navigator.of(context).pop();
+                            } else {}
+                          },
+                          child: Text(
+                            'Gửi đánh giá',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        value: agreePolicy,
-                        onChanged: (val) {
-                          setState(() {
-                            agreePolicy = val ?? false;
-                          });
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      SizedBox(height: 16),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 48),
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () {
-                          if (agreePolicy &&
-                              nameController.text.isNotEmpty &&
-                              phoneController.text.isNotEmpty) {
-                            Navigator.of(context).pop();
-                          } else {}
-                        },
-                        child: Text(
-                          'Gửi đánh giá',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                    ]
-                  ],
-                ),
-              );
-            },
+                        SizedBox(height: 16),
+                      ]
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       );

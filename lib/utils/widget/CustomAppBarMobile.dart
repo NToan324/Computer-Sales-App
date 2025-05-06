@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBarMobile extends StatelessWidget
@@ -10,13 +11,13 @@ class CustomAppBarMobile extends StatelessWidget
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.primary,
       scrolledUnderElevation: 0,
       title: Text(
         title,
         style: const TextStyle(
           fontSize: 18,
-          color: Colors.black,
+          color: Colors.white,
           fontWeight: FontWeight.w500,
         ),
       ),

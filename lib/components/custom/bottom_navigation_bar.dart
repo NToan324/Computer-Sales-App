@@ -2,10 +2,9 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/client/Chat/widgets/chat_body.dart';
-import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_appbar.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/home_body.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
-import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
+import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/profile_body.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,12 +26,12 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       'appBar': AppBarHomeCustom(),
     },
     {
-      'page': NotificationView(),
-      'appBar': CustomAppBarMobile(title: 'Notification'),
+      'page': ProductPageView(),
+      'appBar': CustomAppBarMobile(title: 'Product'),
     },
     {
       'page': ChatBody(),
-      'appBar': ChatAppBar(),
+      'appBar': CustomAppBarMobile(title: 'Message'),
     },
     {
       'page': ProfileBody(),
@@ -65,12 +64,12 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
 
   final List<Map<String, dynamic>> icons = [
     {
-      'icon': CupertinoIcons.home,
+      'icon': CupertinoIcons.square_grid_2x2,
       'label': 'Home',
     },
     {
-      'icon': CupertinoIcons.bell,
-      'label': 'Notification',
+      'icon': CupertinoIcons.cube,
+      'label': 'Product',
     },
     {
       'icon': FeatherIcons.messageCircle,

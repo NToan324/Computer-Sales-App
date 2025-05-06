@@ -1,5 +1,4 @@
 import 'package:computer_sales_app/utils/responsive.dart';
-import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -8,76 +7,78 @@ class ProductPageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    bool isMobile = screenWidth < 768; // Tùy chỉnh ngưỡng theo ý bạn
+    bool isMobile = Responsive.isMobile(context);
 
     return Scaffold(
-      appBar: AppBarHomeCustom(),
-      body: ListView(children: [
-        Container(
-          color: Colors.white,
-          padding: const EdgeInsets.all(16),
-          child: isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) => const FilterWidget(),
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.filter_list,
-                        color: Colors.black,
-                        size: 16,
-                      ),
-                      label: const Text(
-                        'Filter',
-                        style: TextStyle(color: Colors.black, fontSize: 14),
-                      ),
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStateProperty.resolveWith<Color?>(
-                          (states) {
-                            if (states.contains(WidgetState.hovered)) {
-                              return Colors.grey[100]; // Hover thì đổi nền xám
-                            }
-                            return Colors.white; // Bình thường màu trắng
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: ListView(
+          children: [
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(16),
+              child: isMobile
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => const FilterWidget(),
+                            );
                           },
-                        ),
-                        elevation:
-                            WidgetStateProperty.all(0), // Luôn không shadow
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            side: const BorderSide(
-                              color: Colors.black45,
-                              width: 0.5,
+                          icon: const Icon(
+                            Icons.filter_list,
+                            color: Colors.black,
+                            size: 16,
+                          ),
+                          label: const Text(
+                            'Filter',
+                            style: TextStyle(color: Colors.black, fontSize: 14),
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.resolveWith<Color?>(
+                              (states) {
+                                if (states.contains(WidgetState.hovered)) {
+                                  return Colors.grey[100];
+                                }
+                                return Colors.white;
+                              },
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                            elevation: WidgetStateProperty.all(0),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                side: const BorderSide(
+                                  color: Colors.black45,
+                                  width: 0.5,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        ShowListProductWidget(),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 1, child: const FilterWidget()),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 4,
+                          child: ShowListProductWidget(),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    ShowListProductWidget(),
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 1, child: const FilterWidget()),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 4,
-                      child: ShowListProductWidget(),
-                    ),
-                  ],
-                ),
+            ),
+          ],
         ),
-      ]),
+      ),
     );
   }
 }
@@ -98,6 +99,7 @@ class _FilterWidgetState extends State<FilterWidget> {
     'Headphones, Speakers',
     'Accessories (Cables, Cooling Pads...)',
   ];
+
   List<String> brands = [
     'Dell',
     'HP',
@@ -109,45 +111,11 @@ class _FilterWidgetState extends State<FilterWidget> {
     'Gigabyte',
     'Razer',
   ];
-  List<String> cpu = [
-    'CPU i3',
-    'CPU i5',
-    'CPU i7',
-    'CPU i9',
-    'M1',
-    'M2',
-    'M1 Pro',
-    'M1 Max',
-    'M2 Pro',
-    'M2 Max',
-    'M1 Ultra',
-  ];
-  List<String> ram = [
-    '4GB',
-    '8GB',
-    '16GB',
-    '32GB',
-    '64GB',
-  ];
-  List<String> storage = [
-    'HDD',
-    'SSD',
-    'NVMe',
-  ];
-  List<String> gpu = [
-    'NVIDIA',
-    'AMD',
-    'Intel',
-  ];
 
   // State cho show more
   Map<String, bool> isExpanded = {
     'Category': false,
     'Brand': false,
-    'CPU': false,
-    'RAM': false,
-    'Storage': false,
-    'GPU': false,
   };
 
   @override
@@ -166,40 +134,38 @@ class _FilterWidgetState extends State<FilterWidget> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 10,
-              children: [
-                const Text(
-                  'Filter',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                if (Responsive.isMobile(context))
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      "Done",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: 10,
+                children: [
+                  const Text(
+                    'Filter',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  if (Responsive.isMobile(context))
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Done",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            buildFilterSection('Product Category', categories, 'Category'),
-            buildFilterSection('Brand', brands, 'Brand'),
-            buildFilterSection('CPU', cpu, 'CPU'),
-            buildFilterSection('RAM', ram, 'RAM'),
-            buildFilterSection('Storage', storage, 'Storage'),
-            buildFilterSection('GPU', gpu, 'GPU'),
-          ],
+                ],
+              ),
+              buildFilterSection('Product Category', categories, 'Category'),
+              buildFilterSection('Brand', brands, 'Brand'),
+            ],
+          ),
         ),
       ),
     );
@@ -207,53 +173,56 @@ class _FilterWidgetState extends State<FilterWidget> {
 
   Widget buildFilterSection(String title, List<String> items, String key) {
     bool expanded = isExpanded[key] ?? false;
-    int displayCount = expanded ? items.length : 3;
+    int displayCount = expanded ? items.length : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: Text(
                 title,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (items.length > 3)
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    isExpanded[key] = !expanded;
-                  });
-                },
-                icon: Icon(
-                  expanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: Colors.black,
-                ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  isExpanded[key] = !expanded;
+                });
+              },
+              icon: Icon(
+                expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                color: Colors.black,
               ),
+            ),
           ],
         ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount:
-              (displayCount > items.length) ? items.length : displayCount,
-          itemBuilder: (context, index) {
-            return CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(items[index], style: const TextStyle(fontSize: 14)),
-              value: false,
-              onChanged: (bool? value) {},
-            );
-          },
-        ),
+        if (expanded)
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: displayCount,
+            itemBuilder: (context, index) {
+              return CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  items[index],
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+                value: false,
+                onChanged: (bool? value) {},
+              );
+            },
+          ),
       ],
     );
   }
@@ -310,12 +279,13 @@ class ShowListProductWidget extends StatelessWidget {
                       underline: const SizedBox.shrink(),
                       dropdownColor: Colors.white,
                       borderRadius: BorderRadius.circular(8),
-                      value: 'Newest',
+                      value: 'All Products',
                       items: <String>[
-                        'Newest',
+                        'All Products',
+                        'Name: A to Z',
+                        'Name: Z to A',
                         'Price: Low to High',
                         'Price: High to Low',
-                        'Best Selling',
                       ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -339,30 +309,29 @@ class ShowListProductWidget extends StatelessWidget {
           Wrap(
             spacing: 16,
             runSpacing: 16,
-            children: List.generate(4, (index) {
+            children: List.generate(3, (index) {
               return Container(
-                padding: const EdgeInsets.all(8),
-                width: 100,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.black45, width: 0.5),
+                  border: Border.all(
+                    color: Colors.black45,
+                    width: 0.5,
+                  ),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Text(
-                        'Filter $index',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      'Filter $index',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 8),
                     IconButton(
                       onPressed: () {},
                       icon: const Icon(
@@ -378,6 +347,7 @@ class ShowListProductWidget extends StatelessWidget {
               );
             }),
           ),
+
           ProductListViewWidget(),
         ],
       ),

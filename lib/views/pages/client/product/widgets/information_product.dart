@@ -1,5 +1,3 @@
-import 'package:computer_sales_app/views/pages/client/product/widgets/color_version.dart';
-
 import 'package:computer_sales_app/views/pages/client/product/widgets/title_product.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/version_product.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +25,6 @@ class InformationProduct extends StatelessWidget {
         SizedBox(
           height: 15,
         ),
-        ColorsVersion(),
         SizedBox(
           height: 15,
         ),
