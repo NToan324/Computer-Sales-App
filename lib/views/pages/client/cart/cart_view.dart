@@ -8,7 +8,6 @@ import 'package:computer_sales_app/views/pages/client/cart/widgets/promocode_sec
 import 'package:computer_sales_app/views/pages/client/cart/widgets/remove_cart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 
 enum ShippingMethod { standard, express }
 
