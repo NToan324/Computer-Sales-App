@@ -6,7 +6,7 @@ import 'package:computer_sales_app/services/auth.service.dart';
 import 'widgets/button.dart';
 
 class CreateNewPasswordView extends StatefulWidget {
-  CreateNewPasswordView({super.key});
+  const CreateNewPasswordView({super.key});
 
   @override
   _CreateNewPasswordViewState createState() => _CreateNewPasswordViewState();
@@ -52,7 +52,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
           type: SnackBarType.success);
       Navigator.pushReplacementNamed(context, 'login');
     } on BadRequestException catch (e) {
-      showCustomSnackBar(context, '${e.message}');
+      showCustomSnackBar(context, e.message);
     } finally {
       setState(() => _isLoading = false);
     }

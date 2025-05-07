@@ -3,13 +3,11 @@ import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/item_cart.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/footer.dart';
-import 'package:computer_sales_app/views/header/header_view.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/cart_item_widget.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/remove_cart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 
 enum ShippingMethod { standard, express }
 

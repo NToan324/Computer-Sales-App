@@ -54,14 +54,14 @@ class _CustomerTableState extends State<CustomerTable> {
     }
   }
 
-  Color _getRankColor(String rank) {
+ Color _getRankColor(String rank) {
     switch (rank) {
       case "Bronze":
-        return Colors.orange;
+        return Colors.brown;
       case "Silver":
         return Colors.grey;
       case "Gold":
-        return Colors.amber;
+        return Colors.yellow[700]!;
       default:
         return Colors.blueGrey;
     }

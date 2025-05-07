@@ -1,4 +1,3 @@
-// lib/admin/admin_screen.dart
 import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/admin/dashboard/dashboard_screen.dart';
@@ -18,12 +17,14 @@ class AdminScreen extends StatefulWidget {
 }
 
 class _AdminScreenState extends State<AdminScreen> {
-  String _selectedMenu = "Dashboard"; // Menu mặc định là Dashboard
+  String _selectedMenu = "Dashboard";
   Widget _currentScreen = const DashboardScreen();
+  bool _hideAppBar = false; // Trạng thái để ẩn AppBar trên mobile
 
   void _onMenuTap(String menu) {
     setState(() {
       _selectedMenu = menu;
+      _hideAppBar = false; // Reset trạng thái khi chuyển menu
       switch (menu) {
         case "Dashboard":
           _currentScreen = const DashboardScreen();
@@ -32,16 +33,22 @@ class _AdminScreenState extends State<AdminScreen> {
           _currentScreen = const ProductManagementScreen();
           break;
         case "Customer":
-          _currentScreen = const CustomerScreen();
+          _currentScreen = CustomerManagementScreen();
           break;
         case "Invoice":
-          _currentScreen = const InvoiceScreen();
+          _currentScreen = const InvoiceManagementScreen();
           break;
         case "Coupon":
-          _currentScreen = const CouponScreen();
+          _currentScreen = CouponManagementScreen();
           break;
         case "Support":
-          _currentScreen = const SupportScreen();
+          _currentScreen = SupportScreen(
+            onChatAreaVisibilityChanged: (isVisible) {
+              setState(() {
+                _hideAppBar = isVisible;
+              });
+            },
+          );
           break;
         case "Logout":
           Navigator.pushReplacementNamed(context, 'login');
@@ -56,7 +63,7 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: Responsive.isMobile(context)
+      appBar: Responsive.isMobile(context) && !_hideAppBar
           ? AppBar(
               title: const Text(
                 "Admin Panel",
@@ -73,7 +80,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 selectedMenu: _selectedMenu,
                 onMenuTap: (menu) {
                   _onMenuTap(menu);
-                  Navigator.pop(context); // Đóng Drawer sau khi chọn
+                  Navigator.pop(context);
                 },
               ),
             )
@@ -81,18 +88,16 @@ class _AdminScreenState extends State<AdminScreen> {
       body: Responsive.isDesktop(context)
           ? Row(
               children: [
-                // Sidebar bên trái
                 CustomSidebar(
                   selectedMenu: _selectedMenu,
                   onMenuTap: _onMenuTap,
                 ),
-                // Nội dung chính
                 Expanded(
                   child: _currentScreen,
                 ),
               ],
             )
-          : _currentScreen, // Mobile/tablet chỉ hiển thị nội dung chính
+          : _currentScreen,
     );
   }
 }

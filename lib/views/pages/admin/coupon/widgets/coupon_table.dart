@@ -1,50 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
-import 'product_form.dart';
+import 'package:intl/intl.dart';
+import 'coupon_form.dart';
 
-class ProductTable extends StatefulWidget {
-  final List<Map<String, dynamic>> products; // Thêm thuộc tính để nhận dữ liệu
+class CouponTable extends StatefulWidget {
+  final List<Map<String, dynamic>> coupons; // Nhận coupons từ ngoài
 
-  const ProductTable({super.key, required this.products}); // Yêu cầu products qua constructor
+  const CouponTable({super.key, required this.coupons});
 
   @override
-  State<ProductTable> createState() => _ProductTableState();
+  State<CouponTable> createState() => _CouponTableState();
 }
 
-class _ProductTableState extends State<ProductTable> {
+class _CouponTableState extends State<CouponTable> {
   final TextEditingController _searchController = TextEditingController();
 
-  List<Map<String, dynamic>> get filteredProducts {
+  List<Map<String, dynamic>> get filteredCoupons {
     if (_searchController.text.isEmpty) {
-      return widget.products; // Sử dụng widget.products thay vì danh sách cứng
+      return widget.coupons;
     } else {
-      return widget.products.where((product) {
-        return product['name']
+      return widget.coupons.where((coupon) {
+        return coupon['code']
             .toLowerCase()
             .contains(_searchController.text.toLowerCase());
       }).toList();
     }
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case "Active":
-        return Colors.green;
-      case "Disabled":
-        return Colors.red;
-      default:
-        return Colors.blueGrey;
-    }
-  }
-
-  void _showProductForm(Map<String, dynamic> product) {
+  void _showCouponForm(Map<String, dynamic> coupon) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           title: Text(
-            product['name'],
+            coupon['code'],
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 20,
@@ -62,22 +52,15 @@ class _ProductTableState extends State<ProductTable> {
                 floatingLabelStyle: TextStyle(color: Colors.orange),
               ),
             ),
-            child: ProductForm(
+            child: CouponForm(
               buttonLabel: "Save",
-              initialProduct: {
-                'name': product['name'],
-                'stock': product['stock'],
-                'originalPrice': product['originalPrice'],
-                'sellingPrice': product['sellingPrice'],
-                'status': product['status'],
-              },
-              onSubmit: (updatedProductData) {
+              initialCoupon: coupon,
+              onSubmit: (updatedCouponData) {
                 setState(() {
-                  product['name'] = updatedProductData['name'];
-                  product['stock'] = updatedProductData['stock'];
-                  product['originalPrice'] = updatedProductData['originalPrice'];
-                  product['sellingPrice'] = updatedProductData['sellingPrice'];
-                  product['status'] = updatedProductData['status'];
+                  final index = widget.coupons.indexOf(coupon);
+                  if (index != -1) {
+                    widget.coupons[index] = updatedCouponData;
+                  }
                 });
                 Navigator.of(context).pop();
               },
@@ -105,59 +88,53 @@ class _ProductTableState extends State<ProductTable> {
     );
   }
 
-  TableRow buildProductRow(Map<String, dynamic> product, List<double> colWidths) {
+  TableRow buildCouponRow(Map<String, dynamic> coupon, List<double> colWidths) {
     final isMobile = Responsive.isMobile(context);
-    
+
     return TableRow(
       children: isMobile
           ? [
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: cellText(product['id'].toString(), colWidths[0]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText(coupon['code'], colWidths[0]),
               ),
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: productCell(product, colWidths[1]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText(
+                    DateFormat('dd/MM/yyyy').format(coupon['createdAt']),
+                    colWidths[1]),
               ),
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: cellText("\$${product['sellingPrice']}", colWidths[2]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText("${coupon['discountValue']}đ", colWidths[2]),
               ),
             ]
           : [
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: cellText(product['id'].toString(), colWidths[0]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText(coupon['code'], colWidths[0]),
               ),
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: productCell(product, colWidths[1]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText(
+                    DateFormat('dd/MM/yyyy').format(coupon['createdAt']),
+                    colWidths[1]),
               ),
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: cellText(product['stock'].toString(), colWidths[2]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText("${coupon['discountValue']}đ", colWidths[2]),
               ),
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: cellText("\$${product['originalPrice']}", colWidths[3]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText(coupon['usageCount'].toString(), colWidths[3]),
               ),
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: cellText("\$${product['sellingPrice']}", colWidths[4]),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText(coupon['maxUsage'].toString(), colWidths[4]),
               ),
               InkWell(
-                onTap: () => _showProductForm(product),
-                child: Container(
-                  width: colWidths[5],
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Chip(
-                    label: Text(
-                      product['status'],
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: _getStatusColor(product['status']),
-                  ),
-                ),
+                onTap: () => _showCouponForm(coupon),
+                child: cellText(coupon['appliedOrders'].join(", "), colWidths[5]),
               ),
             ],
     );
@@ -171,46 +148,6 @@ class _ProductTableState extends State<ProductTable> {
     );
   }
 
-  Widget productCell(Map<String, dynamic> product, double width) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              product['imageUrl'],
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product['name'],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              Text(
-                "ID: ${product['id']}",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -219,25 +156,25 @@ class _ProductTableState extends State<ProductTable> {
         final tableWidth = constraints.maxWidth;
 
         final List<double> colWidths = isMobile
-            ? [tableWidth * 0.08, tableWidth * 0.45, tableWidth * 0.3]
+            ? [tableWidth * 0.3, tableWidth * 0.3, tableWidth * 0.3]
             : [
                 tableWidth * 0.1,
-                tableWidth * 0.3,
-                tableWidth * 0.12,
-                tableWidth * 0.15,
-                tableWidth * 0.15,
-                tableWidth * 0.15,
+                tableWidth * 0.2,
+                tableWidth * 0.1,
+                tableWidth * 0.1,
+                tableWidth * 0.1,
+                tableWidth * 0.2,
               ];
 
         final headers = isMobile
-            ? ["ID", "Product", "Price"]
+            ? ["Code", "Created At", "Discount Value"]
             : [
-                "ID",
-                "Product",
-                "Stock",
-                "Original Price",
-                "Selling Price",
-                "Status"
+                "Code",
+                "Created At",
+                "Discount Value",
+                "Usage Count",
+                "Max Usage",
+                "Applied Orders"
               ];
 
         return Container(
@@ -261,7 +198,7 @@ class _ProductTableState extends State<ProductTable> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Product List",
+                    "Coupon List",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -271,7 +208,7 @@ class _ProductTableState extends State<ProductTable> {
                       controller: _searchController,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                        hintText: "Search by name",
+                        hintText: "Search by code",
                         prefixIcon: const Icon(Icons.search, size: 18),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -303,8 +240,8 @@ class _ProductTableState extends State<ProductTable> {
                     border: TableBorder.all(color: Colors.grey.shade300),
                     children: [
                       buildHeaderRow(headers, colWidths),
-                      ...filteredProducts
-                          .map((product) => buildProductRow(product, colWidths)),
+                      ...filteredCoupons
+                          .map((coupon) => buildCouponRow(coupon, colWidths)),
                     ],
                   ),
                 ),

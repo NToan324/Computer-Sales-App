@@ -6,7 +6,7 @@ import 'widgets/button.dart';
 import 'widgets/otp_input.dart';
 
 class VerifyOtpView extends StatefulWidget {
-  VerifyOtpView({super.key});
+  const VerifyOtpView({super.key});
 
   @override
   _VerifyOtpViewState createState() => _VerifyOtpViewState();
@@ -40,7 +40,7 @@ class _VerifyOtpViewState extends State<VerifyOtpView> {
       // Thêm độ trễ 1 giây để hiển thị hiệu ứng loading
       Navigator.pushNamed(context, 'change-password', arguments: userId);
     } on BadRequestException catch (e) {
-      showCustomSnackBar(context, '${e.message}');
+      showCustomSnackBar(context, e.message);
     } finally {
       setState(() => _isLoading = false);
     }
