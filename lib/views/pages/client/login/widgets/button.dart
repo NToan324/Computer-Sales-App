@@ -5,12 +5,14 @@ class MyButton extends StatelessWidget {
   final String text;
   final Function(BuildContext)? onTap;
   final bool isLoading;
+  final bool variantIsOutline;
 
   const MyButton({
     super.key,
     required this.text,
     required this.onTap,
     this.isLoading = false,
+    this.variantIsOutline = false,
   });
 
   @override
@@ -24,7 +26,17 @@ class MyButton extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: isLoading ? Colors.black12 : AppColors.primary,
+            color: isLoading
+                ? Colors.black12
+                : variantIsOutline
+                    ? Colors.white
+                    : AppColors.primary,
+            border: variantIsOutline
+                ? Border.all(
+                    color: AppColors.primary,
+                    width: 1,
+                  )
+                : null,
           ),
           child: Center(
               child: Row(
@@ -44,8 +56,8 @@ class MyButton extends StatelessWidget {
                 ),
               Text(
                 text,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: variantIsOutline ? AppColors.primary : Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w400,
                 ),

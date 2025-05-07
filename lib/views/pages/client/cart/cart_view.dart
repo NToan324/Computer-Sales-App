@@ -3,7 +3,6 @@ import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/item_cart.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/footer.dart';
-import 'package:computer_sales_app/views/header/header_view.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/cart_item_widget.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/remove_cart_widget.dart';
@@ -287,25 +286,15 @@ class _CartViewState extends State<CartView> {
     return Stack(
       children: <Widget>[
         Scaffold(
-          appBar: AppBar(
-            scrolledUnderElevation: 0,
-            backgroundColor: AppColors.white,
-            elevation: 0,
-            title: const Text('My Cart',
-                style: TextStyle(
-                    fontSize: 18,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w600)),
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.black, size: 18),
-              onPressed: () => Navigator.pop(context),
-            ),
+          backgroundColor: Colors.white,
+          appBar: CustomAppBarMobile(
+            title: 'My Cart',
+            isBack: true,
           ),
           body: ListView(children: [
             Container(
               color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
               child: Stack(
                 children: <Widget>[
                   Column(
@@ -342,8 +331,9 @@ class _CartViewState extends State<CartView> {
                                           Text(
                                             'Remove',
                                             style: TextStyle(
-                                                color: AppColors.red,
-                                                fontSize: 16),
+                                              color: AppColors.red,
+                                              fontSize: 16,
+                                            ),
                                           ),
                                         ],
                                       ),

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/components/custom/my_text_field.dart';
 import 'package:computer_sales_app/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/color.dart';

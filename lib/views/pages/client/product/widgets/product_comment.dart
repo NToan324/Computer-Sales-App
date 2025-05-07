@@ -17,14 +17,12 @@ class _ProductCommentState extends State<ProductComment> {
   int _currentPage = 0;
 
   void _addComment() {
-    final name = _nameController.text.trim();
     final comment = _commentController.text.trim();
 
-    if (name.isEmpty || comment.isEmpty) return;
+    if (comment.isEmpty) return;
 
     setState(() {
       _comments.insert(0, {
-        'name': name,
         'comment': comment,
       });
       _nameController.clear();
@@ -58,48 +56,34 @@ class _ProductCommentState extends State<ProductComment> {
         TextField(
           controller: _commentController,
           cursorColor: Colors.black,
-          maxLines: 3,
+          maxLines: 2,
           decoration: InputDecoration(
-            labelText: 'Enter your comment',
-            labelStyle: const TextStyle(
+            hintText: 'Leave a comment',
+            hintStyle: const TextStyle(
               color: Colors.grey,
             ),
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Colors.grey,
+              ),
+            ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),
+              borderRadius: BorderRadius.circular(12),
             ),
             focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: AppColors.primary,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _nameController,
-          cursorColor: Colors.black,
-          decoration: InputDecoration(
-            labelText: 'Your name',
-            border: OutlineInputBorder(),
-            labelStyle: const TextStyle(
-              color: Colors.grey,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
-            height: 40,
+            height: 45,
             child: ElevatedButton(
               onPressed: _addComment,
               style: ElevatedButton.styleFrom(
@@ -128,17 +112,44 @@ class _ProductCommentState extends State<ProductComment> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text(
-                      comment['name'] ?? '',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                    const CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey,
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(comment['comment'] ?? ''),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                comment['name'] ?? 'Anonymous',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '1 day ago',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(comment['comment'] ?? ''),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

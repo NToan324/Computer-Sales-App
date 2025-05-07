@@ -12,7 +12,14 @@ import 'package:computer_sales_app/views/pages/client/product/widgets/version_pr
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 
-class ProductDetailsView extends StatelessWidget {
+class ProductDetailsView extends StatefulWidget {
+  const ProductDetailsView({super.key});
+
+  @override
+  State<ProductDetailsView> createState() => _ProductDetailsViewState();
+}
+
+class _ProductDetailsViewState extends State<ProductDetailsView> {
   List<String> images = [
     'assets/images/laptop-popular-2.jpg',
     'assets/images/laptop-mockup.jpg',
@@ -23,7 +30,6 @@ class ProductDetailsView extends StatelessWidget {
     'assets/images/laptop-mockup.jpg',
   ];
 
-  ProductDetailsView({super.key});
   @override
   Widget build(BuildContext context) {
     double isWrap = MediaQuery.of(context).size.width;
@@ -34,15 +40,8 @@ class ProductDetailsView extends StatelessWidget {
         itemCount: 1,
         itemBuilder: (context, index) => Stack(
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
-              padding: !Responsive.isMobile(context)
-                  ? EdgeInsets.only(
-                      top: 16,
-                      left: 64,
-                      right: 64,
-                    )
-                  : EdgeInsets.all(8),
               child: Wrap(
                 spacing: 40,
                 runSpacing: 20,
@@ -67,6 +66,16 @@ class ProductDetailsView extends StatelessWidget {
                       minWidth: 300,
                     ),
                     child: Container(
+                      padding: !Responsive.isMobile(context)
+                          ? EdgeInsets.only(
+                              top: 16,
+                              left: 64,
+                              right: 64,
+                            )
+                          : EdgeInsets.only(
+                              left: 16,
+                              right: 16,
+                            ),
                       color: Colors.white,
                       width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
                       child: Column(
@@ -138,6 +147,17 @@ class ProductDetailsView extends StatelessWidget {
                     width: Responsive.isMobile(context)
                         ? double.infinity
                         : isWrap * 0.43,
+                    padding: !Responsive.isMobile(context)
+                        ? EdgeInsets.only(
+                            top: 16,
+                            left: 64,
+                            right: 64,
+                          )
+                        : EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
                     color: Colors.white,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,18 +166,18 @@ class ProductDetailsView extends StatelessWidget {
                         DescriptionProduct(),
                         ProductReviewSection(),
                         Text(
-                          'Sản phẩm tương tự',
+                          'Related Products',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.black,
                           ),
                         ),
+                        ProductListViewWidget(),
+                        ProductComment(),
                       ],
                     ),
                   ),
-                  ProductListViewWidget(),
-                  ProductComment(),
                 ],
               ),
             ),

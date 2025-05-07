@@ -1,4 +1,4 @@
-import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/components/custom/my_text_field.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
 import 'package:flutter/material.dart';

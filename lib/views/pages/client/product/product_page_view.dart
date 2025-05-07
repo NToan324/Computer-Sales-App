@@ -1,14 +1,20 @@
+import 'package:computer_sales_app/components/custom/dropdown.dart';
+import 'package:computer_sales_app/components/custom/radio.dart';
+import 'package:computer_sales_app/components/custom/range_slider.dart';
+import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
+import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 class ProductPageView extends StatelessWidget {
-  const ProductPageView({super.key});
+  const ProductPageView({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -153,7 +159,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        "Done",
+                        "Cancel",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.black,
@@ -164,6 +170,39 @@ class _FilterWidgetState extends State<FilterWidget> {
               ),
               buildFilterSection('Product Category', categories, 'Category'),
               buildFilterSection('Brand', brands, 'Brand'),
+              const SizedBox(height: 16),
+              RangeSliderCustom(
+                title: 'Price',
+                maxValue: 10000000,
+                divisions: 50,
+              ),
+              const SizedBox(height: 16),
+              RatingFilter(),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: 10,
+                children: [
+                  Expanded(
+                    child: MyButton(
+                      text: 'Reset',
+                      variantIsOutline: true,
+                      onTap: (_) {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: MyButton(
+                      text: 'Apply',
+                      onTap: (_) {
+                        // Handle apply filter action
+                        Navigator.pop(context);
+                      },
+                    ),
+                  )
+                ],
+              ),
             ],
           ),
         ),
@@ -228,23 +267,106 @@ class _FilterWidgetState extends State<FilterWidget> {
   }
 }
 
-class ShowListProductWidget extends StatelessWidget {
-  const ShowListProductWidget({super.key});
+enum RatingFilterValue { all, oneStar, twoStar, threeStar, fourStar, fiveStar }
+
+class RatingFilter extends StatefulWidget {
+  const RatingFilter({
+    super.key,
+  });
+
+  @override
+  State<RatingFilter> createState() => _RatingFilterState();
+}
+
+class _RatingFilterState extends State<RatingFilter> {
+  RatingFilterValue selectedRatingValue = RatingFilterValue.all;
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Rating',
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 100,
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemBuilder: (context, index) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(
+                    5 - index,
+                    (index) {
+                      return Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      );
+                    },
+                  ),
+                ),
+                RadioCustom<RatingFilterValue>(
+                  value: RatingFilterValue
+                      .values[RatingFilterValue.values.length - index - 1],
+                  groupValue: selectedRatingValue,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedRatingValue = value!;
+                    });
+                  },
+                )
+              ],
+            ),
+            separatorBuilder: (context, _) => SizedBox(height: 5),
+            itemCount: 5,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ShowListProductWidget extends StatelessWidget {
+  ShowListProductWidget({super.key});
+
+  final List<String> sortOptions = [
+    'All Products',
+    'Name: A to Z',
+    'Name: Z to A',
+    'Price: Low to High',
+    'Price: High to Low',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isMobile = Responsive.isMobile(context);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: !isMobile ? const EdgeInsets.all(16) : null,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: !isMobile
+            ? [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,50 +378,29 @@ class ShowListProductWidget extends StatelessWidget {
             alignment: WrapAlignment.start,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text(
-                'Product List',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              if (!isMobile)
+                const Text(
+                  'Product List',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 spacing: 10,
                 children: [
-                  Text('Sort by: ',
-                      style: TextStyle(fontSize: 14, color: Colors.black54)),
+                  Text(
+                    'Sort by: ',
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    height: 30,
+                    height: 40,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.black45, width: 0.5),
                     ),
-                    child: DropdownButton<String>(
-                      underline: const SizedBox.shrink(),
-                      dropdownColor: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      value: 'All Products',
-                      items: <String>[
-                        'All Products',
-                        'Name: A to Z',
-                        'Name: Z to A',
-                        'Price: Low to High',
-                        'Price: High to Low',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        // Handle sort change
-                      },
-                    ),
+                    child: DropdownCustom(items: sortOptions),
                   ),
                 ],
               )
@@ -311,34 +412,33 @@ class ShowListProductWidget extends StatelessWidget {
             runSpacing: 16,
             children: List.generate(3, (index) {
               return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
+                padding: const EdgeInsets.only(
+                  left: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.primary.withAlpha(25),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.black45,
-                    width: 0.5,
-                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Filter $index',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 14),
+                      child: Text(
+                        'Filter $index',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     IconButton(
                       onPressed: () {},
                       icon: const Icon(
                         Icons.close,
-                        color: Colors.red,
+                        color: AppColors.primary,
                       ),
-                      iconSize: 20,
+                      iconSize: 16,
                       constraints: const BoxConstraints(),
                       padding: EdgeInsets.zero,
                     ),

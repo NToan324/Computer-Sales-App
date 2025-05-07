@@ -50,12 +50,11 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Phần đầu: Tổng số đánh giá + trung bình sao
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Đánh giá sản phẩm',
+              'Reviews ',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -73,7 +72,7 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
                   ),
                 ),
                 Text(
-                  ' (${allReviews.length} đánh giá)',
+                  ' (${allReviews.length} reviews)',
                   style: TextStyle(color: Colors.grey[700]),
                 )
               ],

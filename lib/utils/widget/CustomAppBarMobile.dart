@@ -3,9 +3,18 @@ import 'package:flutter/material.dart';
 
 class CustomAppBarMobile extends StatelessWidget
     implements PreferredSizeWidget {
-  final String title;
+  const CustomAppBarMobile({
+    super.key,
+    required this.title,
+    this.isBack = false,
+    this.actionButton = false,
+    this.handleOnPressed,
+  });
 
-  const CustomAppBarMobile({super.key, required this.title});
+  final String title;
+  final bool isBack;
+  final bool actionButton;
+  final Function()? handleOnPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +31,27 @@ class CustomAppBarMobile extends StatelessWidget
         ),
       ),
       centerTitle: true,
+      leading: isBack
+          ? IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          : null,
+      actions: [
+        if (actionButton)
+          IconButton(
+            icon: const Icon(
+              Icons.menu_rounded,
+              color: Colors.white,
+            ),
+            onPressed: handleOnPressed,
+          ),
+      ],
     );
   }
 

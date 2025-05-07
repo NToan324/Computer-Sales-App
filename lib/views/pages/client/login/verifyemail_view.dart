@@ -1,4 +1,4 @@
-import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/components/custom/my_text_field.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';

@@ -11,6 +11,7 @@ import 'package:computer_sales_app/views/pages/client/product/product_details_vi
 import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:computer_sales_app/views/pages/client/search/search_product_screen.dart';
 import 'package:computer_sales_app/views/pages/client/splash/splash_view.dart';
+import 'package:computer_sales_app/views/pages/client/voucher/voucher_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         'product-details': (context) => ProductDetailsView(),
         'chat': (context) => ChatView(),
         'payment': (context) => PaymentView(),
+        'voucher': (context) => VoucherView(),
 
         //Search
         'cart': (context) => const CartView(),

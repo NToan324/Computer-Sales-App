@@ -20,6 +20,7 @@ class BottomNavigationBarCustom extends StatefulWidget {
 
 class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
   final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
+
   final List<Map<String, dynamic>> _pages = [
     {
       'page': HomeBody(),
@@ -27,7 +28,9 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
     },
     {
       'page': ProductPageView(),
-      'appBar': CustomAppBarMobile(title: 'Product'),
+      'appBar': CustomAppBarMobile(
+        title: 'Product',
+      ),
     },
     {
       'page': ChatBody(),

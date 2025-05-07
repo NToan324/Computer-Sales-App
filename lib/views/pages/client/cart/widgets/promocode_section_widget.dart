@@ -41,41 +41,48 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 15,
-              children: [
-                Text(
-                  'Voucher',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, 'voucher');
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: 15,
+                children: [
+                  Text(
+                    'Voucher',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Row(
-                  spacing: 5,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 222, 255, 222),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text('Shipping Free',
+                  Row(
+                    spacing: 5,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 222, 255, 222),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Shipping Free',
                           style: TextStyle(
                             fontSize: 10,
                             color: const Color.fromARGB(255, 0, 69, 23),
-                          )),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: Colors.black,
-                      size: 14,
-                    ),
-                  ],
-                ),
-              ],
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Colors.black,
+                        size: 14,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           const Divider(

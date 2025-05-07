@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
   Future<void> _fetchProducts() async {
     try {
       final data = await _productService.getVariants();
+
       if (!mounted) return;
       setState(() {
         _products = data;
@@ -57,12 +59,8 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return GridView.builder(
-      itemCount: _products.length,
+      itemCount: _isLoading ? 10 : _products.length,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -70,24 +68,28 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
         childAspectRatio: 0.5,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
-        mainAxisExtent: 350,
+        mainAxisExtent: 330,
       ),
       itemBuilder: (context, index) {
-        final variant = _products[index];
+        final variant =
+            !_isLoading && index < _products.length ? _products[index] : null;
 
-        return ProductView(
-          name: variant['variant_name'] ?? '',
-          imageUrl: (variant['images'] != null && variant['images'].isNotEmpty)
-              ? variant['images'][0]['url'] ?? ''
-              : '',
-          price: _parsePrice(variant['price']),
-          description:
-              '${variant['variant_color'] ?? ''} ${variant['variant_description'] ?? ''}',
-          rating: (variant['avarage_rating'] is int
-                  ? (variant['avarage_rating'] as int).toDouble()
-                  : variant['avarage_rating'] ?? 0.0)
-              .toString(),
-        );
+        return _isLoading
+            ? Skeleton()
+            : ProductView(
+                name: variant['variant_name'] ?? '',
+                imageUrl:
+                    (variant['images'] != null && variant['images'].isNotEmpty)
+                        ? variant['images'][0]['url'] ?? ''
+                        : '',
+                price: _parsePrice(variant['price']),
+                description:
+                    '${variant['variant_color'] ?? ''} ${variant['variant_description'] ?? ''}',
+                rating: (variant['avarage_rating'] is int
+                        ? (variant['avarage_rating'] as int).toDouble()
+                        : variant['avarage_rating'] ?? 0.0)
+                    .toString(),
+              );
       },
     );
   }
@@ -115,8 +117,8 @@ class ProductView extends StatelessWidget {
       onTap: () => Navigator.pushNamed(context, 'product-details'),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
           color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color.fromARGB(255, 219, 219, 219)),
         ),
         child: Column(
@@ -126,41 +128,43 @@ class ProductView extends StatelessWidget {
               constraints: const BoxConstraints(minHeight: 150, maxHeight: 350),
               child: Container(
                 width: double.infinity,
+                padding: const EdgeInsets.all(5),
                 height: 180,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                  ),
-                  color: const Color.fromARGB(255, 238, 238, 238),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(12)),
+                  child: imageUrl.isNotEmpty
+                      ? Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          'assets/images/laptop.png',
+                          fit: BoxFit.cover,
+                        ),
                 ),
-                child: imageUrl.isNotEmpty
-                    ? Image.network(imageUrl, fit: BoxFit.cover)
-                    : Image.asset('assets/images/laptop.png',
-                        fit: BoxFit.cover),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
                 children: [
                   Text(
                     name,
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: FontSizes.medium),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
                   Text(
                     description,
                     style: TextStyle(
                         fontSize: FontSizes.small, color: AppColors.primary),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
                   Text(
                     formatMoney(price.toDouble()),
                     style: TextStyle(
@@ -169,7 +173,6 @@ class ProductView extends StatelessWidget {
                       fontSize: FontSizes.medium,
                     ),
                   ),
-                  const SizedBox(height: 8),
                   Row(
                     children: [
                       const Icon(Icons.star, size: 15, color: Colors.amber),
