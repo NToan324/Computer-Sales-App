@@ -1,5 +1,7 @@
 import 'package:computer_sales_app/components/ui/slider_product.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/models/product.model.dart';
+import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
@@ -13,29 +15,65 @@ import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailsView extends StatefulWidget {
-  const ProductDetailsView({super.key});
+  const ProductDetailsView({super.key, required this.productId});
+  final String productId;
 
   @override
   State<ProductDetailsView> createState() => _ProductDetailsViewState();
 }
 
 class _ProductDetailsViewState extends State<ProductDetailsView> {
-  List<String> images = [
-    'assets/images/laptop-popular-2.jpg',
-    'assets/images/laptop-mockup.jpg',
-    'assets/images/laptop-popular-2.jpg',
-    'assets/images/laptop-mockup.jpg',
-    'assets/images/laptop-popular-2.jpg',
-    'assets/images/laptop-mockup.jpg',
-    'assets/images/laptop-mockup.jpg',
-  ];
+  Product product = Product(
+    id: '',
+    productId: '',
+    variantName: '',
+    variantColor: '',
+    variantDescription: '',
+    price: 0,
+    discount: 0,
+    quantity: 0,
+    averageRating: 0,
+    reviewCount: 0,
+    images: [],
+    isActive: true,
+  );
+  List<String> images = [];
+
+  ProductService productService = ProductService();
+  void fetchProductDetails() async {
+    try {
+      // Call your service to fetch product details here
+      // For example: await ProductService().getProductDetail(widget.productId);
+      final response =
+          await productService.getProductVariantsById(widget.productId);
+      setState(() {
+        product = response;
+      });
+    } catch (e) {
+      // Handle any errors that occur during the fetch
+      print('Error fetching product details: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProductDetails();
+  }
 
   @override
   Widget build(BuildContext context) {
     double isWrap = MediaQuery.of(context).size.width;
+    bool isMobile = Responsive.isMobile(context);
+    bool isTablet = Responsive.isTablet(context);
+    bool isDesktop = Responsive.isDesktop(context);
+
+    if (product.images.isNotEmpty) {
+      images = product.images.map((image) => image.url).toList();
+    }
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: !Responsive.isMobile(context) ? AppBarHomeCustom() : null,
+      appBar: !isMobile ? AppBarHomeCustom() : null,
       body: ListView.builder(
         itemCount: 1,
         itemBuilder: (context, index) => Stack(
@@ -54,7 +92,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       minHeight: 300,
                     ),
                     child: SizedBox(
-                      height: Responsive.isMobile(context) ? 300 : 500,
+                      height: isMobile ? 300 : 500,
                       width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
                       child: SliderProductCustom(
                         imagesUrl: images,
@@ -66,7 +104,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       minWidth: 300,
                     ),
                     child: Container(
-                      padding: !Responsive.isMobile(context)
+                      padding: !isMobile
                           ? EdgeInsets.only(
                               top: 16,
                               left: 64,
@@ -83,13 +121,17 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 20,
                         children: [
-                          TitleProduct(),
+                          TitleProduct(
+                            title: product.variantName,
+                            price: product.price,
+                            discount: product.discount,
+                          ),
                           VersionProduct(
-                            title: 'Surface Pro 7 | i5 8GB - 128GB',
-                            price: 14900000,
+                            title: product.variantName,
+                            price: product.price,
                           ),
                           Quantity(),
-                          if (!Responsive.isMobile(context))
+                          if (!isMobile)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +141,9 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                   width: 200,
                                   height: 50,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      //add to cart
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary,
                                       shape: RoundedRectangleBorder(
@@ -144,10 +188,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     ),
                   ),
                   Container(
-                    width: Responsive.isMobile(context)
-                        ? double.infinity
-                        : isWrap * 0.43,
-                    padding: !Responsive.isMobile(context)
+                    width: !isDesktop ? double.infinity : isWrap * 0.43,
+                    padding: !isMobile
                         ? EdgeInsets.only(
                             top: 16,
                             left: 64,
@@ -163,7 +205,9 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 20,
                       children: [
-                        DescriptionProduct(),
+                        DescriptionProduct(
+                          description: product.variantDescription,
+                        ),
                         ProductReviewSection(),
                         Text(
                           'Related Products',
@@ -173,15 +217,44 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                             color: AppColors.black,
                           ),
                         ),
-                        ProductListViewWidget(),
-                        ProductComment(),
                       ],
                     ),
+                  ),
+                  Padding(
+                    padding: !isMobile
+                        ? EdgeInsets.only(
+                            top: 16,
+                            left: 64,
+                            right: 64,
+                          )
+                        : EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                    child: ProductListViewWidget(),
+                  ),
+                  Padding(
+                    padding: !isMobile
+                        ? EdgeInsets.only(
+                            top: 16,
+                            left: 64,
+                            right: 64,
+                          )
+                        : EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                    child: ProductComment(),
+                  ),
+                  SizedBox(
+                    height: 100,
                   ),
                 ],
               ),
             ),
-            if (Responsive.isMobile(context))
+            if (isMobile)
               Positioned(
                 top: 20,
                 left: 20,
@@ -204,11 +277,11 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   ],
                 ),
               ),
-            // Responsive.isMobile(context) ? DraggableScrollCustom() : SizedBox(),
+            // isMobile ? DraggableScrollCustom() : SizedBox(),
           ],
         ),
       ),
-      bottomNavigationBar: Responsive.isMobile(context)
+      bottomNavigationBar: isMobile
           ? Container(
               decoration: BoxDecoration(
                 color: Colors.white,

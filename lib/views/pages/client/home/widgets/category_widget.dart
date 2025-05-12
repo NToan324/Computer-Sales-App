@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:computer_sales_app/config/color.dart';
-import 'package:computer_sales_app/models/product_card.dart';
+import 'package:computer_sales_app/models/product_card.model.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

@@ -1,3 +1,5 @@
+import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/profile_body.dart';
 import 'package:flutter/material.dart';
 
@@ -7,9 +9,8 @@ class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
+      backgroundColor: Colors.white,
+      appBar: !Responsive.isMobile(context) ? AppBarHomeCustom() : null,
       body: ProfileBody(),
     );
   }

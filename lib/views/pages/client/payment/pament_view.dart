@@ -1,6 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
-import 'package:computer_sales_app/models/item_cart.dart';
+import 'package:computer_sales_app/models/cart.model.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/utils/widget/footer.dart';
@@ -11,22 +11,19 @@ import 'package:flutter/material.dart';
 class PaymentView extends StatelessWidget {
   final List<CartItem> cartItems = [
     CartItem(
-      name: 'Item 1',
-      price: 10000000.0,
-      image: 'assets/images/laptop_banner.jpg',
+      productVariantId: 'Item 1',
       quantity: 4,
+      unitPrice: 10000000,
     ),
     CartItem(
-      name: 'Item 2',
-      price: 20.0,
-      image: 'assets/images/laptop_banner.jpg',
-      quantity: 1,
+      productVariantId: 'Item 2',
+      quantity: 20,
+      unitPrice: 50000000,
     ),
     CartItem(
-      name: 'Item 3',
-      price: 30.0,
-      image: 'assets/images/laptop_banner.jpg',
+      productVariantId: 'Item 3',
       quantity: 3,
+      unitPrice: 20000000,
     ),
   ];
 
@@ -38,7 +35,7 @@ class PaymentView extends StatelessWidget {
 
     double totalAmount = cartItems.fold(
       0,
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) => sum + item.unitPrice * item.quantity,
     );
 
     return Scaffold(

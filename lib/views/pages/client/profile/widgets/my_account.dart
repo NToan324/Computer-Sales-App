@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:computer_sales_app/components/custom/my_text_field.dart';
-import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
@@ -10,7 +9,6 @@ import 'package:computer_sales_app/views/pages/client/login/widgets/otp_input.da
 import 'package:computer_sales_app/views/pages/client/profile/widgets/listTile_custom.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -94,12 +92,15 @@ class _PersonelInformationState extends State<PersonelInformation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBarMobile(
         title: 'Personal Information',
+        isBack: true,
       ),
       body: Container(
         color: Colors.white,
         width: double.infinity,
+        margin: const EdgeInsets.only(top: 16),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -240,10 +241,16 @@ class _PersonelInformationState extends State<PersonelInformation> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: MyButton(
-                  text: 'Change Information',
-                  isLoading: _loading,
-                  onTap: (_) => {},
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: 200,
+                    maxWidth: 350,
+                  ),
+                  child: MyButton(
+                    text: 'Change Information',
+                    isLoading: _loading,
+                    onTap: (_) => {},
+                  ),
                 ),
               ),
             ],
@@ -270,8 +277,10 @@ class _ChangePasswordState extends State<ChangePassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBarMobile(
         title: 'Change Password',
+        isBack: true,
       ),
       body: Container(
         color: Colors.white,
@@ -309,22 +318,45 @@ class _ChangePasswordState extends State<ChangePassword> {
                     ],
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  spacing: 20,
-                  children: [
-                    Flexible(
-                        child: OtpInput(
-                            controller: otp1Controller, autoFocus: true)),
-                    Flexible(child: OtpInput(controller: otp2Controller)),
-                    Flexible(child: OtpInput(controller: otp3Controller)),
-                    Flexible(child: OtpInput(controller: otp4Controller)),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    double boxWidth = (constraints.maxWidth - 60) /
+                        4; // 4 ô, mỗi ô cách nhau 20
+                    boxWidth = boxWidth.clamp(60, 100); // min 60, max 100
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 20,
+                      children: [
+                        SizedBox(
+                          width: boxWidth,
+                          child: OtpInput(
+                              controller: otp1Controller, autoFocus: true),
+                        ),
+                        SizedBox(
+                          width: boxWidth,
+                          child: OtpInput(controller: otp2Controller),
+                        ),
+                        SizedBox(
+                          width: boxWidth,
+                          child: OtpInput(controller: otp3Controller),
+                        ),
+                        SizedBox(
+                          width: boxWidth,
+                          child: OtpInput(controller: otp4Controller),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                MyButton(
-                  text: 'Get code',
-                  isLoading: false,
-                  onTap: (_) => {},
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 300),
+                  child: MyButton(
+                    text: 'Get code',
+                    isLoading: false,
+                    onTap: (_) => {},
+                  ),
                 ),
               ],
             ),
@@ -446,7 +478,11 @@ class _AddressPageState extends State<AddressPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarMobile(title: 'Address'),
+      backgroundColor: Colors.white,
+      appBar: CustomAppBarMobile(
+        title: 'Address',
+        isBack: true,
+      ),
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(16),

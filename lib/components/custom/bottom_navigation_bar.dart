@@ -4,7 +4,7 @@ import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/client/Chat/widgets/chat_body.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/home_body.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
-import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
+import 'package:computer_sales_app/views/pages/client/product/product_page_body.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/profile_body.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,10 +27,8 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
       'appBar': AppBarHomeCustom(),
     },
     {
-      'page': ProductPageView(),
-      'appBar': CustomAppBarMobile(
-        title: 'Product',
-      ),
+      'page': ProductPageBody(),
+      'appBar': CustomAppBarMobile(title: 'Product'),
     },
     {
       'page': ChatBody(),
@@ -105,13 +103,14 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(
-                      icons.length,
-                      (index) => _customItemNavBar(
-                            icons[index]['icon'] as IconData,
-                            icons[index]['label'] as String,
-                            index,
-                            currentIndex,
-                          )).toList(),
+                    icons.length,
+                    (index) => _customItemNavBar(
+                      icons[index]['icon'] as IconData,
+                      icons[index]['label'] as String,
+                      index,
+                      currentIndex,
+                    ),
+                  ).toList(),
                 ),
               )
             : SizedBox(),

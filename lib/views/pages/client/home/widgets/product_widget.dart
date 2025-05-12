@@ -1,12 +1,15 @@
 import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
+import 'package:computer_sales_app/provider/product_provider.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
+import 'package:computer_sales_app/models/product.model.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:provider/provider.dart';
 
 class ProductListViewWidget extends StatefulWidget {
   const ProductListViewWidget({super.key});
@@ -17,7 +20,6 @@ class ProductListViewWidget extends StatefulWidget {
 
 class _ProductListViewWidgetState extends State<ProductListViewWidget> {
   final ProductService _productService = ProductService();
-  List<dynamic> _products = [];
   bool _isLoading = true;
 
   @override
@@ -29,11 +31,14 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
   Future<void> _fetchProducts() async {
     try {
       final data = await _productService.getVariants();
+      final productProvider =
+          Provider.of<ProductProvider>(context, listen: false);
+      final products = data.map((item) => Product.fromMap(item)).toList();
 
-      if (!mounted) return;
-      setState(() {
-        _products = data;
-      });
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+      productProvider.setProducts(products);
     } on BadRequestException catch (e) {
       if (mounted) {
         showCustomSnackBar(context, e.message, type: SnackBarType.error);
@@ -45,22 +50,17 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
     }
   }
 
-  int _parsePrice(dynamic price) {
-    if (price is int) return price;
-    if (price is double) return price.toInt();
-    if (price is String) return int.tryParse(price) ?? 0;
-    return 0;
-  }
-
   @override
   void dispose() {
     super.dispose();
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
+    final products = Provider.of<ProductProvider>(context).products;
     return GridView.builder(
-      itemCount: _isLoading ? 10 : _products.length,
+      itemCount: _isLoading ? 10 : products.length,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -72,23 +72,17 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
       ),
       itemBuilder: (context, index) {
         final variant =
-            !_isLoading && index < _products.length ? _products[index] : null;
-
+            !_isLoading && index < products.length ? products[index] : null;
         return _isLoading
             ? Skeleton()
             : ProductView(
-                name: variant['variant_name'] ?? '',
-                imageUrl:
-                    (variant['images'] != null && variant['images'].isNotEmpty)
-                        ? variant['images'][0]['url'] ?? ''
-                        : '',
-                price: _parsePrice(variant['price']),
-                description:
-                    '${variant['variant_color'] ?? ''} ${variant['variant_description'] ?? ''}',
-                rating: (variant['avarage_rating'] is int
-                        ? (variant['avarage_rating'] as int).toDouble()
-                        : variant['avarage_rating'] ?? 0.0)
-                    .toString(),
+                id: variant?.id ?? '',
+                variantName: variant?.variantName ?? '',
+                images: (variant?.images as List<ProductImage>),
+                price: (variant?.price as double),
+                variantDescription:
+                    variant?.variantDescription ?? 'No description available',
+                averageRating: variant?.averageRating.toString() ?? '0.0',
               );
       },
     );
@@ -96,25 +90,27 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
 }
 
 class ProductView extends StatelessWidget {
-  final String name;
-  final String imageUrl;
-  final int price;
-  final String description;
-  final String rating;
+  final String variantName;
+  final List<ProductImage> images;
+  final double price;
+  final String variantDescription;
+  final String averageRating;
+  final String id;
 
   const ProductView({
     super.key,
-    required this.name,
-    required this.imageUrl,
+    required this.id,
+    required this.variantName,
+    required this.images,
     required this.price,
-    required this.description,
-    required this.rating,
+    required this.variantDescription,
+    required this.averageRating,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, 'product-details'),
+      onTap: () => Navigator.pushNamed(context, '/product-details/$id'),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -132,9 +128,9 @@ class ProductView extends StatelessWidget {
                 height: 180,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  child: imageUrl.isNotEmpty
+                  child: images[0].url.isNotEmpty
                       ? Image.network(
-                          imageUrl,
+                          images[0].url,
                           fit: BoxFit.cover,
                         )
                       : Image.asset(
@@ -151,7 +147,7 @@ class ProductView extends StatelessWidget {
                 spacing: 8,
                 children: [
                   Text(
-                    name,
+                    variantName,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -160,7 +156,7 @@ class ProductView extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    description,
+                    variantDescription,
                     style: TextStyle(
                         fontSize: FontSizes.small, color: AppColors.primary),
                     overflow: TextOverflow.ellipsis,
@@ -177,7 +173,7 @@ class ProductView extends StatelessWidget {
                     children: [
                       const Icon(Icons.star, size: 15, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(rating),
+                      Text(averageRating),
                     ],
                   ),
                 ],

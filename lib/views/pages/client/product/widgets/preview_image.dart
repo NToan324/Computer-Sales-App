@@ -98,7 +98,7 @@ class _PreviewImageState extends State<PreviewImage> {
                                   width: widget.activeIndex == index ? 2 : 0,
                                 ),
                                 image: DecorationImage(
-                                  image: AssetImage(widget.imagesUrl[index]),
+                                  image: NetworkImage(widget.imagesUrl[index]),
                                   fit: BoxFit.cover,
                                 ),
                               ),

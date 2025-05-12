@@ -1,6 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
-import 'package:computer_sales_app/models/item_cart.dart';
+import 'package:computer_sales_app/models/cart.model.dart';
 import 'package:flutter/material.dart';
 
 class PromocodeSectionWidget extends StatefulWidget {
@@ -14,8 +14,8 @@ class PromocodeSectionWidget extends StatefulWidget {
 class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
   final TextEditingController _promoCodeController = TextEditingController();
 
-  double get subtotal =>
-      widget.cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+  double get subtotal => widget.cartItems
+      .fold(0, (sum, item) => sum + item.unitPrice * item.quantity);
 
   double get deliveryFee => 5.0;
   // Example delivery fee

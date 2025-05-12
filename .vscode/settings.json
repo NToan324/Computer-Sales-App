@@ -1,5 +1,10 @@
 {
-    "dart.flutterHotReloadOnSave": "all",
-    "cmake.sourceDirectory": "D:/Flutter/Computer-Sales-App/linux",
-    "cmake.ignoreCMakeListsMissing": true
+  "dart.flutterHotReloadOnSave": "all",
+  "cmake.sourceDirectory": "D:/Flutter/Computer-Sales-App/linux",
+  "cmake.ignoreCMakeListsMissing": true,
+  "files.associations": {
+    "*.embeddedhtml": "html",
+    "*.ejs": "html",
+    "ios": "cpp"
+  }
 }

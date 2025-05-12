@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:computer_sales_app/models/item_cart.dart';
+import 'package:computer_sales_app/models/cart.model.dart';
 import 'package:computer_sales_app/views/pages/client/payment/widgets/product_order.dart';
 
 class OrderSummary extends StatelessWidget {
@@ -37,7 +37,7 @@ class OrderSummary extends StatelessWidget {
             shrinkWrap: true,
             itemCount: cartItems.length,
             itemBuilder: (context, index) {
-              return ProductOrdered(item: cartItems[index]);
+              return ProductOrdered(item: cartItems[index], products: {});
             },
           ),
         ),

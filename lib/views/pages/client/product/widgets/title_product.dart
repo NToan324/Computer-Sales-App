@@ -4,7 +4,16 @@ import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:flutter/material.dart';
 
 class TitleProduct extends StatelessWidget {
-  const TitleProduct({super.key});
+  const TitleProduct(
+      {super.key,
+      required this.title,
+      required this.price,
+      this.oldPrice,
+      this.discount});
+  final String title;
+  final double price;
+  final int? oldPrice;
+  final double? discount;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +23,7 @@ class TitleProduct extends StatelessWidget {
       spacing: 5,
       children: [
         Text(
-          'Surface Pro 7 12.3" Touch-Screen Intel Core i5 8GB Memory 128GB Solid State Drive (Latest Model) Platinum',
+          title,
           style: TextStyle(
             fontSize: lerpDouble(
                 16, 18, (MediaQuery.of(context).size.width - 300) / 300),
@@ -25,7 +34,7 @@ class TitleProduct extends StatelessWidget {
           spacing: 10,
           children: [
             Text(
-              formatMoney(15900000),
+              formatMoney(price),
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -34,7 +43,7 @@ class TitleProduct extends StatelessWidget {
               softWrap: true,
             ),
             Text(
-              formatMoney(14900000),
+              formatMoney(price),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

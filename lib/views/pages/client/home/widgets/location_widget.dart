@@ -27,54 +27,82 @@ class _LocationWidgetState extends State<LocationWidget> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      setState(() {
-        _location = "Please enable location services";
-      });
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        setState(() {
-          _location = "Location permissions are denied";
-        });
+    try {
+      // Check if location service is enabled
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          setState(() {
+            _location = "Location services are disabled";
+          });
+        }
         return;
       }
+
+      // Check and request permission if necessary
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            setState(() {
+              _location = "Location permissions are denied";
+            });
+          }
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          setState(() {
+            _location = "Location permissions are permanently denied";
+          });
+        }
+        return;
+      }
+
+      // Fetch the current position
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+        ),
+      );
+
+      // Get the placemark from the coordinates
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        if (mounted) {
+          setState(() {
+            _location =
+                "${place.street}, ${place.subAdministrativeArea}, ${place.locality}";
+          });
+        }
+
+        // Save location to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('location_current', _location);
+      } else {
+        if (mounted) {
+          setState(() {
+            _location = "Unable to fetch address";
+          });
+        }
+      }
+    } catch (e) {
+      // Handle any errors that occur during the location fetch process
+      if (mounted) {
+        setState(() {
+          _location = "Failed to get location: $e";
+        });
+      }
     }
-
-    if (permission == LocationPermission.deniedForever) {
-      setState(() {
-        _location = "Location permissions are permanently denied";
-      });
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-      locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
-      ),
-    );
-
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      position.latitude,
-      position.longitude,
-    );
-
-    Placemark place = placemarks[0];
-    if (mounted) {
-      setState(() {
-        _location =
-            "${place.street}, ${place.subAdministrativeArea}, ${place.locality}";
-      });
-    }
-    //Save location to shared preferences
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('location_current', _location);
   }
 
   @override

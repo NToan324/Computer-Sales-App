@@ -1,6 +1,4 @@
 import 'package:computer_sales_app/config/color.dart';
-import 'package:computer_sales_app/utils/responsive.dart';
-import 'package:computer_sales_app/views/pages/client/profile/widgets/listTile_custom.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/my_account.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/order_management.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/payment_management.dart';
@@ -149,25 +147,26 @@ class _ProfileBodyState extends State<ProfileBody> {
           SizedBox(height: 20),
           //Show the selected profile menu item
           Expanded(
-              child: Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: 16,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+            child: Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: 16,
               ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: _selectedIndex == 0
+                  ? MyAccountView()
+                  : _selectedIndex == 1
+                      ? OrderManagement()
+                      : _selectedIndex == 2
+                          ? PaymentManagement()
+                          : SupportAccount(),
             ),
-            child: _selectedIndex == 0
-                ? MyAccountView()
-                : _selectedIndex == 1
-                    ? OrderManagement()
-                    : _selectedIndex == 2
-                        ? PaymentManagement()
-                        : SupportAccount(),
-          ))
+          )
         ],
       ),
     );
