@@ -2,7 +2,7 @@ import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/client/review/widgets/item_reviewed_widget.dart';
 import 'package:computer_sales_app/views/pages/client/review/widgets/text_field_review_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:computer_sales_app/models/product.dart';
+import 'package:computer_sales_app/models/product.model.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
@@ -13,10 +13,20 @@ void main(List<String> args) {
 }
 
 var product = Product(
-  name: "Macbook Pro 2021",
-  description: "RAM: 16GB, Storage: 512GB SSD",
+  id: "1",
+  productId: "prod_123",
+  variantName: "Macbook Pro 2021",
+  variantColor: "Silver",
+  variantDescription: "RAM: 16GB, Storage: 512GB SSD",
   price: 13000000,
-  imageUrl: "assets/images/laptop.png",
+  discount: 0.1, // Example discount of 10%
+  quantity: 100,
+  averageRating: 4.5,
+  reviewCount: 150,
+  images: [
+    ProductImage(url: "assets/images/laptop.png", publicId: "public_id_123")
+  ],
+  isActive: true,
 );
 
 class ReviewView extends StatelessWidget {

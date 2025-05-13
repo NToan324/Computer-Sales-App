@@ -1,10 +1,12 @@
 import 'package:computer_sales_app/components/ui/slider_product.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/models/product.model.dart';
+import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
-import 'package:computer_sales_app/views/pages/client/product/widgets/color_version.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/description_product.dart';
+import 'package:computer_sales_app/views/pages/client/product/widgets/product_comment.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/product_preview_section.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/quantity.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/title_product.dart';
@@ -12,189 +14,274 @@ import 'package:computer_sales_app/views/pages/client/product/widgets/version_pr
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 
-class ProductDetailsView extends StatelessWidget {
-  List<String> images = [
-    'assets/images/laptop-popular-2.jpg',
-    'assets/images/laptop-mockup.jpg',
-    'assets/images/laptop-popular-2.jpg',
-    'assets/images/laptop-mockup.jpg',
-    'assets/images/laptop-popular-2.jpg',
-    'assets/images/laptop-mockup.jpg',
-    'assets/images/laptop-mockup.jpg',
-  ];
+class ProductDetailsView extends StatefulWidget {
+  const ProductDetailsView({super.key, required this.productId});
+  final String productId;
 
-  ProductDetailsView({super.key});
+  @override
+  State<ProductDetailsView> createState() => _ProductDetailsViewState();
+}
+
+class _ProductDetailsViewState extends State<ProductDetailsView> {
+  Product product = Product(
+    id: '',
+    productId: '',
+    variantName: '',
+    variantColor: '',
+    variantDescription: '',
+    price: 0,
+    discount: 0,
+    quantity: 0,
+    averageRating: 0,
+    reviewCount: 0,
+    images: [],
+    isActive: true,
+  );
+  List<String> images = [];
+
+  ProductService productService = ProductService();
+  void fetchProductDetails() async {
+    try {
+      // Call your service to fetch product details here
+      // For example: await ProductService().getProductDetail(widget.productId);
+      final response =
+          await productService.getProductVariantsById(widget.productId);
+      setState(() {
+        product = response;
+      });
+    } catch (e) {
+      // Handle any errors that occur during the fetch
+      print('Error fetching product details: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProductDetails();
+  }
+
   @override
   Widget build(BuildContext context) {
     double isWrap = MediaQuery.of(context).size.width;
+    bool isMobile = Responsive.isMobile(context);
+    bool isTablet = Responsive.isTablet(context);
+    bool isDesktop = Responsive.isDesktop(context);
+
+    if (product.images.isNotEmpty) {
+      images = product.images.map((image) => image.url).toList();
+    }
     return Scaffold(
-      appBar: !Responsive.isMobile(context) ? AppBarHomeCustom() : null,
-      body: Container(
-        color: Colors.white,
-        child: ListView.builder(
-          itemCount: 1,
-          itemBuilder: (context, index) => Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                padding: !Responsive.isMobile(context)
-                    ? EdgeInsets.only(
-                        top: 16,
-                        left: 64,
-                        right: 64,
-                      )
-                    : EdgeInsets.all(8),
-                child: Wrap(
-                  spacing: 40,
-                  runSpacing: 20,
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.start,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: 300,
-                        minHeight: 300,
-                      ),
-                      child: SizedBox(
-                        height: Responsive.isMobile(context) ? 300 : 500,
-                        width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
-                        child: SliderProductCustom(
-                          imagesUrl: images,
-                        ),
+      backgroundColor: Colors.white,
+      appBar: !isMobile ? AppBarHomeCustom() : null,
+      body: ListView.builder(
+        itemCount: 1,
+        itemBuilder: (context, index) => Stack(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                spacing: 40,
+                runSpacing: 20,
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300,
+                      minHeight: 300,
+                    ),
+                    child: SizedBox(
+                      height: isMobile ? 300 : 500,
+                      width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
+                      child: SliderProductCustom(
+                        imagesUrl: images,
                       ),
                     ),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: 300,
-                        minHeight: 500,
-                      ),
-                      child: Container(
-                        color: Colors.white,
-                        width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 20,
-                          children: [
-                            TitleProduct(),
-                            ColorsVersion(),
-                            VersionProduct(
-                              title: 'Surface Pro 7 | i5 8GB - 128GB',
-                              price: 14900000,
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300,
+                    ),
+                    child: Container(
+                      padding: !isMobile
+                          ? EdgeInsets.only(
+                              top: 16,
+                              left: 64,
+                              right: 64,
+                            )
+                          : EdgeInsets.only(
+                              left: 16,
+                              right: 16,
                             ),
-                            Quantity(),
-                            if (!Responsive.isMobile(context))
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: 20,
-                                children: [
-                                  SizedBox(
-                                    width: 200,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.primary,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Add to cart',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 200,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          side: BorderSide(
-                                            color: AppColors.primary,
-                                            width: 1,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Buy now',
-                                        style: TextStyle(
-                                          color: AppColors.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                          ],
-                        ),
-                      ),
-                    ),
-                    // 👇 Nội dung chiếm toàn bộ màn hình trên desktop
-                    Container(
-                      width: Responsive.isMobile(context)
-                          ? double.infinity
-                          : isWrap * 0.43,
                       color: Colors.white,
+                      width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 20,
                         children: [
-                          DescriptionProduct(),
-                          ProductReviewSection(),
-                          Text(
-                            'Sản phẩm tương tự',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.black,
-                            ),
+                          TitleProduct(
+                            title: product.variantName,
+                            price: product.price,
+                            discount: product.discount,
                           ),
+                          VersionProduct(
+                            title: product.variantName,
+                            price: product.price,
+                          ),
+                          Quantity(),
+                          if (!isMobile)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 20,
+                              children: [
+                                SizedBox(
+                                  width: 200,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      //add to cart
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Add to cart',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 200,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: BorderSide(
+                                          color: AppColors.primary,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Buy now',
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
                         ],
                       ),
                     ),
-                    ProductListViewWidget(),
+                  ),
+                  Container(
+                    width: !isDesktop ? double.infinity : isWrap * 0.43,
+                    padding: !isMobile
+                        ? EdgeInsets.only(
+                            top: 16,
+                            left: 64,
+                            right: 64,
+                          )
+                        : EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                    color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 20,
+                      children: [
+                        DescriptionProduct(
+                          description: product.variantDescription,
+                        ),
+                        ProductReviewSection(),
+                        Text(
+                          'Related Products',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: !isMobile
+                        ? EdgeInsets.only(
+                            top: 16,
+                            left: 64,
+                            right: 64,
+                          )
+                        : EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                    child: ProductListViewWidget(),
+                  ),
+                  Padding(
+                    padding: !isMobile
+                        ? EdgeInsets.only(
+                            top: 16,
+                            left: 64,
+                            right: 64,
+                          )
+                        : EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                    child: ProductComment(),
+                  ),
+                  SizedBox(
+                    height: 100,
+                  ),
+                ],
+              ),
+            ),
+            if (isMobile)
+              Positioned(
+                top: 20,
+                left: 20,
+                right: 20,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButtonCustom(
+                      icon: Icons.arrow_back_ios_rounded,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    IconButtonCustom(
+                      icon: Icons.share_rounded,
+                      onPressed: () {
+                        // Navigator.pop(context);
+                      },
+                    ),
                   ],
                 ),
               ),
-              if (Responsive.isMobile(context))
-                Positioned(
-                  top: 20,
-                  left: 20,
-                  right: 20,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButtonCustom(
-                        icon: Icons.arrow_back_ios_rounded,
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      IconButtonCustom(
-                        icon: Icons.share_rounded,
-                        onPressed: () {
-                          // Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              // Responsive.isMobile(context) ? DraggableScrollCustom() : SizedBox(),
-            ],
-          ),
+            // isMobile ? DraggableScrollCustom() : SizedBox(),
+          ],
         ),
       ),
-      bottomNavigationBar: Responsive.isMobile(context)
+      bottomNavigationBar: isMobile
           ? Container(
               decoration: BoxDecoration(
                 color: Colors.white,

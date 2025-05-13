@@ -104,6 +104,7 @@ class AvatarWidget extends StatelessWidget {
     switch (value) {
       case 'profile':
         // Điều hướng đến trang thông tin cá nhân
+        Navigator.of(context).pushNamed('profile');
         break;
       case 'notifications':
         if (Responsive.isDesktop(context)) {

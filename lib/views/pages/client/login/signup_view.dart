@@ -1,4 +1,4 @@
-import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/components/custom/my_text_field.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
 import 'package:flutter/material.dart';
@@ -109,7 +109,7 @@ class _SignUpViewState extends State<SignUpView> {
               onPressed: () => Navigator.pop(context),
             ),
             Text(
-              'Login',
+              'Back',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -132,23 +132,16 @@ class _SignUpViewState extends State<SignUpView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 20,
                 children: [
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                   SizedBox(
-                    width: 300,
+                    width: 200,
                     child: const Text(
-                      'Fill the form below to create an account',
-                      textAlign: TextAlign.center,
+                      'Create Account',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 159, 159, 159),
-                        fontSize: 16,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                   MyTextField(
@@ -180,10 +173,13 @@ class _SignUpViewState extends State<SignUpView> {
                     obscureText: true,
                   ),
                   const SizedBox(height: 20),
-                  MyButton(
-                    text: 'Sign Up',
-                    isLoading: _loading,
-                    onTap: (_) => signUp(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: MyButton(
+                      text: 'Sign Up',
+                      isLoading: _loading,
+                      onTap: (_) => signUp(),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Row(

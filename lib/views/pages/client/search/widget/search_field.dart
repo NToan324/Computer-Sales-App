@@ -24,6 +24,7 @@ class SearchField extends StatelessWidget {
       controller: controller,
       autofocus: autofocus,
       onTap: onTap,
+      cursorColor: Colors.black,
       decoration: InputDecoration(
         fillColor: Colors.white,
         filled: true,
@@ -57,7 +58,7 @@ class SearchField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      onSubmitted: onSubmitted, // Vẫn giữ để hỗ trợ nhấn Enter
+      onSubmitted: onSubmitted,
     );
   }
 }

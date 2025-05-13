@@ -130,6 +130,7 @@ class BaseClient {
     switch (response.statusCode) {
       case 400:
         final message = _parseErrorMessage(response.data);
+        print('Error Dio: $message');
         throw BadRequestException(message, response.requestOptions.path);
       case 401:
         final message = _parseErrorMessage(response.data);

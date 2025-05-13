@@ -2,7 +2,7 @@ import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
-import 'package:computer_sales_app/models/product.dart';
+import 'package:computer_sales_app/models/product.model.dart';
 
 class ItemReviewedWidget extends StatelessWidget {
   const ItemReviewedWidget({
@@ -28,7 +28,7 @@ class ItemReviewedWidget extends StatelessWidget {
               Radius.circular(10),
             ),
             image: DecorationImage(
-              image: Image.asset(product.imageUrl).image,
+              image: Image.asset(product.images[0].url).image,
               fit: BoxFit.cover,
             ),
           ),
@@ -38,7 +38,7 @@ class ItemReviewedWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              product.name,
+              product.variantName,
               style: const TextStyle(
                 fontSize: FontSizes.large,
                 fontWeight: FontWeight.bold,
@@ -48,11 +48,11 @@ class ItemReviewedWidget extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              product.description,
+              product.variantDescription,
               style:
                   TextStyle(fontSize: FontSizes.large, color: AppColors.black),
               overflow: TextOverflow.ellipsis,
-              maxLines: 3,
+            maxLines: 3,
             ),
             Text(
               formatMoney(product.price),

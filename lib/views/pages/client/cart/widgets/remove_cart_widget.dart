@@ -1,20 +1,21 @@
 import 'package:computer_sales_app/config/color.dart';
-import 'package:computer_sales_app/models/item_cart.dart';
+import 'package:computer_sales_app/models/cart.model.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/cart_item_widget.dart';
 import 'package:flutter/material.dart';
 
 class RemoveCartWidget extends StatefulWidget {
-  RemoveCartWidget(
+   RemoveCartWidget(
       {super.key,
       required this.cartItems,
       required this.itemToRemove,
       required this.cancelRemoveItem,
       required this.quantityToRemove,
       required this.removeItem});
+
   final List<CartItem> cartItems;
   final int? itemToRemove;
   final VoidCallback cancelRemoveItem;
-  int quantityToRemove;
+  late int quantityToRemove;
   final VoidCallback removeItem;
 
   @override

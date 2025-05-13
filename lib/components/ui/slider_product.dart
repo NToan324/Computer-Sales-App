@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:computer_sales_app/components/custom/fadeIn_network_image.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/preview_image.dart';
@@ -57,7 +58,7 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
       (index) => Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
+            image: NetworkImage(
               widget.imagesUrl[index],
             ),
             fit: BoxFit.cover,
@@ -108,12 +109,14 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
                           borderRadius: !Responsive.isMobile(context)
                               ? BorderRadius.circular(10)
                               : null,
-                          image: DecorationImage(
-                            image: AssetImage(
-                              widget.imagesUrl[index],
-                            ),
-                            fit: BoxFit.cover,
-                          ),
+                          // image: DecorationImage(
+                          //   image: NetworkImage(widget.imagesUrl[index]),
+                          //   fit: BoxFit.cover,
+                          // ),
+                        ),
+                        child: FadeInNetworkImage(
+                          imageUrl: widget.imagesUrl[index],
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
