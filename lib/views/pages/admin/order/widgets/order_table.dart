@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:intl/intl.dart';
-import 'invoice_detail_dialog.dart';
+import 'order_detail_dialog.dart';
 
-class InvoiceTable extends StatefulWidget {
-  final List<Map<String, dynamic>> invoices;
+class OrderManagementTable extends StatefulWidget {
+  final List<Map<String, dynamic>> orders; // Thêm thuộc tính để nhận dữ liệu
 
-  const InvoiceTable({super.key, required this.invoices});
+  const OrderManagementTable({super.key, required this.orders}); // Yêu cầu Orders qua constructor
 
   @override
-  State<InvoiceTable> createState() => _InvoiceTableState();
+  State<OrderManagementTable> createState() => _OrderManagementTableState();
 }
 
-class _InvoiceTableState extends State<InvoiceTable> {
+class _OrderManagementTableState extends State<OrderManagementTable> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedFilter = "All";
   DateTimeRange? _customDateRange;
   int _currentPage = 1;
   final int _itemsPerPage = 20;
 
-  List<Map<String, dynamic>> get filteredInvoices {
-    List<Map<String, dynamic>> sortedInvoices = List.from(widget.invoices)
-      ..sort((a, b) {
-        DateTime dateA = DateTime.parse(a['orderDate']);
-        DateTime dateB = DateTime.parse(b['orderDate']);
-        return dateB.compareTo(dateA);
-      });
+ List<Map<String, dynamic>> get filteredOrders {
+    List<Map<String, dynamic>> sortedOrders =
+        List.from(widget.orders)..sort((a, b) {
+          DateTime dateA = DateTime.parse(a['orderDate']);
+          DateTime dateB = DateTime.parse(b['orderDate']);
+          return dateB.compareTo(dateA);
+        });
     DateTime now = DateTime.now();
     DateTime todayStart = DateTime(now.year, now.month, now.day);
     DateTime yesterdayStart = todayStart.subtract(const Duration(days: 1));
@@ -34,36 +34,50 @@ class _InvoiceTableState extends State<InvoiceTable> {
 
     switch (_selectedFilter) {
       case "Today":
-        sortedInvoices = sortedInvoices.where((invoice) {
-          DateTime invoiceDate = DateTime.parse(invoice['orderDate']);
-          return invoiceDate.isAfter(todayStart) || invoiceDate.isAtSameMomentAs(todayStart);
-        }).toList();
+        sortedOrders = sortedOrders
+            .where((order) {
+              DateTime orderDate = DateTime.parse(order['orderDate']);
+              return orderDate.isAfter(todayStart) ||
+                  orderDate.isAtSameMomentAs(todayStart);
+            })
+            .toList();
         break;
       case "Yesterday":
-        sortedInvoices = sortedInvoices.where((invoice) {
-          DateTime invoiceDate = DateTime.parse(invoice['orderDate']);
-          return invoiceDate.isAfter(yesterdayStart) && invoiceDate.isBefore(todayStart);
-        }).toList();
+        sortedOrders = sortedOrders
+            .where((order) {
+              DateTime orderDate = DateTime.parse(order['orderDate']);
+              return orderDate.isAfter(yesterdayStart) &&
+                  orderDate.isBefore(todayStart);
+            })
+            .toList();
         break;
       case "This Week":
-        sortedInvoices = sortedInvoices.where((invoice) {
-          DateTime invoiceDate = DateTime.parse(invoice['orderDate']);
-          return invoiceDate.isAfter(weekStart) || invoiceDate.isAtSameMomentAs(weekStart);
-        }).toList();
+        sortedOrders = sortedOrders
+            .where((order) {
+              DateTime orderDate = DateTime.parse(order['orderDate']);
+              return orderDate.isAfter(weekStart) ||
+                  orderDate.isAtSameMomentAs(weekStart);
+            })
+            .toList();
         break;
       case "This Month":
-        sortedInvoices = sortedInvoices.where((invoice) {
-          DateTime invoiceDate = DateTime.parse(invoice['orderDate']);
-          return invoiceDate.isAfter(monthStart) || invoiceDate.isAtSameMomentAs(monthStart);
-        }).toList();
+        sortedOrders = sortedOrders
+            .where((order) {
+              DateTime orderDate = DateTime.parse(order['orderDate']);
+              return orderDate.isAfter(monthStart) ||
+                  orderDate.isAtSameMomentAs(monthStart);
+            })
+            .toList();
         break;
       case "Custom":
         if (_customDateRange != null) {
-          sortedInvoices = sortedInvoices.where((invoice) {
-            DateTime invoiceDate = DateTime.parse(invoice['orderDate']);
-            return invoiceDate.isAfter(_customDateRange!.start) &&
-                invoiceDate.isBefore(_customDateRange!.end.add(const Duration(days: 1)));
-          }).toList();
+          sortedOrders = sortedOrders
+              .where((order) {
+                DateTime orderDate = DateTime.parse(order['orderDate']);
+                return orderDate.isAfter(_customDateRange!.start) &&
+                    orderDate.isBefore(_customDateRange!.end.add(const Duration(days: 1)));
+              })
+              .toList();
         }
         break;
       default:
@@ -71,28 +85,50 @@ class _InvoiceTableState extends State<InvoiceTable> {
     }
 
     if (_searchController.text.isNotEmpty) {
-      sortedInvoices = sortedInvoices.where((invoice) {
-        return invoice['id'].toLowerCase().contains(_searchController.text.toLowerCase());
+      sortedOrders = sortedOrders.where((order) {
+        return order['id']
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase());
       }).toList();
     }
 
-    return sortedInvoices;
+    return sortedOrders;
   }
 
-  List<Map<String, dynamic>> get paginatedInvoices {
+  List<Map<String, dynamic>> get paginatedOrders {
     int startIndex = (_currentPage - 1) * _itemsPerPage;
     int endIndex = startIndex + _itemsPerPage;
-    if (startIndex >= filteredInvoices.length) return [];
-    return filteredInvoices.sublist(
-        startIndex, endIndex > filteredInvoices.length ? filteredInvoices.length : endIndex);
+    if (startIndex >= filteredOrders.length) return [];
+    return filteredOrders.sublist(
+        startIndex, endIndex > filteredOrders.length ? filteredOrders.length : endIndex);
   }
 
-  void _showInvoiceDetail(Map<String, dynamic> invoice) {
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case "Pending":
+        return Colors.orange;
+      case "Confirmed":
+        return Colors.green;
+      case "Shipped":
+        return Colors.blue;
+      case "Delivered":
+        return Colors.teal;
+      default:
+        return Colors.blueGrey;
+    }
+  }
+
+  void _showOrderDetail(Map<String, dynamic> order) {
     showDialog(
       context: context,
       builder: (context) {
-        return InvoiceDetailDialog(
-          invoice: invoice,
+        return OrderDetailDialog(
+          order: order,
+          onStatusChanged: (newStatus) {
+            setState(() {
+              order['status'] = newStatus;
+            });
+          },
         );
       },
     );
@@ -115,45 +151,63 @@ class _InvoiceTableState extends State<InvoiceTable> {
     );
   }
 
-  TableRow buildInvoiceRow(Map<String, dynamic> invoice, List<double> colWidths) {
+  TableRow buildOrderRow(Map<String, dynamic> order, List<double> colWidths) {
     final isMobile = Responsive.isMobile(context);
 
     return TableRow(
       children: isMobile
           ? [
               InkWell(
-                onTap: () => _showInvoiceDetail(invoice),
-                child: cellText(invoice['id'], colWidths[0]),
+                onTap: () => _showOrderDetail(order),
+                child: cellText(order['id'], colWidths[0]),
               ),
               InkWell(
-                onTap: () => _showInvoiceDetail(invoice),
+                onTap: () => _showOrderDetail(order),
                 child: cellText(
-                    DateFormat('dd/MM/yyyy').format(DateTime.parse(invoice['orderDate'])),
+                    DateFormat('dd/MM/yyyy').format(DateTime.parse(order['orderDate'])),
                     colWidths[1]),
               ),
               InkWell(
-                onTap: () => _showInvoiceDetail(invoice),
-                child: cellText("${invoice['totalAmount']}đ", colWidths[2]),
+                onTap: () => _showOrderDetail(order),
+                child: cellText("${order['totalAmount']}đ", colWidths[2]),
               ),
             ]
           : [
               InkWell(
-                onTap: () => _showInvoiceDetail(invoice),
-                child: cellText(invoice['id'], colWidths[0]),
+                onTap: () => _showOrderDetail(order),
+                child: cellText(order['id'], colWidths[0]),
               ),
               InkWell(
-                onTap: () => _showInvoiceDetail(invoice),
-                child: cellText(invoice['customerName'], colWidths[1]),
+                onTap: () => _showOrderDetail(order),
+                child: cellText(order['customerName'], colWidths[1]),
               ),
               InkWell(
-                onTap: () => _showInvoiceDetail(invoice),
+                onTap: () => _showOrderDetail(order),
                 child: cellText(
-                    DateFormat('dd/MM/yyyy').format(DateTime.parse(invoice['orderDate'])),
+                    DateFormat('dd/MM/yyyy').format(DateTime.parse(order['orderDate'])),
                     colWidths[2]),
               ),
               InkWell(
-                onTap: () => _showInvoiceDetail(invoice),
-                child: cellText("${invoice['totalAmount']}đ", colWidths[3]),
+                onTap: () => _showOrderDetail(order),
+                child: cellText("${order['totalAmount']}đ", colWidths[3]),
+              ),
+              InkWell(
+                onTap: () => _showOrderDetail(order),
+                child: cellText("${order['discountApplied']}đ", colWidths[4]),
+              ),
+              InkWell(
+                onTap: () => _showOrderDetail(order),
+                child: Container(
+                  width: colWidths[5],
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Chip(
+                    label: Text(
+                      order['status'],
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: _getStatusColor(order['status']),
+                  ),
+                ),
               ),
             ],
     );
@@ -177,19 +231,23 @@ class _InvoiceTableState extends State<InvoiceTable> {
         final List<double> colWidths = isMobile
             ? [tableWidth * 0.3, tableWidth * 0.3, tableWidth * 0.3]
             : [
+                tableWidth * 0.15,
                 tableWidth * 0.2,
-                tableWidth * 0.25,
-                tableWidth * 0.2,
-                tableWidth * 0.2,
+                tableWidth * 0.15,
+                tableWidth * 0.15,
+                tableWidth * 0.15,
+                tableWidth * 0.15,
               ];
 
         final headers = isMobile
-            ? ["Invoice ID", "Date", "Total Amount"]
+            ? ["Order ID", "Date", "Total Amount"]
             : [
-                "Invoice ID",
+                "Order ID",
                 "Customer",
                 "Date",
                 "Total Amount",
+                "Discount",
+                "Status",
               ];
 
         return Container(
@@ -213,7 +271,7 @@ class _InvoiceTableState extends State<InvoiceTable> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Invoice List",
+                    "Order List",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Row(
@@ -224,10 +282,11 @@ class _InvoiceTableState extends State<InvoiceTable> {
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12),
-                            hintText: "Search by Invoice ID",
-                            prefixIcon: Icon(Icons.search, size: isMobile ? 16 : 18),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: isMobile ? 8 : 12),
+                            hintText: "Search by Order ID",
+                            prefixIcon: Icon(Icons.search,
+                                size: isMobile ? 16 : 18),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                               borderSide: const BorderSide(color: Colors.grey),
@@ -236,10 +295,13 @@ class _InvoiceTableState extends State<InvoiceTable> {
                               borderRadius: BorderRadius.circular(20),
                               borderSide: const BorderSide(color: Colors.orange),
                             ),
-                            hintStyle: TextStyle(fontSize: isMobile ? 12 : 14),
-                            labelStyle: TextStyle(fontSize: isMobile ? 12 : 14),
+                            hintStyle: TextStyle(
+                                fontSize: isMobile ? 12 : 14),
+                            labelStyle: TextStyle(
+                                fontSize: isMobile ? 12 : 14),
                           ),
-                          style: TextStyle(fontSize: isMobile ? 12 : 14),
+                          style: TextStyle(
+                              fontSize: isMobile ? 12 : 14),
                           onChanged: (value) {
                             setState(() {
                               _currentPage = 1;
@@ -254,7 +316,8 @@ class _InvoiceTableState extends State<InvoiceTable> {
                           initialSelection: _selectedFilter,
                           onSelected: (value) async {
                             if (value == "Custom") {
-                              final DateTimeRange? picked = await showDateRangePicker(
+                              final DateTimeRange? picked =
+                                  await showDateRangePicker(
                                 context: context,
                                 firstDate: DateTime(2000),
                                 lastDate: DateTime.now(),
@@ -282,7 +345,12 @@ class _InvoiceTableState extends State<InvoiceTable> {
                             "This Week",
                             "This Month",
                             "Custom"
-                          ].map((value) => DropdownMenuEntry(value: value, label: value)).toList(),
+                          ]
+                              .map((value) => DropdownMenuEntry(
+                                    value: value,
+                                    label: value,
+                                  ))
+                              .toList(),
                           textStyle: TextStyle(
                             fontSize: isMobile ? 12 : 15,
                             color: Colors.black,
@@ -324,12 +392,13 @@ class _InvoiceTableState extends State<InvoiceTable> {
                   child: Table(
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: {
-                      for (int i = 0; i < colWidths.length; i++) i: FixedColumnWidth(colWidths[i]),
+                      for (int i = 0; i < colWidths.length; i++)
+                        i: FixedColumnWidth(colWidths[i]),
                     },
                     border: TableBorder.all(color: Colors.grey.shade300),
                     children: [
                       buildHeaderRow(headers, colWidths),
-                      ...paginatedInvoices.map((invoice) => buildInvoiceRow(invoice, colWidths)),
+                      ...paginatedOrders.map((order) => buildOrderRow(order, colWidths)),
                     ],
                   ),
                 ),
@@ -351,7 +420,7 @@ class _InvoiceTableState extends State<InvoiceTable> {
                   Text("Page $_currentPage"),
                   IconButton(
                     icon: const Icon(Icons.arrow_forward),
-                    onPressed: (_currentPage * _itemsPerPage) < filteredInvoices.length
+                    onPressed: (_currentPage * _itemsPerPage) < filteredOrders.length
                         ? () {
                             setState(() {
                               _currentPage++;

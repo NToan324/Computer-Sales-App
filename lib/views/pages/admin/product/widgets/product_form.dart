@@ -1,16 +1,20 @@
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'product_variant_form.dart';
 
 class ProductForm extends StatefulWidget {
   final void Function(Map<String, dynamic>) onSubmit;
-  final void Function()? onDelete; // Thêm hành động xóa
+  final void Function()? onDelete;
   final String buttonLabel;
   final Map<String, dynamic>? initialProduct;
 
   const ProductForm({
     super.key,
     required this.onSubmit,
-    this.onDelete, // Optional delete function
+    this.onDelete,
     required this.buttonLabel,
     this.initialProduct,
   });
@@ -25,28 +29,81 @@ class _ProductFormState extends State<ProductForm> {
   late TextEditingController stockController;
   late TextEditingController originalPriceController;
   late TextEditingController sellingPriceController;
-  late TextEditingController imageUrlController;
   late TextEditingController descriptionController;
-
+  File? imageFile;
+  Uint8List? imageBytes;
   String productType = 'Laptop';
   String productBrand = 'Asus';
   bool isDisabled = false;
+  List<Map<String, dynamic>> variants = [];
+
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     final data = widget.initialProduct;
+    print('initialProduct: $data');
 
     codeController = TextEditingController(text: data?['code'] ?? '');
     nameController = TextEditingController(text: data?['name'] ?? '');
     stockController = TextEditingController(text: data?['stock']?.toString() ?? '');
     originalPriceController = TextEditingController(text: data?['originalPrice']?.toString() ?? '');
     sellingPriceController = TextEditingController(text: data?['sellingPrice']?.toString() ?? '');
-    imageUrlController = TextEditingController(text: data?['imageUrl'] ?? '');
     descriptionController = TextEditingController(text: data?['description'] ?? '');
     productType = data?['type'] ?? 'Laptop';
     productBrand = data?['brand'] ?? 'Asus';
     isDisabled = data?['disabled'] ?? false;
+    variants = List<Map<String, dynamic>>.from(data?['variants'] ?? []);
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        if (kIsWeb) {
+          pickedFile.readAsBytes().then((bytes) {
+            setState(() {
+              imageBytes = bytes;
+              imageFile = null;
+            });
+          });
+        } else {
+          imageFile = File(pickedFile.path);
+          imageBytes = null;
+        }
+      });
+    }
+  }
+
+  void _showVariantForm({Map<String, dynamic>? initialVariant, int? index}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            initialVariant == null ? 'Add Product Variant' : 'Edit Product Variant',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          content: ProductVariantForm(
+            onSubmit: (variantData) {
+              setState(() {
+                if (index != null) {
+                  variants[index] = variantData; // Cập nhật variant
+                } else {
+                  variants.add(variantData); // Thêm variant mới
+                }
+              });
+              Navigator.of(context).pop();
+            },
+            initialProduct: widget.initialProduct,
+            initialVariant: initialVariant,
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -67,31 +124,40 @@ class _ProductFormState extends State<ProductForm> {
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: imageUrlController.text.isEmpty
-                      ? const Center(child: Text("No Image"))
-                      : Image.network(
-                        imageUrlController.text,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(child: Text("No Image"));
-                        },
-                      ),
+                  child: imageBytes != null
+                      ? Image.memory(
+                          imageBytes!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(child: Text('Error Loading Image'));
+                          },
+                        )
+                      : imageFile != null && !kIsWeb
+                          ? Image.file(
+                              imageFile!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(child: Text('Error Loading Image'));
+                              },
+                            )
+                          : const Center(child: Text('No Image')),
                 ),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: imageUrlController,
-                  decoration: const InputDecoration(
-                    labelText: "Image URL",
-                    border: OutlineInputBorder(),
+                ElevatedButton(
+                  onPressed: _pickImage,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    minimumSize: const Size(double.infinity, 48),
                   ),
-                  onChanged: (_) => setState(() {}),
+                  child: const Text(
+                    'Choose Image',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
           ),
-
           const SizedBox(width: 16),
-
           Expanded(
             flex: 2,
             child: SingleChildScrollView(
@@ -100,7 +166,7 @@ class _ProductFormState extends State<ProductForm> {
                   TextField(
                     controller: codeController,
                     decoration: const InputDecoration(
-                      labelText: "Product Code",
+                      labelText: 'Product Code',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -108,17 +174,16 @@ class _ProductFormState extends State<ProductForm> {
                   TextField(
                     controller: nameController,
                     decoration: const InputDecoration(
-                      labelText: "Product Name",
+                      labelText: 'Product Name',
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Product Type Dropdown
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Product Type",
+                        'Product Type',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 8),
@@ -131,14 +196,14 @@ class _ProductFormState extends State<ProductForm> {
                               initialSelection: productType,
                               onSelected: (value) => setState(() => productType = value!),
                               dropdownMenuEntries: ['Laptop', 'Headphones', 'Smartphone', 'Mouse']
-                                  .map((brand) => DropdownMenuEntry(value: brand, label: brand))
+                                  .map((type) => DropdownMenuEntry(value: type, label: type))
                                   .toList(),
                               textStyle: const TextStyle(fontSize: 14, color: Colors.black),
                               menuStyle: MenuStyle(
                                 maximumSize: WidgetStatePropertyAll(
                                   Size(constraints.maxWidth, double.infinity),
                                 ),
-                                backgroundColor: WidgetStatePropertyAll(Colors.white),
+                                backgroundColor: const WidgetStatePropertyAll(Colors.white),
                               ),
                               inputDecorationTheme: const InputDecorationTheme(
                                 border: OutlineInputBorder(),
@@ -152,15 +217,12 @@ class _ProductFormState extends State<ProductForm> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Product Brand Dropdown
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Product Brand",
+                        'Product Brand',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 8),
@@ -172,7 +234,7 @@ class _ProductFormState extends State<ProductForm> {
                               width: constraints.maxWidth,
                               initialSelection: productBrand,
                               onSelected: (value) => setState(() => productBrand = value!),
-                              dropdownMenuEntries: ['Asus', 'Dell', 'Lenovo', 'Logitect']
+                              dropdownMenuEntries: ['Asus', 'Dell', 'Lenovo', 'Logitech']
                                   .map((brand) => DropdownMenuEntry(value: brand, label: brand))
                                   .toList(),
                               textStyle: const TextStyle(fontSize: 14, color: Colors.black),
@@ -180,7 +242,7 @@ class _ProductFormState extends State<ProductForm> {
                                 maximumSize: WidgetStatePropertyAll(
                                   Size(constraints.maxWidth, double.infinity),
                                 ),
-                                backgroundColor: WidgetStatePropertyAll(Colors.white),
+                                backgroundColor: const WidgetStatePropertyAll(Colors.white),
                               ),
                               inputDecorationTheme: const InputDecorationTheme(
                                 border: OutlineInputBorder(),
@@ -194,14 +256,13 @@ class _ProductFormState extends State<ProductForm> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
                   TextField(
                     controller: stockController,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: const InputDecoration(
-                      labelText: "Stock Quantity",
+                      labelText: 'Stock Quantity',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -213,9 +274,8 @@ class _ProductFormState extends State<ProductForm> {
                           controller: originalPriceController,
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-
                           decoration: const InputDecoration(
-                            labelText: "Original Price",
+                            labelText: 'Original Price',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -227,7 +287,7 @@ class _ProductFormState extends State<ProductForm> {
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           decoration: const InputDecoration(
-                            labelText: "Selling Price",
+                            labelText: 'Selling Price',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -241,7 +301,7 @@ class _ProductFormState extends State<ProductForm> {
                         value: isDisabled,
                         onChanged: (value) => setState(() => isDisabled = value!),
                       ),
-                      const Text("Disable Product"),
+                      const Text('Disable Product'),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -249,36 +309,128 @@ class _ProductFormState extends State<ProductForm> {
                     controller: descriptionController,
                     maxLines: 3,
                     decoration: const InputDecoration(
-                      labelText: "Product Description",
+                      labelText: 'Product Description',
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      final productData = {
-                        'code': codeController.text,
-                        'name': nameController.text,
-                        'type': productType,
-                        'brand': productBrand,
-                        'stock': int.tryParse(stockController.text) ?? 0,
-                        'originalPrice': double.tryParse(originalPriceController.text) ?? 0.0,
-                        'sellingPrice': double.tryParse(sellingPriceController.text) ?? 0.0,
-                        'disabled': isDisabled,
-                        'description': descriptionController.text,
-                        'imageUrl': imageUrlController.text,
-                      };
-                      widget.onSubmit(productData);
-                    },
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    child: Text(widget.buttonLabel, style: TextStyle(color: Colors.white)),
-                  ),
-                  if (widget.onDelete != null) // Hiển thị nút "Delete" nếu có
+                  if (widget.initialProduct != null)
                     ElevatedButton(
-                      onPressed: widget.onDelete,
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text("Delete", style: TextStyle(color: Colors.white)),
+                      onPressed: () => _showVariantForm(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                      child: const Text(
+                        'Add Variant',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
+                  const SizedBox(height: 20),
+                  if (variants.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Variants',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 10),
+                        ...variants.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final variant = entry.value;
+                          final image = variant['images']?.isNotEmpty == true ? variant['images'][0] : null;
+                          return InkWell(
+                            onTap: () => _showVariantForm(initialVariant: variant, index: index),
+                            child: ListTile(
+                              leading: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: image != null
+                                    ? kIsWeb
+                                        ? Image.memory(
+                                            image,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return const Text('No Image');
+                                            },
+                                          )
+                                        : Image.file(
+                                            image,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return const Text('No Image');
+                                            },
+                                          )
+                                    : const Text('No Image'),
+                              ),
+                              title: Text(variant['variant_name']),
+                              subtitle: Text(
+                                'Color: ${variant['variant_color'] ?? 'N/A'}, Price: ${variant['price']}, Quantity: ${variant['quantity']}, Rating: ${variant['avarage_rating'] ?? 'N/A'}',
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    variants.removeAt(index);
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final productData = {
+                              'code': codeController.text,
+                              'name': nameController.text,
+                              'type': productType,
+                              'brand': productBrand,
+                              'stock': int.tryParse(stockController.text) ?? 0,
+                              'originalPrice': double.tryParse(originalPriceController.text) ?? 0.0,
+                              'sellingPrice': double.tryParse(sellingPriceController.text) ?? 0.0,
+                              'disabled': isDisabled,
+                              'description': descriptionController.text,
+                              'image': kIsWeb ? imageBytes : imageFile,
+                              'variants': variants,
+                            };
+                            widget.onSubmit(productData);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            minimumSize: const Size(double.infinity, 48),
+                          ),
+                          child: Text(
+                            widget.buttonLabel,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      if (widget.onDelete != null) ...[
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: widget.onDelete,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              minimumSize: const Size(double.infinity, 48),
+                            ),
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               ),
             ),

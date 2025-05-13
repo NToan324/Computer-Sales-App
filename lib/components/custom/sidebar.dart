@@ -77,7 +77,14 @@ class CustomSidebar extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _buildMenuItem(
-              icon: Icons.receipt,
+              icon: Icons.shopping_cart,
+              title: "Order",
+              isSelected: selectedMenu == "Order",
+              onTap: () => onMenuTap("Order"),
+            ),
+            const SizedBox(height: 10),
+            _buildMenuItem(
+              icon: Icons.receipt_long,
               title: "Invoice",
               isSelected: selectedMenu == "Invoice",
               onTap: () => onMenuTap("Invoice"),

@@ -237,7 +237,7 @@ class ChatInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -249,7 +249,7 @@ class ChatInput extends StatelessWidget {
           ),
           Expanded(
             child: TextField(
-              controller: _controller,
+              controller: controller,
               decoration: InputDecoration(
                 hintText: "Type your message here...",
                 border: OutlineInputBorder(
@@ -262,7 +262,7 @@ class ChatInput extends StatelessWidget {
               ),
               onSubmitted: (value) {
                 onSend(value);
-                _controller.clear();
+                controller.clear();
               },
             ),
           ),
@@ -274,8 +274,8 @@ class ChatInput extends StatelessWidget {
               size: 30,
             ),
             onPressed: () {
-              onSend(_controller.text);
-              _controller.clear();
+              onSend(controller.text);
+              controller.clear();
             },
           ),
         ],
