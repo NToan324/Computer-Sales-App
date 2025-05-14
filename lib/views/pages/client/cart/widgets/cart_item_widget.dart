@@ -1,6 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
-import 'package:computer_sales_app/models/item_cart.dart';
+import 'package:computer_sales_app/models/cart.model.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/quantity_widget.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +49,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                         Radius.circular(10),
                       ),
                       image: DecorationImage(
-                        image: Image.asset(widget.item.image).image,
+                        image: Image.asset('widget.item.image').image,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -60,7 +60,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.item.name,
+                          'widget.item.name',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -70,7 +70,8 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          formatMoney(widget.item.price),
+                          // formatMoney(widget.item.price),
+                          500.toString(),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.black,
@@ -106,7 +107,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  formatMoney(widget.item.price * widget.item.quantity),
+                  formatMoney(widget.item.unitPrice * widget.item.quantity),
                   textAlign: TextAlign.start,
                   style: const TextStyle(
                     fontSize: 14,

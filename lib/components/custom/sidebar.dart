@@ -30,7 +30,7 @@ class CustomSidebar extends StatelessWidget {
                     const CircleAvatar(
                       radius: 25,
                       backgroundImage: NetworkImage(
-                        "https://via.placeholder.com/150",
+                        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -89,7 +89,7 @@ class CustomSidebar extends StatelessWidget {
               isSelected: selectedMenu == "Invoice",
               onTap: () => onMenuTap("Invoice"),
             ),
-            const SizedBox(height: 10),  
+            const SizedBox(height: 10),
             _buildMenuItem(
               icon: Icons.local_activity,
               title: "Coupon",
@@ -122,10 +122,8 @@ class CustomSidebar extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children:[
-        SizedBox(
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      SizedBox(
         width: 220,
         child: ListTile(
           leading: Icon(
@@ -141,7 +139,7 @@ class CustomSidebar extends StatelessWidget {
             ),
           ),
           tileColor: isSelected ? Colors.orange : null,
-           shape: isSelected
+          shape: isSelected
               ? RoundedRectangleBorder(
                   borderRadius: BorderRadius.horizontal(
                     left: Radius.circular(30), // Bo góc bên trái
@@ -150,10 +148,8 @@ class CustomSidebar extends StatelessWidget {
                 )
               : null,
           onTap: onTap,
-          
         ),
       ),
-      ] 
-    );
+    ]);
   }
 }

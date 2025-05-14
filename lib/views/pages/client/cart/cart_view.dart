@@ -1,13 +1,17 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
-import 'package:computer_sales_app/models/item_cart.dart';
+import 'package:computer_sales_app/models/cart.model.dart';
+import 'package:computer_sales_app/models/product.model.dart';
+import 'package:computer_sales_app/provider/product_provider.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/utils/widget/footer.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/cart_item_widget.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/remove_cart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 
 enum ShippingMethod { standard, express }
 
@@ -20,45 +24,9 @@ class CartView extends StatefulWidget {
 
 class _CartViewState extends State<CartView> {
   ShippingMethod _selectedMethod = ShippingMethod.standard;
+  List<ProductModel> products = [];
 
-  List<CartItem> cartItems = [
-    CartItem(
-      name: 'Item 1',
-      price: 10000000.0,
-      image: 'assets/images/laptop_banner.jpg',
-      quantity: 4,
-    ),
-    CartItem(
-      name: 'Item 2',
-      price: 20.0,
-      image: 'assets/images/laptop_banner.jpg',
-      quantity: 1,
-    ),
-    CartItem(
-      name: 'Item 3',
-      price: 30.0,
-      image: 'assets/images/laptop_banner.jpg',
-      quantity: 3,
-    ),
-    CartItem(
-      name: 'Item 1',
-      price: 10000000.0,
-      image: 'assets/images/laptop_banner.jpg',
-      quantity: 4,
-    ),
-    CartItem(
-      name: 'Item 2',
-      price: 20.0,
-      image: 'assets/images/laptop_banner.jpg',
-      quantity: 1,
-    ),
-    CartItem(
-      name: 'Item 3',
-      price: 30.0,
-      image: 'assets/images/laptop_banner.jpg',
-      quantity: 3,
-    ),
-  ];
+  List<CartItem> cartItems = [];
 
   int? _itemToRemove;
   int _quantityToRemove = 1;
@@ -281,29 +249,25 @@ class _CartViewState extends State<CartView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    products = Provider.of<ProductProvider>(context).products;
     return Stack(
       children: <Widget>[
         Scaffold(
-          appBar: AppBar(
-            scrolledUnderElevation: 0,
-            backgroundColor: AppColors.white,
-            elevation: 0,
-            title: const Text('My Cart',
-                style: TextStyle(
-                    fontSize: 18,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w600)),
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.black, size: 18),
-              onPressed: () => Navigator.pop(context),
-            ),
+          backgroundColor: Colors.white,
+          appBar: CustomAppBarMobile(
+            title: 'My Cart',
+            isBack: true,
           ),
           body: ListView(children: [
             Container(
               color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
               child: Stack(
                 children: <Widget>[
                   Column(
@@ -321,7 +285,7 @@ class _CartViewState extends State<CartView> {
                             itemBuilder: (context, index) {
                               final item = cartItems[index];
                               return Slidable(
-                                key: ValueKey(item.name),
+                                key: ValueKey(item.productVariantId),
                                 closeOnScroll: true,
                                 endActionPane: ActionPane(
                                   motion: const ScrollMotion(),
@@ -340,8 +304,9 @@ class _CartViewState extends State<CartView> {
                                           Text(
                                             'Remove',
                                             style: TextStyle(
-                                                color: AppColors.red,
-                                                fontSize: 16),
+                                              color: AppColors.red,
+                                              fontSize: 16,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -354,10 +319,10 @@ class _CartViewState extends State<CartView> {
                                     onQuantityChanged: (quantity) {
                                       setState(() {
                                         cartItems[index] = CartItem(
-                                          name: item.name,
-                                          price: item.price,
-                                          image: item.image,
-                                          quantity: quantity,
+                                          productVariantId:
+                                              item.productVariantId,
+                                          unitPrice: item.unitPrice,
+                                          quantity: item.quantity,
                                         );
                                       });
                                     },

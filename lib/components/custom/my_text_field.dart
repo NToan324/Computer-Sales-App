@@ -46,7 +46,7 @@ class _MyTextFieldState extends State<MyTextField> {
     final hasText = widget.controller.text.isNotEmpty;
 
     return Container(
-      color: Colors.white,
+      color: hasText ? const Color.fromARGB(255, 255, 244, 240) : Colors.white,
       width: 350,
       child: TextField(
         controller: widget.controller,
@@ -56,7 +56,7 @@ class _MyTextFieldState extends State<MyTextField> {
         decoration: InputDecoration(
           prefixIcon: Icon(
             widget.prefixIcon,
-            color: hasText ? AppColors.primary : Colors.grey,
+            color: Colors.grey,
           ),
           hintText: widget.hintText,
           border: OutlineInputBorder(
@@ -64,9 +64,7 @@ class _MyTextFieldState extends State<MyTextField> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: hasText
-                ? BorderSide(color: AppColors.primary)
-                : const BorderSide(color: Colors.black54),
+            borderSide: BorderSide(color: Colors.black26),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

@@ -15,14 +15,13 @@ class OtpInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 60,
       height: 60,
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
-        autofocus: autoFocus, 
+        autofocus: autoFocus,
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         cursorColor: AppColors.primary,
         inputFormatters: [

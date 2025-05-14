@@ -2,13 +2,12 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/client/Chat/widgets/chat_body.dart';
-import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_appbar.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/home_body.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
-import 'package:computer_sales_app/views/pages/client/notification/notification_view.dart';
-import 'package:computer_sales_app/views/pages/client/order/order_view.dart';
-import 'package:computer_sales_app/views/pages/client/order/widget/appBar_widget.dart';
+import 'package:computer_sales_app/views/pages/client/product/product_page_body.dart';
+import 'package:computer_sales_app/views/pages/client/profile/widgets/profile_body.dart';
 import 'package:feather_icons/feather_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigationBarCustom extends StatefulWidget {
@@ -21,26 +20,23 @@ class BottomNavigationBarCustom extends StatefulWidget {
 
 class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
   final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
+
   final List<Map<String, dynamic>> _pages = [
     {
       'page': HomeBody(),
       'appBar': AppBarHomeCustom(),
     },
     {
-      'page': NotificationView(),
-      'appBar': CustomAppBarMobile(title: 'Notification'),
-    },
-    {
-      'page': OrderView(),
-      'appBar': AppBarOrderCustom(),
+      'page': ProductPageBody(),
+      'appBar': CustomAppBarMobile(title: 'Product'),
     },
     {
       'page': ChatBody(),
-      'appBar': ChatAppBar(),
+      'appBar': CustomAppBarMobile(title: 'Message'),
     },
     {
-      'page': Text('Profile'),
-      'appBar': AppBar(title: Text('Profile')),
+      'page': ProfileBody(),
+      'appBar': CustomAppBarMobile(title: 'Profile'),
     },
   ];
 
@@ -69,28 +65,25 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
 
   final List<Map<String, dynamic>> icons = [
     {
-      'icon': Icons.home_outlined,
+      'icon': CupertinoIcons.square_grid_2x2,
       'label': 'Home',
     },
     {
-      'icon': Icons.notifications_none_outlined,
-      'label': 'Notification',
-    },
-    {
-      'icon': Icons.add_to_photos_outlined,
-      'label': 'Calendar',
+      'icon': CupertinoIcons.cube,
+      'label': 'Product',
     },
     {
       'icon': FeatherIcons.messageCircle,
       'label': 'Message',
     },
     {
-      'icon': Icons.person_outline_rounded,
+      'icon': CupertinoIcons.person,
       'label': 'Profile',
     },
   ];
 
   Scaffold _buildPage(int currentIndex) {
+    bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
       appBar: _pages[currentIndex]['appBar'] as PreferredSizeWidget,
       body: _pages[currentIndex]['page'] as Widget,
@@ -104,20 +97,21 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
             ),
           ],
         ),
-        child: Responsive.isMobile(context)
+        child: !isDesktop
             ? BottomAppBar(
                 color: Colors.white,
                 elevation: 10,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(
-                      5,
-                      (index) => _customItemNavBar(
-                            icons[index]['icon'] as IconData,
-                            icons[index]['label'] as String,
-                            index,
-                            currentIndex,
-                          )).toList(),
+                    icons.length,
+                    (index) => _customItemNavBar(
+                      icons[index]['icon'] as IconData,
+                      icons[index]['label'] as String,
+                      index,
+                      currentIndex,
+                    ),
+                  ).toList(),
                 ),
               )
             : SizedBox(),

@@ -1,3 +1,6 @@
+import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatBody extends StatelessWidget {
@@ -11,21 +14,24 @@ class ChatBody extends StatelessWidget {
         'name': 'Shane Martinez',
         'message': 'On my way home but I needed...',
         'time': '5 min',
-        'avatar': 'https://i.pravatar.cc/150?img=1',
+        'avatar':
+            'https://st3.depositphotos.com/4111759/13425/v/450/depositphotos_134255532-stock-illustration-profile-placeholder-male-default-profile.jpg',
         'unread': true,
       },
       {
         'name': 'Katie Keller',
         'message': 'I\'m watching Friends. What are you doing?',
         'time': '15 min',
-        'avatar': 'https://i.pravatar.cc/150?img=2',
+        'avatar':
+            'https://st3.depositphotos.com/4111759/13425/v/450/depositphotos_134255532-stock-illustration-profile-placeholder-male-default-profile.jpg',
         'unread': false,
       },
       {
         'name': 'Stephen Mann',
         'message': 'I\'m working now. I\'m making a deposit...',
         'time': '1 hour',
-        'avatar': 'https://i.pravatar.cc/150?img=3',
+        'avatar':
+            'https://st3.depositphotos.com/4111759/13425/v/450/depositphotos_134255532-stock-illustration-profile-placeholder-male-default-profile.jpg',
         'unread': false,
       },
     ];
@@ -39,7 +45,7 @@ class ChatBody extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        bool isMobile = constraints.maxWidth < 600;
+        bool isMobile = Responsive.isMobile(context);
         return Container(
           color: Colors.white,
           child: Row(
@@ -102,7 +108,6 @@ class ChatBody extends StatelessWidget {
                 flex: 5,
                 child: Column(
                   children: [
-                    const SizedBox(height: 32),
                     const Text('Today', style: TextStyle(color: Colors.grey)),
                     const SizedBox(height: 16),
                     Expanded(
@@ -120,7 +125,7 @@ class ChatBody extends StatelessWidget {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: msg['isMe']! as bool
-                                    ? Colors.blueAccent
+                                    ? AppColors.primary
                                     : Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -138,7 +143,7 @@ class ChatBody extends StatelessWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                          horizontal: 16, vertical: 20),
                       color: Colors.white,
                       child: Row(
                         children: [
@@ -159,8 +164,12 @@ class ChatBody extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           CircleAvatar(
-                            backgroundColor: Colors.blueAccent,
-                            child: const Icon(Icons.send, color: Colors.white),
+                            backgroundColor: AppColors.primary,
+                            child: const Icon(
+                              CupertinoIcons.paperplane_fill,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
                         ],
                       ),

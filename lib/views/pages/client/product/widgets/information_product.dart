@@ -1,6 +1,3 @@
-import 'package:computer_sales_app/views/pages/client/product/widgets/color_version.dart';
-
-import 'package:computer_sales_app/views/pages/client/product/widgets/title_product.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/version_product.dart';
 import 'package:flutter/material.dart';
 
@@ -23,18 +20,17 @@ class InformationProduct extends StatelessWidget {
         SizedBox(
           height: 15,
         ),
-        TitleProduct(),
+        // TitleProduct(),
         SizedBox(
           height: 15,
         ),
-        ColorsVersion(),
         SizedBox(
           height: 15,
         ),
-        VersionProduct(
-          title: 'Surface Pro 7 | i5 8GB - 128GB',
-          price: 14900000,
-        ),
+        // VersionProduct(
+        //   title: 'Surface Pro 7 | i5 8GB - 128GB',
+        //   price: 14900000,
+        // ),
         SizedBox(
           height: 15,
         ),

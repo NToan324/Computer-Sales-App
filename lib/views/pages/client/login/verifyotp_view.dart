@@ -19,7 +19,7 @@ class _VerifyOtpViewState extends State<VerifyOtpView> {
   final otp4Controller = TextEditingController();
   bool _isLoading = false; // Thêm trạng thái loading
 
-  void verifyOtp(BuildContext context) async {
+  Future<void> verifyOtp(BuildContext context) async {
     final userId = ModalRoute.of(context)!.settings.arguments as String;
 
     String otpCode = otp1Controller.text +

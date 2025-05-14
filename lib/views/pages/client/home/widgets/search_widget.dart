@@ -14,6 +14,7 @@ class SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<SearchWidget> {
   final TextEditingController _searchController = TextEditingController();
+
   final List<String> _recentSearches = [
     "Laptop gaming",
     "Chuột không dây",
@@ -25,20 +26,18 @@ class _SearchWidgetState extends State<SearchWidget> {
   final LayerLink _layerLink = LayerLink();
 
   void _openSearchScreen({String? query}) {
-    // Nếu đang ở chế độ desktop
     if (Responsive.isDesktop(context)) {
       if (query != null && query.isNotEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => SearchProductScreen(
-              onSearch: (newQuery) {}, // Có thể thêm logic cập nhật nếu cần
+              onSearch: (newQuery) {},
               initialQuery: query,
             ),
           ),
         );
       } else {
-        // Nếu không có từ khóa => Mở danh sách tìm kiếm gần đây
         _showOverlay();
       }
     } else {
@@ -52,21 +51,19 @@ class _SearchWidgetState extends State<SearchWidget> {
   }
 
   void _showOverlay() {
-    _removeOverlay(); // Đóng overlay cũ nếu có
+    _removeOverlay();
     _overlayEntry = OverlayEntry(
       builder: (context) => GestureDetector(
-        behavior: HitTestBehavior.opaque, // Bắt sự kiện click ngoài overlay
+        behavior: HitTestBehavior.opaque,
         onTap: _removeOverlay,
         child: Stack(
           children: [
-            Positioned.fill(
-                child: Container(
-                    color: Colors.transparent)), // Click ngoài để đóng
+            Positioned.fill(child: Container(color: Colors.transparent)),
             Positioned(
               width: 400,
               child: CompositedTransformFollower(
                 link: _layerLink,
-                offset: const Offset(0, 50), // Hiển thị ngay dưới ô tìm kiếm
+                offset: const Offset(0, 50),
                 child: Material(
                   elevation: 5,
                   borderRadius: BorderRadius.circular(10),
@@ -91,13 +88,16 @@ class _SearchWidgetState extends State<SearchWidget> {
                                   "Recent",
                                   style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.w500),
                                 ),
                                 TextButton(
                                   onPressed: _clearAllSearches,
-                                  child: Text("Clear all",
-                                      style:
-                                          TextStyle(color: AppColors.primary)),
+                                  child: Text(
+                                    "Clear all",
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -189,7 +189,10 @@ class _SearchWidgetState extends State<SearchWidget> {
             ),
             child: IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
+              icon: const Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 
-class Quantity extends StatelessWidget {
-  const Quantity({super.key});
+class Quantity extends StatefulWidget {
+  Quantity(
+      {super.key,
+      required this.onIncrease,
+      required this.onDecrease,
+      required this.quantity});
+  final Function onIncrease;
+  final Function onDecrease;
+  final int quantity;
 
+  @override
+  State<Quantity> createState() => _QuantityState();
+}
+
+class _QuantityState extends State<Quantity> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,7 +32,7 @@ class Quantity extends StatelessWidget {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          spacing: 20,
+          spacing: 15,
           children: [
             Container(
               width: 35,
@@ -30,7 +42,9 @@ class Quantity extends StatelessWidget {
                 color: Colors.black,
               ),
               child: IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  widget.onDecrease();
+                },
                 icon: const Icon(
                   Icons.remove,
                   color: Colors.white,
@@ -38,11 +52,16 @@ class Quantity extends StatelessWidget {
                 ),
               ),
             ),
-            const Text(
-              '1',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black,
+            SizedBox(
+              width: 25,
+              child: Center(
+                child: Text(
+                  widget.quantity.toString(),
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                  ),
+                ),
               ),
             ),
             Container(
@@ -53,7 +72,9 @@ class Quantity extends StatelessWidget {
                 color: Colors.black,
               ),
               child: IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  widget.onIncrease();
+                },
                 icon: const Icon(
                   Icons.add,
                   color: Colors.white,

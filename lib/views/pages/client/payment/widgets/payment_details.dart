@@ -1,4 +1,4 @@
-import 'package:computer_sales_app/components/custom/myTextField.dart';
+import 'package:computer_sales_app/components/custom/my_text_field.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
@@ -155,11 +155,14 @@ class PaymentDetails extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: const TextStyle(fontSize: 14, color: Colors.black)),
-          Text(value ?? '',
-              style:
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 14, color: Colors.black),
+          ),
+          Text(
+            value ?? '',
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
         ],
       ),
     );
