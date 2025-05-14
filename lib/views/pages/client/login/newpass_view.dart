@@ -17,7 +17,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
   final confirmedpasswordController = TextEditingController();
   bool _isLoading = false; // Thêm trạng thái loading
 
-  void newPass(BuildContext context) async {
+  Future<void> newPass(BuildContext context) async {
     final password = passwordController.text.trim();
     final confirmedPassword = confirmedpasswordController.text.trim();
     final userId = ModalRoute.of(context)!.settings.arguments as String;

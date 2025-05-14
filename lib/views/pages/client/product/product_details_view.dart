@@ -43,7 +43,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
   bool isLoading = false;
 
   ProductService productService = ProductService();
-  void fetchProductDetails() async {
+  Future<void> fetchProductDetails() async {
     setState(() {
       isLoading = true;
     });

@@ -9,3 +9,11 @@ String formatDate(String date) {
   final format = DateFormat('dd/MM/yyyy');
   return format.format(DateTime.parse(date));
 }
+
+double parseMoney(String money) {
+  return double.tryParse(money
+          .replaceAll(',', '')
+          .replaceAll('.', '')
+          .replaceAll('VNĐ', '')) ??
+      0;
+}

@@ -79,9 +79,9 @@ class ProductService extends BaseClient {
     List<String>? brandIds,
     double? minPrice,
     double? maxPrice,
-    List<double>? ratings,
     String? sortPrice, // "asc" | "desc"
     String? sortName, // "asc" | "desc"
+    num? ratings,
   }) async {
     final queryList = <String>[];
 
@@ -98,16 +98,14 @@ class ProductService extends BaseClient {
     }
     if (minPrice != null) queryList.add('min_price=$minPrice');
     if (maxPrice != null) queryList.add('max_price=$maxPrice');
-    if (ratings != null && ratings.isNotEmpty) {
-      for (final r in ratings) {
-        queryList.add('ratings=${r.toString()}');
-      }
-    }
+    if (ratings != null) queryList.add('ratings=$ratings');
     if (sortPrice != null) queryList.add('sort_price=$sortPrice');
     if (sortName != null) queryList.add('sort_name=$sortName');
 
     final uri = Uri.parse("product/variant/search?${queryList.join('&')}");
     final res = await get(uri.toString());
-    return res['data'].map<ProductModel>((item) => ProductModel.fromJson(item)).toList();
+    return res['data']
+        .map<ProductModel>((item) => ProductModel.fromJson(item))
+        .toList();
   }
 }

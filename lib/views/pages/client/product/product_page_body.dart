@@ -1,7 +1,9 @@
 import 'package:computer_sales_app/components/custom/dropdown.dart';
 import 'package:computer_sales_app/components/custom/radio.dart';
 import 'package:computer_sales_app/components/custom/range_slider.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/consts/index.dart';
 import 'package:computer_sales_app/models/brand.model.dart';
 import 'package:computer_sales_app/models/category.model.dart';
 import 'package:computer_sales_app/provider/product_provider.dart';
@@ -109,23 +111,20 @@ class _FilterWidgetState extends State<FilterWidget> {
   late double minPrice;
   late double maxPrice;
   late RangeValues _rangeValues;
+  late RatingFilterValue _selectedRatingValue;
   final BrandService brandService = BrandService();
   final CategoryService categoryService = CategoryService();
 
   List<CategoryModel> categories = [];
   List<BrandModel> brands = [];
 
-  void fetchBrands() async {
-    final response = await brandService.getBrands();
+  Future<void> fetchData() async {
+    final provider = Provider.of<ProductProvider>(context, listen: false);
+    await provider.fetchCategories();
+    await provider.fetchBrands();
     setState(() {
-      brands = response.map((brand) => brand).toList();
-    });
-  }
-
-  void fetchCategories() async {
-    final response = await categoryService.getCategories();
-    setState(() {
-      categories = response.map((category) => category).toList();
+      categories = provider.categories;
+      brands = provider.brands;
     });
   }
 
@@ -146,8 +145,8 @@ class _FilterWidgetState extends State<FilterWidget> {
     minPrice = 100000;
     maxPrice = 100000000;
     _rangeValues = RangeValues(minPrice, maxPrice);
-    fetchBrands();
-    fetchCategories();
+    _selectedRatingValue = RatingFilterValue.all;
+    fetchData();
   }
 
   @override
@@ -210,7 +209,13 @@ class _FilterWidgetState extends State<FilterWidget> {
                 },
               ),
               const SizedBox(height: 16),
-              RatingFilter(),
+              RatingFilter(
+                  selectedRatingValue: _selectedRatingValue,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedRatingValue = value;
+                    });
+                  }),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -223,6 +228,14 @@ class _FilterWidgetState extends State<FilterWidget> {
                       onTap: (_) {
                         Provider.of<ProductProvider>(context, listen: false)
                             .clearFilters();
+                        setState(() {
+                          selectedItems = {
+                            'Category': {},
+                            'Brand': {},
+                          };
+                          _rangeValues = RangeValues(minPrice, maxPrice);
+                          _selectedRatingValue = RatingFilterValue.all;
+                        });
                         if (Responsive.isMobile(context)) {
                           Navigator.pop(context);
                         }
@@ -234,13 +247,15 @@ class _FilterWidgetState extends State<FilterWidget> {
                       text: 'Apply',
                       onTap: (_) {
                         Provider.of<ProductProvider>(context, listen: false)
-                            .handleSortByFilter(
+                            .applyFilters(
                           minPrice: _rangeValues.start,
                           maxPrice: _rangeValues.end,
                           categoryIds:
                               selectedItems['Category']?.toList() ?? [],
                           brandIds: selectedItems['Brand']?.toList() ?? [],
+                          rating: _selectedRatingValue,
                         );
+
                         if (Responsive.isMobile(context)) {
                           Navigator.pop(context);
                         }
@@ -323,20 +338,21 @@ class _FilterWidgetState extends State<FilterWidget> {
   }
 }
 
-enum RatingFilterValue { all, oneStar, twoStar, threeStar, fourStar, fiveStar }
-
 class RatingFilter extends StatefulWidget {
-  const RatingFilter({
+  RatingFilter({
     super.key,
+    required this.selectedRatingValue,
+    required this.onChanged,
   });
+
+  late RatingFilterValue selectedRatingValue;
+  final Function(RatingFilterValue) onChanged;
 
   @override
   State<RatingFilter> createState() => _RatingFilterState();
 }
 
 class _RatingFilterState extends State<RatingFilter> {
-  RatingFilterValue selectedRatingValue = RatingFilterValue.all;
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -354,7 +370,7 @@ class _RatingFilterState extends State<RatingFilter> {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: 100,
+          height: Responsive.isMobile(context) ? 100 : 200,
           child: ListView.separated(
             shrinkWrap: true,
             itemBuilder: (context, index) => Row(
@@ -376,11 +392,9 @@ class _RatingFilterState extends State<RatingFilter> {
                 RadioCustom<RatingFilterValue>(
                   value: RatingFilterValue
                       .values[RatingFilterValue.values.length - index - 1],
-                  groupValue: selectedRatingValue,
+                  groupValue: widget.selectedRatingValue,
                   onChanged: (value) {
-                    setState(() {
-                      selectedRatingValue = value!;
-                    });
+                    widget.onChanged(value!);
                   },
                 )
               ],
@@ -501,7 +515,18 @@ class _ShowListProductWidgetState extends State<ShowListProductWidget> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        final removedFilter = filters[index];
+
+                        Provider.of<ProductProvider>(context, listen: false)
+                            .removeFilterByName(removedFilter);
+
+                        setState(() {
+                          //Remove the filter from the list
+                        });
+
+                        showCustomSnackBar(context, '$removedFilter removed');
+                      },
                       icon: const Icon(
                         Icons.close,
                         color: AppColors.primary,
