@@ -2,6 +2,7 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/admin/dashboard/dashboard_screen.dart';
 import 'package:computer_sales_app/views/pages/admin/customer/customer_screen.dart';
+import 'package:computer_sales_app/views/pages/admin/order/order_screen.dart';
 import 'package:computer_sales_app/views/pages/admin/invoice/invoice_screen.dart';
 import 'package:computer_sales_app/views/pages/admin/product/product_screen.dart';
 import 'package:computer_sales_app/views/pages/admin/coupon/coupon_screen.dart';
@@ -34,6 +35,9 @@ class _AdminScreenState extends State<AdminScreen> {
           break;
         case "Customer":
           _currentScreen = CustomerManagementScreen();
+          break;
+        case "Order":
+          _currentScreen = const OrderManagementScreen();
           break;
         case "Invoice":
           _currentScreen = const InvoiceManagementScreen();

@@ -3,9 +3,9 @@ import 'package:computer_sales_app/utils/responsive.dart';
 import 'product_form.dart';
 
 class ProductTable extends StatefulWidget {
-  final List<Map<String, dynamic>> products; // Thêm thuộc tính để nhận dữ liệu
+  final List<Map<String, dynamic>> products;
 
-  const ProductTable({super.key, required this.products}); // Yêu cầu products qua constructor
+  const ProductTable({super.key, required this.products});
 
   @override
   State<ProductTable> createState() => _ProductTableState();
@@ -16,7 +16,7 @@ class _ProductTableState extends State<ProductTable> {
 
   List<Map<String, dynamic>> get filteredProducts {
     if (_searchController.text.isEmpty) {
-      return widget.products; // Sử dụng widget.products thay vì danh sách cứng
+      return widget.products;
     } else {
       return widget.products.where((product) {
         return product['name']
@@ -28,9 +28,9 @@ class _ProductTableState extends State<ProductTable> {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case "Active":
+      case 'Active':
         return Colors.green;
-      case "Disabled":
+      case 'Disabled':
         return Colors.red;
       default:
         return Colors.blueGrey;
@@ -63,13 +63,15 @@ class _ProductTableState extends State<ProductTable> {
               ),
             ),
             child: ProductForm(
-              buttonLabel: "Save",
+              buttonLabel: 'Save',
               initialProduct: {
+                '_id': product['id'].toString(),
                 'name': product['name'],
                 'stock': product['stock'],
                 'originalPrice': product['originalPrice'],
                 'sellingPrice': product['sellingPrice'],
-                'status': product['status'],
+                'disabled': product['status'] == 'Disabled',
+                // Không truyền imageUrl vì ProductForm dùng ảnh cục bộ
               },
               onSubmit: (updatedProductData) {
                 setState(() {
@@ -77,7 +79,15 @@ class _ProductTableState extends State<ProductTable> {
                   product['stock'] = updatedProductData['stock'];
                   product['originalPrice'] = updatedProductData['originalPrice'];
                   product['sellingPrice'] = updatedProductData['sellingPrice'];
-                  product['status'] = updatedProductData['status'];
+                  product['status'] = updatedProductData['disabled'] ? 'Disabled' : 'Active';
+                  // Lưu ảnh cục bộ nếu cần (hiện tại chỉ in ra)
+                  print('Updated product image: ${updatedProductData['image']}');
+                });
+                Navigator.of(context).pop();
+              },
+              onDelete: () {
+                setState(() {
+                  widget.products.remove(product);
                 });
                 Navigator.of(context).pop();
               },
@@ -107,7 +117,7 @@ class _ProductTableState extends State<ProductTable> {
 
   TableRow buildProductRow(Map<String, dynamic> product, List<double> colWidths) {
     final isMobile = Responsive.isMobile(context);
-    
+
     return TableRow(
       children: isMobile
           ? [
@@ -121,7 +131,7 @@ class _ProductTableState extends State<ProductTable> {
               ),
               InkWell(
                 onTap: () => _showProductForm(product),
-                child: cellText("\$${product['sellingPrice']}", colWidths[2]),
+                child: cellText('\$${product['sellingPrice']}', colWidths[2]),
               ),
             ]
           : [
@@ -139,11 +149,11 @@ class _ProductTableState extends State<ProductTable> {
               ),
               InkWell(
                 onTap: () => _showProductForm(product),
-                child: cellText("\$${product['originalPrice']}", colWidths[3]),
+                child: cellText('\$${product['originalPrice']}', colWidths[3]),
               ),
               InkWell(
                 onTap: () => _showProductForm(product),
-                child: cellText("\$${product['sellingPrice']}", colWidths[4]),
+                child: cellText('\$${product['sellingPrice']}', colWidths[4]),
               ),
               InkWell(
                 onTap: () => _showProductForm(product),
@@ -177,14 +187,15 @@ class _ProductTableState extends State<ProductTable> {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              product['imageUrl'],
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
+          // Thay Image.network bằng placeholder
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
             ),
+            child: const Center(child: Text('No Image')),
           ),
           const SizedBox(width: 8),
           Column(
@@ -198,7 +209,7 @@ class _ProductTableState extends State<ProductTable> {
                 ),
               ),
               Text(
-                "ID: ${product['id']}",
+                'ID: ${product['id']}',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -230,14 +241,14 @@ class _ProductTableState extends State<ProductTable> {
               ];
 
         final headers = isMobile
-            ? ["ID", "Product", "Price"]
+            ? ['ID', 'Product', 'Price']
             : [
-                "ID",
-                "Product",
-                "Stock",
-                "Original Price",
-                "Selling Price",
-                "Status"
+                'ID',
+                'Product',
+                'Stock',
+                'Original Price',
+                'Selling Price',
+                'Status'
               ];
 
         return Container(
@@ -261,7 +272,7 @@ class _ProductTableState extends State<ProductTable> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Product List",
+                    'Product List',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -271,7 +282,7 @@ class _ProductTableState extends State<ProductTable> {
                       controller: _searchController,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                        hintText: "Search by name",
+                        hintText: 'Search by name',
                         prefixIcon: const Icon(Icons.search, size: 18),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
