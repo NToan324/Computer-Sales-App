@@ -268,7 +268,13 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         DescriptionProduct(
                           description: product.variantDescription,
                         ),
-                        ProductReviewSection(),
+                        ProductReviewSection(
+                          productId: product.id,
+                          productName: product.variantName,
+                          averageRating: product.averageRating ?? 0,
+                          reviewCount: product.reviewCount ?? 0,
+                          images: images,
+                        ),
                         Text(
                           'Related Products',
                           style: TextStyle(

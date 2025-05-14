@@ -1,9 +1,9 @@
+import 'dart:ui';
+
+import 'package:computer_sales_app/components/custom/pagination.dart';
 import 'package:computer_sales_app/components/custom/skeleton.dart';
-import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/provider/product_provider.dart';
-import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:flutter/material.dart';
-import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/product.model.dart';
 import 'package:computer_sales_app/config/color.dart';
@@ -19,7 +19,6 @@ class ProductListViewWidget extends StatefulWidget {
 }
 
 class _ProductListViewWidgetState extends State<ProductListViewWidget> {
-  final ProductService _productService = ProductService();
   bool _isLoading = true;
 
   @override
@@ -29,24 +28,14 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
   }
 
   Future<void> _fetchProducts() async {
-    try {
-      final data = await _productService.getVariants();
-      final productProvider =
-          Provider.of<ProductProvider>(context, listen: false);
-      final products = data.map((item) => ProductModel.fromMap(item)).toList();
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-      productProvider.setProducts(products);
-    } on BadRequestException catch (e) {
-      if (mounted) {
-        showCustomSnackBar(context, e.message, type: SnackBarType.error);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+    setState(() {
+      _isLoading = true;
+    });
+    Provider.of<ProductProvider>(context, listen: false)
+        .fetchProducts(page: 1, limit: 12, resetFilter: true);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -56,33 +45,53 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<ProductProvider>(context).products;
-    return GridView.builder(
-      itemCount: _isLoading ? 10 : products.length,
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: Responsive.isDesktop(context) ? 4 : 2,
-        childAspectRatio: 0.55,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-        mainAxisExtent: 350,
-      ),
-      itemBuilder: (context, index) {
-        final variant =
-            !_isLoading && index < products.length ? products[index] : null;
-        return _isLoading
-            ? Skeleton()
-            : ProductView(
-                id: variant?.id ?? '',
-                variantName: variant?.variantName ?? '',
-                images: (variant?.images as List<ProductImage>),
-                price: (variant?.price as double),
-                variantDescription:
-                    variant?.variantDescription ?? 'No description available',
-                averageRating: variant?.averageRating.toString() ?? '0.0',
-              );
-      },
+    final provider = Provider.of<ProductProvider>(context);
+    final products = provider.products;
+    final totalPage = provider.totalPage;
+    final currentPage = provider.page;
+    return Column(
+      children: [
+        GridView.builder(
+          itemCount: _isLoading ? 10 : products.length,
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: Responsive.isDesktop(context) ? 4 : 2,
+            childAspectRatio: 0.55,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+            mainAxisExtent: 350,
+          ),
+          itemBuilder: (context, index) {
+            final variant =
+                !_isLoading && index < products.length ? products[index] : null;
+            return _isLoading
+                ? Skeleton()
+                : ProductView(
+                    id: variant?.id ?? '',
+                    variantName: variant?.variantName ?? '',
+                    images: (variant?.images as List<ProductImage>),
+                    price: (variant?.price as double),
+                    variantDescription: variant?.variantDescription ??
+                        'No description available',
+                    averageRating: variant?.averageRating.toString() ?? '0.0',
+                  );
+          },
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        PaginationWidget(
+          currentPage: currentPage,
+          totalPages: totalPage,
+          onPageChanged: (page) {
+            provider.fetchProducts(page: page, limit: 12, resetFilter: true);
+          },
+        ),
+        SizedBox(
+          height: 20,
+        ),
+      ],
     );
   }
 }
@@ -183,6 +192,92 @@ class ProductView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class FilterHomeProduct extends StatefulWidget {
+  const FilterHomeProduct({super.key});
+
+  @override
+  State<FilterHomeProduct> createState() => _FilterHomeProductState();
+}
+
+class _FilterHomeProductState extends State<FilterHomeProduct> {
+  final List<String> filtersList = [
+    'All',
+    'Low to High',
+    'High to Low',
+  ];
+
+  late String isSelectedList;
+  @override
+  void initState() {
+    super.initState();
+    isSelectedList = filtersList[0];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 20,
+      children: [
+        Row(),
+        Text(
+          'Product',
+          style: TextStyle(
+              fontSize: lerpDouble(
+                  16, 18, (MediaQuery.of(context).size.width - 300) / 300),
+              fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          height: 40,
+          child: ListView.separated(
+            separatorBuilder: (context, index) => SizedBox(width: 10),
+            scrollDirection: Axis.horizontal,
+            itemCount: filtersList.length,
+            itemBuilder: (context, index) {
+              return InkWell(
+                onTap: () {
+                  setState(
+                    () {
+                      isSelectedList = filtersList[index];
+                      final valueFilter = switch (filtersList[index]) {
+                        'Low to High' => 'Price: Low to High',
+                        'High to Low' => 'Price: High to Low',
+                        _ => 'All',
+                      };
+                      Provider.of<ProductProvider>(context, listen: false)
+                          .handleSortChange(valueFilter);
+                    },
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isSelectedList == filtersList[index]
+                        ? AppColors.orangePastel
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Center(
+                    child: Text(
+                      filtersList[index],
+                      style: TextStyle(
+                          color: isSelectedList == filtersList[index]
+                              ? AppColors.primary
+                              : Colors.black,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

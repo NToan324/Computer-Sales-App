@@ -70,22 +70,24 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     var imagesList = json['images'] as List;
-    List<ProductImage> imageObjects =
-        imagesList.map((image) => ProductImage.fromJson(image)).toList();
+    List<ProductImage> imageObjects = imagesList.map((image) {
+      return ProductImage.fromJson(image);
+    }).toList();
 
     return ProductModel(
-      id: json['_id'],
-      productId: json['product_id'],
-      variantName: json['variant_name'],
-      variantColor: json['variant_color'],
-      variantDescription: json['variant_description'],
-      price: json['price'].toDouble(),
+      id: json['_id'] ?? '',
+      productId: json['product_id'] ?? '',
+      variantName: json['variant_name'] ?? '',
+      variantColor: json['variant_color'] ?? '',
+      variantDescription: json['variant_description'] ?? '',
+      price: double.tryParse(json['price'].toString()) ?? 0.0,
+      discount: double.tryParse(json['discount'].toString()) ?? 0.0,
+      quantity: int.tryParse(json['quantity'].toString()) ?? 0,
+      averageRating:
+          double.tryParse(json['average_rating']?.toString() ?? '') ?? 0.0,
+      reviewCount: int.tryParse(json['review_count']?.toString() ?? '') ?? 0,
       images: imageObjects,
-      discount: json['discount'].toDouble(),
-      quantity: json['quantity'],
-      averageRating: json['average_rating']?.toDouble(),
-      reviewCount: json['review_count'],
-      isActive: json['isActive'],
+      isActive: json['isActive'] == true,
     );
   }
 }
@@ -117,7 +119,7 @@ class ProductImage {
   factory ProductImage.fromJson(Map<String, dynamic> json) {
     return ProductImage(
       url: json['url'] as String,
-      publicId: json['public_id'] as String,
+      publicId: json['public_id'] ?? '',
     );
   }
 }

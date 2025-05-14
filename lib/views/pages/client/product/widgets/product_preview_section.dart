@@ -2,7 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:computer_sales_app/config/color.dart';
 
 class ProductReviewSection extends StatefulWidget {
-  const ProductReviewSection({super.key});
+  const ProductReviewSection(
+      {super.key,
+      required this.productId,
+      required this.productName,
+      required this.averageRating,
+      required this.reviewCount,
+      required this.images});
+  final String productId;
+  final String productName;
+  final double averageRating;
+  final int reviewCount;
+  final List<String> images;
 
   @override
   State<ProductReviewSection> createState() => _ProductReviewSectionState();
@@ -179,7 +190,9 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      _openReviewDialog(context);
+                      _openReviewDialog(context,
+                          images: widget.images,
+                          productName: widget.productName);
                     },
                     style: ElevatedButton.styleFrom(
                       side: BorderSide(
@@ -204,7 +217,8 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
   }
 }
 
-void _openReviewDialog(BuildContext context) {
+void _openReviewDialog(BuildContext context,
+    {required List<String> images, required String productName}) {
   int selectedRating = 0;
   bool showForm = false;
   TextEditingController commentController = TextEditingController();
@@ -239,12 +253,12 @@ void _openReviewDialog(BuildContext context) {
                       ),
                       SizedBox(height: 16),
                       Image.network(
-                        'https://cdn.tgdd.vn/Products/Images/44/302209/TimerThumb/hp-pavilion-15-eg2088tu-i7-7c0r0pa-(10).jpg',
+                        images[0],
                         height: 100,
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'Laptop HP Pavilion 15 eg2088TU i7 1260P/16GB/512GB/Win11 (7C0R0PA)',
+                        productName,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 14),
