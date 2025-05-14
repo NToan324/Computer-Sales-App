@@ -23,7 +23,7 @@ class ProductDetailsView extends StatefulWidget {
 }
 
 class _ProductDetailsViewState extends State<ProductDetailsView> {
-  Product product = Product(
+  ProductModel product = ProductModel(
     id: '',
     productId: '',
     variantName: '',
@@ -37,22 +37,50 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     images: [],
     isActive: true,
   );
+  List<ProductModel> relatedProductsVariant = [];
   List<String> images = [];
+  int quantity = 1;
+  bool isLoading = false;
 
   ProductService productService = ProductService();
   void fetchProductDetails() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
-      // Call your service to fetch product details here
-      // For example: await ProductService().getProductDetail(widget.productId);
       final response =
           await productService.getProductVariantsById(widget.productId);
+
+      final newProduct = ProductModel.fromJson(response['productVariant']);
+      final newRelated = (response['relatedVariants'] as List)
+          .map((item) => ProductModel.fromJson(item))
+          .toList();
+
       setState(() {
-        product = response;
+        product = newProduct;
+        relatedProductsVariant = [newProduct, ...newRelated];
       });
     } catch (e) {
       // Handle any errors that occur during the fetch
-      print('Error fetching product details: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
+
+  void handleSelectVariant(String variantId) {
+    setState(() {
+      product = relatedProductsVariant
+          .firstWhere((variant) => variant.id == variantId);
+      images = product.images.map((image) => image.url).toList();
+    });
+  }
+
+  void handleAddToCart() {
+    // Handle add to cart logic here
+    print('Add to cart: ${product.id}');
+    print('Quantity: $quantity');
   }
 
   @override
@@ -65,12 +93,12 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
   Widget build(BuildContext context) {
     double isWrap = MediaQuery.of(context).size.width;
     bool isMobile = Responsive.isMobile(context);
-    bool isTablet = Responsive.isTablet(context);
     bool isDesktop = Responsive.isDesktop(context);
 
     if (product.images.isNotEmpty) {
       images = product.images.map((image) => image.url).toList();
     }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: !isMobile ? AppBarHomeCustom() : null,
@@ -91,13 +119,23 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       minWidth: 300,
                       minHeight: 300,
                     ),
-                    child: SizedBox(
-                      height: isMobile ? 300 : 500,
-                      width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
-                      child: SliderProductCustom(
-                        imagesUrl: images,
-                      ),
-                    ),
+                    child: Container(
+                        padding: !isMobile
+                            ? EdgeInsets.only(
+                                top: 16,
+                                left: 64,
+                                right: 64,
+                              )
+                            : EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                              ),
+                        height: isMobile ? 300 : 500,
+                        width: isWrap < 1200 ? double.infinity : isWrap * 0.52,
+                        child: SliderProductCustom(
+                          imagesUrl: images,
+                          isLoading: isLoading,
+                        )),
                   ),
                   ConstrainedBox(
                     constraints: BoxConstraints(
@@ -114,7 +152,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                               left: 16,
                               right: 16,
                             ),
-                      color: Colors.white,
                       width: isWrap < 1200 ? double.infinity : isWrap * 0.43,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -127,22 +164,42 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                             discount: product.discount,
                           ),
                           VersionProduct(
-                            title: product.variantName,
-                            price: product.price,
+                            relatedProductsVariant: relatedProductsVariant,
+                            handleSelectVariant: handleSelectVariant,
+                            isSelected: product.id,
                           ),
-                          Quantity(),
+                          Quantity(
+                            quantity: quantity,
+                            onIncrease: () {
+                              if (quantity < 99) {
+                                setState(() {
+                                  quantity++;
+                                });
+                              }
+                            },
+                            onDecrease: () {
+                              if (quantity > 1) {
+                                setState(() {
+                                  quantity--;
+                                });
+                              }
+                            },
+                          ),
                           if (!isMobile)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               spacing: 20,
                               children: [
-                                SizedBox(
-                                  width: 200,
-                                  height: 50,
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 200,
+                                    minWidth: 150,
+                                    minHeight: 50,
+                                  ),
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      //add to cart
+                                      handleAddToCart();
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary,
@@ -158,9 +215,12 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 200,
-                                  height: 50,
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 200,
+                                    minWidth: 150,
+                                    minHeight: 50,
+                                  ),
                                   child: ElevatedButton(
                                     onPressed: () {},
                                     style: ElevatedButton.styleFrom(

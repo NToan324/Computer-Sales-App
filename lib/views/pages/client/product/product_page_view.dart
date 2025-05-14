@@ -8,6 +8,7 @@ class ProductPageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBarHomeCustom(),
       body: ProductPageBody(),
     );

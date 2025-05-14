@@ -1,6 +1,6 @@
 import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
 import 'package:computer_sales_app/provider/user_provider.dart';
-import 'package:computer_sales_app/services/user_service.dart';
+import 'package:computer_sales_app/services/user.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/splash/widgets/splash_image_view.dart';
 import 'package:flutter/material.dart';

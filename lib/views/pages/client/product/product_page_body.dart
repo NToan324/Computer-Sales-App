@@ -2,10 +2,17 @@ import 'package:computer_sales_app/components/custom/dropdown.dart';
 import 'package:computer_sales_app/components/custom/radio.dart';
 import 'package:computer_sales_app/components/custom/range_slider.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/models/brand.model.dart';
+import 'package:computer_sales_app/models/category.model.dart';
+import 'package:computer_sales_app/provider/product_provider.dart';
+import 'package:computer_sales_app/services/brand.service.dart';
+import 'package:computer_sales_app/services/category.service.dart';
+import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
 import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductPageBody extends StatelessWidget {
   const ProductPageBody({
@@ -71,10 +78,15 @@ class ProductPageBody extends StatelessWidget {
                 : Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(flex: 1, child: const FilterWidget()),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 200,
+                          maxWidth: 300,
+                        ),
+                        child: const FilterWidget(),
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
-                        flex: 4,
                         child: ShowListProductWidget(),
                       ),
                     ],
@@ -94,32 +106,49 @@ class FilterWidget extends StatefulWidget {
 }
 
 class _FilterWidgetState extends State<FilterWidget> {
-  List<String> categories = [
-    'Laptop',
-    'PC (Desktop)',
-    'Screen',
-    'Keyboard, Mouse',
-    'Headphones, Speakers',
-    'Accessories (Cables, Cooling Pads...)',
-  ];
+  late double minPrice;
+  late double maxPrice;
+  late RangeValues _rangeValues;
+  final BrandService brandService = BrandService();
+  final CategoryService categoryService = CategoryService();
 
-  List<String> brands = [
-    'Dell',
-    'HP',
-    'Asus',
-    'Acer',
-    'Lenovo',
-    'Apple',
-    'MSI',
-    'Gigabyte',
-    'Razer',
-  ];
+  List<CategoryModel> categories = [];
+  List<BrandModel> brands = [];
+
+  void fetchBrands() async {
+    final response = await brandService.getBrands();
+    setState(() {
+      brands = response.map((brand) => brand).toList();
+    });
+  }
+
+  void fetchCategories() async {
+    final response = await categoryService.getCategories();
+    setState(() {
+      categories = response.map((category) => category).toList();
+    });
+  }
 
   // State cho show more
   Map<String, bool> isExpanded = {
     'Category': false,
     'Brand': false,
   };
+
+  Map<String, Set<String>> selectedItems = {
+    'Category': {},
+    'Brand': {},
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    minPrice = 100000;
+    maxPrice = 100000000;
+    _rangeValues = RangeValues(minPrice, maxPrice);
+    fetchBrands();
+    fetchCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,8 +199,15 @@ class _FilterWidgetState extends State<FilterWidget> {
               const SizedBox(height: 16),
               RangeSliderCustom(
                 title: 'Price',
-                maxValue: 10000000,
                 divisions: 50,
+                minValue: minPrice,
+                maxValue: maxPrice,
+                rangeValues: _rangeValues,
+                onChanged: (RangeValues values) {
+                  setState(() {
+                    _rangeValues = values;
+                  });
+                },
               ),
               const SizedBox(height: 16),
               RatingFilter(),
@@ -185,7 +221,11 @@ class _FilterWidgetState extends State<FilterWidget> {
                       text: 'Reset',
                       variantIsOutline: true,
                       onTap: (_) {
-                        Navigator.pop(context);
+                        Provider.of<ProductProvider>(context, listen: false)
+                            .clearFilters();
+                        if (Responsive.isMobile(context)) {
+                          Navigator.pop(context);
+                        }
                       },
                     ),
                   ),
@@ -193,8 +233,17 @@ class _FilterWidgetState extends State<FilterWidget> {
                     child: MyButton(
                       text: 'Apply',
                       onTap: (_) {
-                        // Handle apply filter action
-                        Navigator.pop(context);
+                        Provider.of<ProductProvider>(context, listen: false)
+                            .handleSortByFilter(
+                          minPrice: _rangeValues.start,
+                          maxPrice: _rangeValues.end,
+                          categoryIds:
+                              selectedItems['Category']?.toList() ?? [],
+                          brandIds: selectedItems['Brand']?.toList() ?? [],
+                        );
+                        if (Responsive.isMobile(context)) {
+                          Navigator.pop(context);
+                        }
                       },
                     ),
                   )
@@ -207,7 +256,7 @@ class _FilterWidgetState extends State<FilterWidget> {
     );
   }
 
-  Widget buildFilterSection(String title, List<String> items, String key) {
+  Widget buildFilterSection(String title, List<dynamic> items, String key) {
     bool expanded = isExpanded[key] ?? false;
     int displayCount = expanded ? items.length : 0;
 
@@ -246,16 +295,26 @@ class _FilterWidgetState extends State<FilterWidget> {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: displayCount,
             itemBuilder: (context, index) {
+              final item = items[index];
+              final isSelected = selectedItems[key]?.contains(item.id) ?? false;
+
               return CheckboxListTile(
+                activeColor: AppColors.primary,
                 contentPadding: EdgeInsets.zero,
                 title: Text(
-                  items[index],
-                  style: const TextStyle(
-                    fontSize: 14,
-                  ),
+                  item.name,
+                  style: const TextStyle(fontSize: 14),
                 ),
-                value: false,
-                onChanged: (bool? value) {},
+                value: isSelected,
+                onChanged: (bool? value) {
+                  setState(() {
+                    if (value == true) {
+                      selectedItems[key]?.add(item.id);
+                    } else {
+                      selectedItems[key]?.remove(item.id);
+                    }
+                  });
+                },
               );
             },
           ),
@@ -335,8 +394,15 @@ class _RatingFilterState extends State<RatingFilter> {
   }
 }
 
-class ShowListProductWidget extends StatelessWidget {
-  ShowListProductWidget({super.key});
+class ShowListProductWidget extends StatefulWidget {
+  const ShowListProductWidget({super.key});
+
+  @override
+  State<ShowListProductWidget> createState() => _ShowListProductWidgetState();
+}
+
+class _ShowListProductWidgetState extends State<ShowListProductWidget> {
+  final ProductService productService = ProductService();
 
   final List<String> sortOptions = [
     'All Products',
@@ -348,8 +414,8 @@ class ShowListProductWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final filters = Provider.of<ProductProvider>(context).filters;
     final bool isMobile = Responsive.isMobile(context);
-
     return Container(
       padding: !isMobile ? const EdgeInsets.all(16) : null,
       decoration: BoxDecoration(
@@ -397,7 +463,13 @@ class ShowListProductWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.black45, width: 0.5),
                     ),
-                    child: DropdownCustom(items: sortOptions),
+                    child: DropdownCustom(
+                      items: sortOptions,
+                      onChanged: (value) {
+                        Provider.of<ProductProvider>(context, listen: false)
+                            .handleSortChange(value);
+                      },
+                    ),
                   ),
                 ],
               )
@@ -407,10 +479,11 @@ class ShowListProductWidget extends StatelessWidget {
           Wrap(
             spacing: 16,
             runSpacing: 16,
-            children: List.generate(3, (index) {
+            children: List.generate(filters.length, (index) {
               return Container(
-                padding: const EdgeInsets.only(
-                  left: 8,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withAlpha(25),
@@ -418,15 +491,13 @@ class ShowListProductWidget extends StatelessWidget {
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  spacing: 10,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 14),
-                      child: Text(
-                        'Filter $index',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    Text(
+                      filters[index],
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     IconButton(

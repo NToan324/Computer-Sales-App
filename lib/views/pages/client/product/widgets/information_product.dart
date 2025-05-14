@@ -27,10 +27,10 @@ class InformationProduct extends StatelessWidget {
         SizedBox(
           height: 15,
         ),
-        VersionProduct(
-          title: 'Surface Pro 7 | i5 8GB - 128GB',
-          price: 14900000,
-        ),
+        // VersionProduct(
+        //   title: 'Surface Pro 7 | i5 8GB - 128GB',
+        //   price: 14900000,
+        // ),
         SizedBox(
           height: 15,
         ),

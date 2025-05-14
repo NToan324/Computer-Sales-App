@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class ProductOrdered extends StatelessWidget {
   final CartItem item;
-  final Map<String, Product> products;
+  final Map<String, ProductModel> products;
 
   const ProductOrdered({
     super.key,

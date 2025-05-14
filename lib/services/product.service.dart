@@ -66,32 +66,48 @@ class ProductService extends BaseClient {
     await delete('product/variants/$variantId');
   }
 
-  Future<Product> getProductVariantsById(String variantId) async {
+  Future<Map<String, dynamic>> getProductVariantsById(String variantId) async {
     final res = await get('product/variant/$variantId');
-    return Product.fromJson(res['data']);
+    return res['data'];
   }
 
-  // // 🔍 Tìm kiếm biến thể
-  // Future<Map<String, dynamic>> searchProductVariants({
-  //   String? name,
-  //   String? categoryId,
-  //   String? brandId,
-  //   double? minPrice,
-  //   double? maxPrice,
-  //   double? rating,
-  //   int page = 1,
-  //   int limit = 10,
-  // }) async {
-  //   final res = await get('product/variants/search', params: {
-  //     if (name != null) 'name': name,
-  //     if (categoryId != null) 'category_id': categoryId,
-  //     if (brandId != null) 'brand_id': brandId,
-  //     if (minPrice != null) 'min_price': minPrice.toString(),
-  //     if (maxPrice != null) 'max_price': maxPrice.toString(),
-  //     if (rating != null) 'rating': rating.toString(),
-  //     'page': page.toString(),
-  //     'limit': limit.toString(),
-  //   });
-  //   return res['data'];
-  // }
+  // 🔍 Tìm kiếm biến thể
+
+  Future<List<ProductModel>> searchProductVariants({
+    String? name,
+    List<String>? categoryIds,
+    List<String>? brandIds,
+    double? minPrice,
+    double? maxPrice,
+    List<double>? ratings,
+    String? sortPrice, // "asc" | "desc"
+    String? sortName, // "asc" | "desc"
+  }) async {
+    final queryList = <String>[];
+
+    if (name != null) queryList.add('name=$name');
+    if (categoryIds != null && categoryIds.isNotEmpty) {
+      for (final id in categoryIds) {
+        queryList.add('category_ids=$id');
+      }
+    }
+    if (brandIds != null && brandIds.isNotEmpty) {
+      for (final id in brandIds) {
+        queryList.add('brand_ids=$id');
+      }
+    }
+    if (minPrice != null) queryList.add('min_price=$minPrice');
+    if (maxPrice != null) queryList.add('max_price=$maxPrice');
+    if (ratings != null && ratings.isNotEmpty) {
+      for (final r in ratings) {
+        queryList.add('ratings=${r.toString()}');
+      }
+    }
+    if (sortPrice != null) queryList.add('sort_price=$sortPrice');
+    if (sortName != null) queryList.add('sort_name=$sortName');
+
+    final uri = Uri.parse("product/variant/search?${queryList.join('&')}");
+    final res = await get(uri.toString());
+    return res['data'].map<ProductModel>((item) => ProductModel.fromJson(item)).toList();
+  }
 }

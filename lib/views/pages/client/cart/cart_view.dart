@@ -24,7 +24,7 @@ class CartView extends StatefulWidget {
 
 class _CartViewState extends State<CartView> {
   ShippingMethod _selectedMethod = ShippingMethod.standard;
-  List<Product> products = [];
+  List<ProductModel> products = [];
 
   List<CartItem> cartItems = [];
 

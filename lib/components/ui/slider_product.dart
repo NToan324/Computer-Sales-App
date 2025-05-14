@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:computer_sales_app/components/custom/fadeIn_network_image.dart';
+import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/product/widgets/preview_image.dart';
@@ -8,18 +9,26 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class SliderProductCustom extends StatefulWidget {
-  const SliderProductCustom({super.key, required this.imagesUrl});
+  const SliderProductCustom(
+      {super.key, required this.imagesUrl, this.isLoading = false});
   final List<String> imagesUrl;
+  final bool isLoading;
 
   @override
   State<SliderProductCustom> createState() => _CarouselSliderCustomState();
 }
 
 class _CarouselSliderCustomState extends State<SliderProductCustom> {
-  int activeIndex = 0;
+  late int activeIndex;
+
   bool isHover = false;
 
   final CarouselSliderController _controller = CarouselSliderController();
+  @override
+  void initState() {
+    super.initState();
+    activeIndex = widget.imagesUrl.isNotEmpty ? 0 : -1;
+  }
 
   void scrollAutomatically(ScrollController scrollController, int index) {
     if (scrollController.hasClients) {
@@ -87,74 +96,81 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
             ),
             child: Stack(
               children: [
-                CarouselSlider.builder(
-                  carouselController: _controller,
-                  itemCount: items.length,
-                  itemBuilder: (context, index, realIndex) => MouseRegion(
-                    onEnter: (_) {
-                      setState(() {
-                        isHover = true;
-                      });
-                    },
-                    onExit: (_) {
-                      setState(() {
-                        isHover = false;
-                      });
-                    },
-                    child: AnimatedScale(
-                      duration: const Duration(milliseconds: 300),
-                      scale: isHover && activeIndex == index ? 0.99 : 1,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: !Responsive.isMobile(context)
-                              ? BorderRadius.circular(10)
-                              : null,
-                          // image: DecorationImage(
-                          //   image: NetworkImage(widget.imagesUrl[index]),
-                          //   fit: BoxFit.cover,
-                          // ),
+                widget.isLoading == false
+                    ? CarouselSlider.builder(
+                        carouselController: _controller,
+                        itemCount: items.length,
+                        itemBuilder: (context, index, realIndex) => MouseRegion(
+                          onEnter: (_) {
+                            setState(() {
+                              isHover = true;
+                            });
+                          },
+                          onExit: (_) {
+                            setState(() {
+                              isHover = false;
+                            });
+                          },
+                          child: AnimatedScale(
+                            duration: const Duration(milliseconds: 300),
+                            scale: isHover && activeIndex == index ? 0.99 : 1,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: !Responsive.isMobile(context)
+                                    ? BorderRadius.circular(10)
+                                    : null,
+                              ),
+                              child: FadeInNetworkImage(
+                                imageUrl: widget.imagesUrl[index],
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                         ),
-                        child: FadeInNetworkImage(
-                          imageUrl: widget.imagesUrl[index],
-                          fit: BoxFit.cover,
+                        options: CarouselOptions(
+                          height: !Responsive.isMobile(context) ? 500.0 : 300.0,
+                          enlargeCenterPage: false,
+                          autoPlay: false,
+                          aspectRatio: 1 / 1,
+                          autoPlayCurve: Curves.fastOutSlowIn,
+                          enableInfiniteScroll: true,
+                          autoPlayAnimationDuration:
+                              Duration(milliseconds: 500),
+                          viewportFraction: 1.0,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              activeIndex = index;
+                            });
+                          },
                         ),
+                      )
+                    : SkeletonImage(
+                        imageHeight: !Responsive.isMobile(context) ? 500 : 300,
+                        imageWidth: double.infinity,
                       ),
-                    ),
-                  ),
-                  options: CarouselOptions(
-                    height: !Responsive.isMobile(context) ? 500.0 : 300.0,
-                    enlargeCenterPage: false,
-                    autoPlay: false,
-                    aspectRatio: 1 / 1,
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enableInfiniteScroll: true,
-                    autoPlayAnimationDuration: Duration(milliseconds: 500),
-                    viewportFraction: 1.0,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        activeIndex = index;
-                      });
-                    },
-                  ),
-                ),
                 (!Responsive.isMobile(context))
                     ? Positioned.fill(
                         bottom: 10,
                         child: Align(
                           alignment: Alignment.bottomCenter,
-                          child: AnimatedSmoothIndicator(
-                            activeIndex: activeIndex,
-                            count: items.length,
-                            effect: SwapEffect(
-                              dotColor: Colors.white,
-                              activeDotColor: AppColors.primary,
-                              dotHeight: 10,
-                              dotWidth: 10,
-                            ),
-                            onDotClicked: (index) => {
-                              _controller.animateToPage(index),
-                            },
-                          ),
+                          child: activeIndex >= 0 && widget.imagesUrl.isNotEmpty
+                              ? AnimatedSmoothIndicator(
+                                  activeIndex: activeIndex,
+                                  count: items.length,
+                                  effect: SwapEffect(
+                                    dotColor: Colors.black12,
+                                    activeDotColor: AppColors.primary,
+                                    dotHeight: 10,
+                                    dotWidth: 10,
+                                  ),
+                                  onDotClicked: (index) => {
+                                    _controller.animateToPage(index),
+                                  },
+                                )
+                              : const SizedBox(
+                                  height: 10,
+                                  width: 100,
+                                ),
                         ),
                       )
                     : Positioned(
@@ -166,6 +182,7 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
                           direction: Axis.horizontal,
                           imagesUrl: widget.imagesUrl,
                           activeIndex: activeIndex,
+                          isLoading: widget.isLoading,
                           onTap: (index) {
                             activeIndex = index;
                             _controller.animateToPage(index);

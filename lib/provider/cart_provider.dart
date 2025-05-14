@@ -10,7 +10,7 @@ class CartProvider with ChangeNotifier {
 
   int get totalItems => _items.length;
 
-  void addToCart(Product product, int quantity) {
+  void addToCart(ProductModel product, int quantity) {
     if (_items.containsKey(product.id)) {
       _items[product.id]!.quantity += quantity;
     } else {

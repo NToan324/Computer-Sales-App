@@ -33,8 +33,7 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
       final data = await _productService.getVariants();
       final productProvider =
           Provider.of<ProductProvider>(context, listen: false);
-      final products = data.map((item) => Product.fromMap(item)).toList();
-
+      final products = data.map((item) => ProductModel.fromMap(item)).toList();
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -56,7 +55,6 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     final products = Provider.of<ProductProvider>(context).products;
     return GridView.builder(
@@ -65,10 +63,10 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: Responsive.isDesktop(context) ? 4 : 2,
-        childAspectRatio: 0.5,
+        childAspectRatio: 0.55,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
-        mainAxisExtent: 330,
+        mainAxisExtent: 350,
       ),
       itemBuilder: (context, index) {
         final variant =
@@ -158,8 +156,11 @@ class ProductView extends StatelessWidget {
                   Text(
                     variantDescription,
                     style: TextStyle(
-                        fontSize: FontSizes.small, color: AppColors.primary),
+                      fontSize: FontSizes.small,
+                      color: Colors.black54,
+                    ),
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                   Text(
                     formatMoney(price.toDouble()),

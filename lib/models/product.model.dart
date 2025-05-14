@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 //Product is product Variant
-class Product {
+class ProductModel {
   final String id;
   final String productId;
   final String variantName;
@@ -15,7 +15,7 @@ class Product {
   final List<ProductImage> images;
   final bool isActive;
 
-  Product({
+  ProductModel({
     required this.id,
     required this.productId,
     required this.variantName,
@@ -47,8 +47,8 @@ class Product {
     };
   }
 
-  factory Product.fromMap(Map<String, dynamic> map) {
-    return Product(
+  factory ProductModel.fromMap(Map<String, dynamic> map) {
+    return ProductModel(
       id: map['_id'] as String,
       productId: map['product_id'] as String,
       variantName: map['variant_name'] as String,
@@ -68,12 +68,12 @@ class Product {
 
   String toJson() => json.encode(toMap());
 
-  factory Product.fromJson(Map<String, dynamic> json) {
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
     var imagesList = json['images'] as List;
     List<ProductImage> imageObjects =
         imagesList.map((image) => ProductImage.fromJson(image)).toList();
 
-    return Product(
+    return ProductModel(
       id: json['_id'],
       productId: json['product_id'],
       variantName: json['variant_name'],

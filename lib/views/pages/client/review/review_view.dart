@@ -12,7 +12,7 @@ void main(List<String> args) {
   runApp(ReviewView(product: product));
 }
 
-var product = Product(
+var product = ProductModel(
   id: "1",
   productId: "prod_123",
   variantName: "Macbook Pro 2021",
@@ -30,7 +30,7 @@ var product = Product(
 );
 
 class ReviewView extends StatelessWidget {
-  final Product product;
+  final ProductModel product;
   const ReviewView({super.key, required this.product});
 
   @override

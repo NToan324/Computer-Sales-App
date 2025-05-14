@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class PreviewImage extends StatefulWidget {
     required this.activeIndex,
     required this.onTap,
     required this.scrollAutomatically,
+    this.isLoading = false,
   });
 
   final List<String> imagesUrl;
@@ -17,6 +19,7 @@ class PreviewImage extends StatefulWidget {
   final Function onTap;
   final Axis direction;
   final Function(ScrollController, int) scrollAutomatically;
+  final bool isLoading;
 
   @override
   State<PreviewImage> createState() => _PreviewImageState();
@@ -68,24 +71,25 @@ class _PreviewImageState extends State<PreviewImage> {
             ),
             child: Center(
               child: ListView.separated(
-                  controller: _scrollController,
-                  scrollDirection: widget.direction,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) => MouseRegion(
-                        onHover: (_) {
-                          setState(() {
-                            indexHover = index;
-                          });
-                        },
-                        child: GestureDetector(
-                          onTap: () => {
-                            widget.onTap(index),
-                            widget.scrollAutomatically(
-                                _scrollController, widget.activeIndex),
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            child: Container(
+                controller: _scrollController,
+                scrollDirection: widget.direction,
+                shrinkWrap: true,
+                itemBuilder: (context, index) => MouseRegion(
+                  onHover: (_) {
+                    setState(() {
+                      indexHover = index;
+                    });
+                  },
+                  child: GestureDetector(
+                    onTap: () => {
+                      widget.onTap(index),
+                      widget.scrollAutomatically(
+                          _scrollController, widget.activeIndex),
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      child: !widget.isLoading
+                          ? Container(
                               width:
                                   widget.direction == Axis.horizontal ? 60 : 70,
                               height: widget.direction == Axis.horizontal
@@ -102,15 +106,23 @@ class _PreviewImageState extends State<PreviewImage> {
                                   fit: BoxFit.cover,
                                 ),
                               ),
+                            )
+                          : SkeletonImage(
+                              imageWidth:
+                                  widget.direction == Axis.horizontal ? 60 : 70,
+                              imageHeight: widget.direction == Axis.horizontal
+                                  ? 40
+                                  : 120,
                             ),
-                          ),
-                        ),
-                      ),
-                  separatorBuilder: (context, index) => SizedBox(
-                        width: 10,
-                        height: 10,
-                      ),
-                  itemCount: widget.imagesUrl.length),
+                    ),
+                  ),
+                ),
+                separatorBuilder: (context, index) => SizedBox(
+                  width: 10,
+                  height: 10,
+                ),
+                itemCount: widget.imagesUrl.length,
+              ),
             ),
           ),
         ),

@@ -83,6 +83,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
   ];
 
   Scaffold _buildPage(int currentIndex) {
+    bool isDesktop = Responsive.isDesktop(context);
     return Scaffold(
       appBar: _pages[currentIndex]['appBar'] as PreferredSizeWidget,
       body: _pages[currentIndex]['page'] as Widget,
@@ -96,7 +97,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
             ),
           ],
         ),
-        child: Responsive.isMobile(context)
+        child: !isDesktop
             ? BottomAppBar(
                 color: Colors.white,
                 elevation: 10,
