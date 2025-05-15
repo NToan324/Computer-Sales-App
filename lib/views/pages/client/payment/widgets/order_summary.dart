@@ -3,7 +3,7 @@ import 'package:computer_sales_app/models/cart.model.dart';
 import 'package:computer_sales_app/views/pages/client/payment/widgets/product_order.dart';
 
 class OrderSummary extends StatelessWidget {
-  final List<CartItem> cartItems;
+  final List<CartModel> cartItems;
 
   const OrderSummary({super.key, required this.cartItems});
 
@@ -37,7 +37,7 @@ class OrderSummary extends StatelessWidget {
             shrinkWrap: true,
             itemCount: cartItems.length,
             itemBuilder: (context, index) {
-              return ProductOrdered(item: cartItems[index], products: {});
+              return ProductOrdered(item: cartItems[index]);
             },
           ),
         ),

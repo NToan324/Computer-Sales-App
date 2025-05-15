@@ -40,7 +40,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
     },
   ];
 
-  Widget _customItemNavBar(
+  Widget customItemNavBar(
       IconData iconData, String label, int index, int currentIndex) {
     return Container(
       width: 60,
@@ -105,7 +105,7 @@ class _BottomNavigationBarCustomState extends State<BottomNavigationBarCustom> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(
                     icons.length,
-                    (index) => _customItemNavBar(
+                    (index) => customItemNavBar(
                       icons[index]['icon'] as IconData,
                       icons[index]['label'] as String,
                       index,

@@ -1,25 +1,18 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/cart.model.dart';
-import 'package:computer_sales_app/models/product.model.dart';
 import 'package:flutter/material.dart';
 
 class ProductOrdered extends StatelessWidget {
-  final CartItem item;
-  final Map<String, ProductModel> products;
+  final CartModel item;
 
   const ProductOrdered({
     super.key,
     required this.item,
-    required this.products,
   });
 
   @override
   Widget build(BuildContext context) {
-    final product = products[item.productVariantId];
-    final imageUrl = product?.images.isNotEmpty == true
-        ? product!.images[0].url
-        : 'assets/images/default.png';
     return Container(
       color: Colors.white,
       margin: const EdgeInsets.all(16),
@@ -40,7 +33,7 @@ class ProductOrdered extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       image: DecorationImage(
-                        image: AssetImage(imageUrl),
+                        image: NetworkImage(item.items.images.url),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -51,7 +44,7 @@ class ProductOrdered extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          product?.variantName ?? 'Unknown Product',
+                          item.items.productVariantName,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -62,7 +55,7 @@ class ProductOrdered extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          formatMoney(item.unitPrice),
+                          formatMoney(item.items.unitPrice),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.black,
@@ -79,7 +72,7 @@ class ProductOrdered extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Text(
-                'x${item.quantity}',
+                'x${item.items.quantity}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
@@ -92,7 +85,11 @@ class ProductOrdered extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Text(
-                formatMoney(item.totalPrice),
+                formatMoney(
+                  (item.items.unitPrice +
+                          (item.items.unitPrice * item.items.discount)) *
+                      item.items.quantity,
+                ),
                 textAlign: TextAlign.end,
                 style: const TextStyle(
                   fontSize: 14,

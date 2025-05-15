@@ -67,6 +67,7 @@ class PaymentDetails extends StatelessWidget {
           Container(
             color: Colors.white,
             child: DropdownButtonFormField<String>(
+              isExpanded: true,
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(10),
               items: const [
@@ -91,7 +92,10 @@ class PaymentDetails extends StatelessWidget {
                   borderSide: BorderSide(color: Colors.grey, width: 1),
                 ),
                 hintText: 'Select payment method',
-                hintStyle: const TextStyle(fontSize: 14),
+                hintStyle: const TextStyle(
+                  fontSize: 14,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: AppColors.primary,

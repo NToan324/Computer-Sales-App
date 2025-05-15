@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
 import 'package:computer_sales_app/components/custom/cart.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/provider/user_provider.dart';
@@ -60,12 +61,12 @@ class AvatarWidget extends StatelessWidget {
                         ),
                       ),
                     PopupMenuItem<String>(
-                      value: 'notifications',
+                      value: 'home',
                       child: Row(
                         children: [
-                          Icon(CupertinoIcons.bell),
+                          Icon(CupertinoIcons.square_grid_2x2),
                           SizedBox(width: 8),
-                          Text('Notifications'),
+                          Text('Home'),
                         ],
                       ),
                     ),
@@ -106,10 +107,14 @@ class AvatarWidget extends StatelessWidget {
         // Điều hướng đến trang thông tin cá nhân
         Navigator.of(context).pushNamed('profile');
         break;
-      case 'notifications':
-        if (Responsive.isDesktop(context)) {
-          _showNotificationPopup(context);
-        }
+      case 'home':
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BottomNavigationBarCustom(),
+          ),
+          (Route<dynamic> route) => false,
+        );
         // Điều hướng đến trang thông báo
         break;
       case 'login':
@@ -119,7 +124,7 @@ class AvatarWidget extends StatelessWidget {
       case 'logout':
         // Xử lý đăng xuất
         final prefs = await SharedPreferences.getInstance();
-        await prefs.remove('access_token');
+        await prefs.remove('accessToken');
         await prefs.remove('user');
         // Xóa thông tin người dùng khỏi provider
         if (context.mounted) {

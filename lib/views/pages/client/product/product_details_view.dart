@@ -1,6 +1,9 @@
+import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/components/ui/slider_product.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/models/product.model.dart';
+import 'package:computer_sales_app/provider/cart_provider.dart';
 import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/appBar_widget.dart';
@@ -13,6 +16,7 @@ import 'package:computer_sales_app/views/pages/client/product/widgets/title_prod
 import 'package:computer_sales_app/views/pages/client/product/widgets/version_product.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductDetailsView extends StatefulWidget {
   const ProductDetailsView({super.key, required this.productId});
@@ -77,12 +81,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     });
   }
 
-  void handleAddToCart() {
-    // Handle add to cart logic here
-    print('Add to cart: ${product.id}');
-    print('Quantity: $quantity');
-  }
-
   @override
   void initState() {
     super.initState();
@@ -94,6 +92,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     double isWrap = MediaQuery.of(context).size.width;
     bool isMobile = Responsive.isMobile(context);
     bool isDesktop = Responsive.isDesktop(context);
+    bool isTablet = Responsive.isTablet(context);
 
     if (product.images.isNotEmpty) {
       images = product.images.map((image) => image.url).toList();
@@ -199,7 +198,18 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                   ),
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      handleAddToCart();
+                                      final provider =
+                                          Provider.of<CartProvider>(context,
+                                              listen: false);
+                                      provider.handleAddToCart(
+                                        product.id,
+                                        quantity,
+                                      );
+                                      showCustomSnackBar(
+                                        context,
+                                        'You have added to cart',
+                                        type: SnackBarType.success,
+                                      );
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary,
@@ -320,6 +330,35 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 ],
               ),
             ),
+            if (isTablet)
+              Positioned(
+                top: 0,
+                left: 64,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BottomNavigationBarCustom(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                    ),
+                    const Text(
+                      'Back',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             if (isMobile)
               Positioned(
                 top: 20,
@@ -398,7 +437,9 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     child: SizedBox(
                       height: 50,
                       child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, 'cart');
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             shadowColor: Colors.transparent,
@@ -418,7 +459,19 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     child: SizedBox(
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          final provider =
+                              Provider.of<CartProvider>(context, listen: false);
+                          provider.handleAddToCart(
+                            product.id,
+                            quantity,
+                          );
+                          showCustomSnackBar(
+                            context,
+                            'You have added to cart',
+                            type: SnackBarType.success,
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           shadowColor: Colors.transparent,
                           backgroundColor: AppColors.primary,
@@ -427,7 +480,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                           ),
                         ),
                         child: Text(
-                          'Buy now',
+                          'Add to cart',
                           style: TextStyle(
                             color: AppColors.white,
                           ),

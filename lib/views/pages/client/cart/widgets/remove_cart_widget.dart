@@ -1,10 +1,9 @@
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/models/cart.model.dart';
-import 'package:computer_sales_app/views/pages/client/cart/widgets/cart_item_widget.dart';
 import 'package:flutter/material.dart';
 
 class RemoveCartWidget extends StatefulWidget {
-   RemoveCartWidget(
+  RemoveCartWidget(
       {super.key,
       required this.cartItems,
       required this.itemToRemove,
@@ -12,7 +11,7 @@ class RemoveCartWidget extends StatefulWidget {
       required this.quantityToRemove,
       required this.removeItem});
 
-  final List<CartItem> cartItems;
+  final List<CartModel> cartItems;
   final int? itemToRemove;
   final VoidCallback cancelRemoveItem;
   late int quantityToRemove;
@@ -38,16 +37,6 @@ class _RemoveCartWidgetState extends State<RemoveCartWidget> {
           mainAxisSize: MainAxisSize.min,
           spacing: 10,
           children: [
-            CartItemWidget(
-              item: widget.cartItems[widget.itemToRemove!],
-              onQuantityChanged: (newQuantity) {
-                setState(() {
-                  widget.quantityToRemove = newQuantity;
-                });
-              },
-              maxQuantity: widget.cartItems[widget.itemToRemove!].quantity,
-              isRemove: true,
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

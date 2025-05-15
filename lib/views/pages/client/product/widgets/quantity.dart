@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Quantity extends StatefulWidget {
-  Quantity(
+  const Quantity(
       {super.key,
       required this.onIncrease,
       required this.onDecrease,

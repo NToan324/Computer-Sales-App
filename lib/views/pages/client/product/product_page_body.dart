@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
 import 'package:computer_sales_app/components/custom/dropdown.dart';
 import 'package:computer_sales_app/components/custom/pagination.dart';
 import 'package:computer_sales_app/components/custom/radio.dart';
@@ -27,9 +28,38 @@ class ProductPageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
+    bool isTablet = Responsive.isTablet(context);
+    final arguments =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final showBackButton = arguments?['showBackButton'] ?? false;
     return SafeArea(
       child: ListView(
         children: [
+          if (isMobile && showBackButton)
+            Container(
+              padding: const EdgeInsets.only(top: 16, left: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BottomNavigationBarCustom(),
+                        ),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
+                  ),
+                  const Text(
+                    'Home',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(16),
@@ -80,19 +110,56 @@ class ProductPageBody extends StatelessWidget {
                       ShowListProductWidget(),
                     ],
                   )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                : Column(
                     children: [
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 200,
-                          maxWidth: 300,
+                      if (isTablet && showBackButton)
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                      Icons.arrow_back_ios_new_rounded),
+                                  onPressed: () {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            BottomNavigationBarCustom(),
+                                      ),
+                                      (Route<dynamic> route) => false,
+                                    );
+                                  },
+                                ),
+                                const Text(
+                                  'Home',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        child: const FilterWidget(),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ShowListProductWidget(),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minWidth: 200,
+                              maxWidth: 300,
+                            ),
+                            child: const FilterWidget(),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ShowListProductWidget(),
+                          ),
+                        ],
                       ),
                     ],
                   ),

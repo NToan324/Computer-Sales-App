@@ -68,7 +68,7 @@ class _LoginViewState extends State<LoginView> {
     try {
       final response = await authService.login(email, password);
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('access_token', response['access_token']);
+      await prefs.setString('accessToken', response['accessToken']);
       await prefs.setString('user', jsonEncode(response['user']));
       //Store user in provider
       if (mounted) {

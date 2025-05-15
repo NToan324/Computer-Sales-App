@@ -26,7 +26,7 @@ class BaseClient {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('access_token');
+        final token = prefs.getString('accessToken');
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }

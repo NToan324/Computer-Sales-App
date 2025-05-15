@@ -145,7 +145,7 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
                         ),
                       )
                     : SkeletonImage(
-                        imageHeight: !Responsive.isMobile(context) ? 500 : 300,
+                        imageHeight: !Responsive.isMobile(context) ? 450 : 300,
                         imageWidth: double.infinity,
                       ),
                 (!Responsive.isMobile(context))
@@ -194,14 +194,16 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
           ),
         ),
         if (!Responsive.isMobile(context))
-          PreviewImage(
-            scrollAutomatically: scrollAutomatically,
-            direction: Axis.vertical,
-            imagesUrl: widget.imagesUrl,
-            activeIndex: activeIndex,
-            onTap: (index) {
-              _controller.animateToPage(index);
-            },
+          SizedBox(
+            child: PreviewImage(
+              scrollAutomatically: scrollAutomatically,
+              direction: Axis.vertical,
+              imagesUrl: widget.imagesUrl,
+              activeIndex: activeIndex,
+              onTap: (index) {
+                _controller.animateToPage(index);
+              },
+            ),
           ),
       ],
     );

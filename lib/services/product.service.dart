@@ -10,6 +10,11 @@ class ProductService extends BaseClient {
     return res['data'];
   }
 
+  Future<ProductModel> getProductVariantById(String id) async {
+    final res = await get('product/variant/$id');
+    return ProductModel.fromJson(res['data']['productVariant']);
+  }
+
   // Lấy chi tiết sản phẩm
   Future<Map<String, dynamic>> getProductDetail(String id) async {
     final res = await get('product/$id');
@@ -59,11 +64,6 @@ class ProductService extends BaseClient {
           .map<ProductModel>((item) => ProductModel.fromJson(item))
           .toList() as List<ProductModel>
     };
-  }
-
-  Future<List<dynamic>> getVariantsByProduct(String productId) async {
-    final res = await get('product/$productId/variant');
-    return res['data'];
   }
 
   Future<Map<String, dynamic>> createProductVariant(

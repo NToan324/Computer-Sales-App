@@ -1,5 +1,7 @@
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/provider/cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuantitySelector extends StatefulWidget {
   const QuantitySelector({
@@ -7,11 +9,13 @@ class QuantitySelector extends StatefulWidget {
     required this.initialQuantity,
     required this.onQuantityChanged,
     this.maxQuantity,
+    required this.productId,
   });
 
   final int initialQuantity;
   final ValueChanged<int> onQuantityChanged;
   final int? maxQuantity;
+  final String productId;
 
   @override
   _QuantitySelectorState createState() => _QuantitySelectorState();
@@ -37,6 +41,8 @@ class _QuantitySelectorState extends State<QuantitySelector> {
   }
 
   void _incrementQuantity() {
+    final provider = Provider.of<CartProvider>(context, listen: false);
+    provider.handleAddToCart(widget.productId, 1);
     if (widget.maxQuantity == null || _quantity < widget.maxQuantity!) {
       setState(() {
         _quantity++;
@@ -46,6 +52,8 @@ class _QuantitySelectorState extends State<QuantitySelector> {
   }
 
   void _decrementQuantity() {
+    final provider = Provider.of<CartProvider>(context, listen: false);
+    provider.handleRemoveToCart(widget.productId, 1);
     if (_quantity > 1) {
       setState(() {
         _quantity--;
