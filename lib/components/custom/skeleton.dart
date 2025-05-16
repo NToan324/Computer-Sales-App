@@ -100,3 +100,81 @@ class SkeletonImage extends StatelessWidget {
     );
   }
 }
+
+class SkeletonHorizontalProduct extends StatelessWidget {
+  const SkeletonHorizontalProduct({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: const Color.fromARGB(255, 238, 238, 238),
+      highlightColor: Colors.white,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Hình ảnh
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 238, 238, 238),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Thông tin: title, description, quantity + price
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Container(
+                    height: 20,
+                    width: double.infinity,
+                    color: const Color.fromARGB(255, 238, 238, 238),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Description
+                  Container(
+                    height: 16,
+                    width: 250,
+                    color: const Color.fromARGB(255, 238, 238, 238),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Quantity + Price
+                  Row(
+                    children: [
+                      // Quantity
+                      Container(
+                        height: 20,
+                        width: 60,
+                        color: const Color.fromARGB(255, 238, 238, 238),
+                      ),
+                      const SizedBox(width: 16),
+                      // Price
+                      Container(
+                        height: 20,
+                        width: 100,
+                        color: const Color.fromARGB(255, 238, 238, 238),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

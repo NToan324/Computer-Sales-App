@@ -38,15 +38,18 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     quantity: 0,
     averageRating: 0,
     reviewCount: 0,
-    images: [],
+    images: [
+      ProductImage(url: 'https://placehold.co/600x400.png', publicId: '')
+    ],
     isActive: true,
   );
   List<ProductModel> relatedProductsVariant = [];
-  List<String> images = [];
+  List<String> images = ['https://placehold.co/600x400.png'];
   int quantity = 1;
   bool isLoading = false;
 
   ProductService productService = ProductService();
+
   Future<void> fetchProductDetails() async {
     setState(() {
       isLoading = true;
@@ -54,7 +57,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     try {
       final response =
           await productService.getProductVariantsById(widget.productId);
-
       final newProduct = ProductModel.fromJson(response['productVariant']);
       final newRelated = (response['relatedVariants'] as List)
           .map((item) => ProductModel.fromJson(item))
@@ -63,6 +65,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       setState(() {
         product = newProduct;
         relatedProductsVariant = [newProduct, ...newRelated];
+        images = newProduct.images.map((image) => image.url).toList();
       });
     } catch (e) {
       // Handle any errors that occur during the fetch
@@ -93,11 +96,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     bool isMobile = Responsive.isMobile(context);
     bool isDesktop = Responsive.isDesktop(context);
     bool isTablet = Responsive.isTablet(context);
-
-    if (product.images.isNotEmpty) {
-      images = product.images.map((image) => image.url).toList();
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: !isMobile ? AppBarHomeCustom() : null,

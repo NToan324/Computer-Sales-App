@@ -61,33 +61,86 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          'Reviews ',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.black,
+          ),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 40,
           children: [
-            Text(
-              'Reviews ',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-              ),
-            ),
-            Row(
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.star, size: 18, color: Colors.orange),
                 Text(
-                  averageRating.toStringAsFixed(1),
+                  '4.1',
                   style: TextStyle(
+                    fontSize: 64,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
                   ),
                 ),
+                Row(
+                  children: List.generate(5, (index) {
+                    return Icon(
+                      index < averageRating
+                          ? Icons.star
+                          : index < averageRating + 0.5
+                              ? Icons.star_half
+                              : Icons.star_border,
+                      size: 18,
+                      color: AppColors.yellow,
+                    );
+                  }),
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  ' (${allReviews.length} reviews)',
+                  '${allReviews.length} reviews',
                   style: TextStyle(color: Colors.grey[700]),
-                )
+                ),
               ],
             ),
+            Expanded(
+              child: Column(
+                spacing: 4,
+                children: [
+                  RatingReviewBar(
+                    rating: 5,
+                    count: allReviews
+                        .where((review) => review['rating'] == 5.0)
+                        .length,
+                  ),
+                  RatingReviewBar(
+                    rating: 4,
+                    count: allReviews
+                        .where((review) => review['rating'] == 4.0)
+                        .length,
+                  ),
+                  RatingReviewBar(
+                    rating: 3,
+                    count: allReviews
+                        .where((review) => review['rating'] == 3.0)
+                        .length,
+                  ),
+                  RatingReviewBar(
+                    rating: 2,
+                    count: allReviews
+                        .where((review) => review['rating'] == 2.0)
+                        .length,
+                  ),
+                  RatingReviewBar(
+                    rating: 1,
+                    count: allReviews
+                        .where((review) => review['rating'] == 1.0)
+                        .length,
+                  ),
+                ],
+              ),
+            )
           ],
         ),
         const SizedBox(height: 10),
@@ -140,7 +193,7 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
                                 ? Icons.star_half
                                 : Icons.star_border,
                         size: 18,
-                        color: Colors.orange,
+                        color: AppColors.yellow,
                       );
                     }),
                   ),
@@ -212,6 +265,53 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
               ),
             ],
           )
+      ],
+    );
+  }
+}
+
+class RatingReviewBar extends StatelessWidget {
+  const RatingReviewBar({
+    super.key,
+    required this.rating,
+    required this.count,
+  });
+
+  final int rating;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 10,
+          child: Text(
+            rating.toString(),
+            style: TextStyle(
+              fontSize: 14,
+              color: const Color.fromARGB(255, 179, 179, 179),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Icon(
+          Icons.star,
+          size: 18,
+          color: AppColors.yellow,
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 200,
+          child: LinearProgressIndicator(
+            value: count / 5,
+            backgroundColor: Colors.grey[300],
+            color: AppColors.yellow,
+            minHeight: 12,
+            borderRadius: BorderRadius.circular(8),
+          ),
+        )
       ],
     );
   }

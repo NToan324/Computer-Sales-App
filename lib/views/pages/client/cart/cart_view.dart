@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
@@ -243,7 +244,9 @@ class _CartViewState extends State<CartView> {
   @override
   void initState() {
     super.initState();
-    Provider.of<CartProvider>(context, listen: false).getCartByUserId();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CartProvider>(context, listen: false).getCartByUserId();
+    });
   }
 
   @override
@@ -259,188 +262,180 @@ class _CartViewState extends State<CartView> {
                 title: 'My Cart',
                 isBack: true,
               ),
-              body: Stack(
+              body: ListView(
                 children: [
-                  ListView(
-                    children: [
-                      cartItems.isEmpty
-                          ? Column(
-                              children: [
-                                Image.asset(
-                                  'assets/images/NoItem.png',
-                                  width: 400,
-                                  height: 400,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: Text(
-                                    "You haven't placed any order yet",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                SizedBox(
-                                  width: 150,
-                                  child: MyButton(
-                                    text: 'Order Now',
-                                    onTap: (_) {
-                                      Navigator.pushNamed(
-                                        context,
-                                        'product',
-                                        arguments: {
-                                          'showBackButton': true,
-                                        },
-                                      );
-                                    },
-                                  ),
-                                )
-                              ],
-                            )
-                          : Container(
-                              color: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 16),
-                              child: Stack(
-                                children: <Widget>[
-                                  Column(
-                                    children: [
-                                      if (!Responsive.isMobile(context))
-                                        _buildHeaderRow(),
-                                      Container(
-                                        color: Colors.white,
-                                        child: SlidableAutoCloseBehavior(
-                                          child: ListView.separated(
-                                            shrinkWrap: true,
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            separatorBuilder:
-                                                (context, index) =>
-                                                    const SizedBox(height: 20),
-                                            itemCount: cartItems.length,
-                                            itemBuilder: (context, index) {
-                                              final itemCart = cartItems[index];
-                                              return Slidable(
-                                                key: ValueKey(itemCart
-                                                    .productVariantId),
-                                                closeOnScroll: true,
-                                                endActionPane: ActionPane(
-                                                  motion: const ScrollMotion(),
-                                                  children: [
-                                                    CustomSlidableAction(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16),
-                                                      onPressed: (_) => {
-                                                        cartProvider
-                                                            .handleDeleteToCart(
-                                                                itemCart
-                                                                    .productVariantId),
-                                                        showCustomSnackBar(
-                                                            context,
-                                                            'Delete product from cart successfully',
-                                                            type: SnackBarType
-                                                                .success)
-                                                      },
-                                                      backgroundColor:
-                                                          AppColors.pink,
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: const [
-                                                          Icon(
-                                                              Icons
-                                                                  .delete_outline,
-                                                              color:
-                                                                  AppColors.red,
-                                                              size: 28),
-                                                          Text(
-                                                            'Remove',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  AppColors.red,
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Center(
-                                                  child: CartItemWidget(
-                                                    itemCart: itemCart,
-                                                    onQuantityChanged:
-                                                        (quantity) {
-                                                      setState(() {});
-                                                    },
-                                                  ),
-                                                ),
-                                              );
-                                            },
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 16),
+                    child: Stack(
+                      children: <Widget>[
+                        Column(
+                          children: [
+                            if (!Responsive.isMobile(context) &&
+                                cartItems.isNotEmpty)
+                              _buildHeaderRow(),
+                            cartProvider.isLoading
+                                ? ListView.builder(
+                                    itemCount: 5,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return const SkeletonHorizontalProduct();
+                                    })
+                                : cartItems.isEmpty
+                                    ? Column(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/NoItem.png',
+                                            width: 400,
+                                            height: 400,
                                           ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16),
+                                            child: Text(
+                                              "You haven't placed any order yet",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          SizedBox(
+                                            width: 150,
+                                            child: MyButton(
+                                              text: 'Order Now',
+                                              onTap: (_) {
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  'product',
+                                                  arguments: {
+                                                    'showBackButton': true,
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    : SlidableAutoCloseBehavior(
+                                        child: ListView.separated(
+                                          shrinkWrap: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          separatorBuilder: (context, index) =>
+                                              const SizedBox(height: 20),
+                                          itemCount: cartItems.length,
+                                          itemBuilder: (context, index) {
+                                            final itemCart = cartItems[index];
+                                            return Slidable(
+                                              key: ValueKey(
+                                                  itemCart.productVariantId),
+                                              closeOnScroll: true,
+                                              endActionPane: ActionPane(
+                                                motion: const ScrollMotion(),
+                                                children: [
+                                                  CustomSlidableAction(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            16),
+                                                    onPressed: (_) => {
+                                                      cartProvider
+                                                          .handleDeleteToCart(
+                                                              itemCart
+                                                                  .productVariantId),
+                                                      showCustomSnackBar(
+                                                          context,
+                                                          'Delete product from cart successfully',
+                                                          type: SnackBarType
+                                                              .success)
+                                                    },
+                                                    backgroundColor:
+                                                        AppColors.pink,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: const [
+                                                        Icon(
+                                                            Icons
+                                                                .delete_outline,
+                                                            color:
+                                                                AppColors.red,
+                                                            size: 28),
+                                                        Text(
+                                                          'Remove',
+                                                          style: TextStyle(
+                                                            color:
+                                                                AppColors.red,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: CartItemWidget(
+                                                  itemCart: itemCart,
+                                                  onQuantityChanged:
+                                                      (quantity) {
+                                                    setState(() {});
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ),
-                                      if (!Responsive.isMobile(context))
-                                        Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 40),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 30, vertical: 20),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black.withAlpha(10),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: ConstrainedBox(
-                                            constraints: const BoxConstraints(
-                                              maxWidth: 900,
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  child:
-                                                      _buildShippingOptions(),
-                                                ),
-                                                Flexible(
-                                                  child: SizedBox(
-                                                    width: 250,
-                                                    child: _buildSummary(
-                                                        cartItems),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                            if (!Responsive.isMobile(context) &&
+                                cartItems.isNotEmpty)
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 40),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 20),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withAlpha(10),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 900,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        child: _buildShippingOptions(),
+                                      ),
+                                      Flexible(
+                                        child: SizedBox(
+                                          width: 250,
+                                          child: _buildSummary(cartItems),
                                         ),
-                                      if (!Responsive.isMobile(context))
-                                        FooterWidget()
+                                      ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
+                            SizedBox(
+                              height: 20,
                             ),
-                    ],
-                  ),
-                  if (cartProvider.isLoading)
-                    Container(
-                      color: Colors.white.withAlpha(200), // nền mờ che nội dung
-                      alignment: Alignment.center,
-                      child: const CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
+                            if (!Responsive.isMobile(context)) FooterWidget()
+                          ],
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               ),
               bottomNavigationBar:

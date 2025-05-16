@@ -72,8 +72,8 @@ class ProductForCartModel {
       productVariantId: map['product_variant_id'] as String,
       productVariantName: map['product_variant_name'] as String,
       quantity: map['quantity'] as int,
-      unitPrice: map['unit_price'] as double,
-      discount: map['discount'] as double,
+      unitPrice: (map['unit_price'] as num).toDouble(),
+      discount: (map['discount'] as num).toDouble(),
       images: ProductImage.fromMap(map['images'] as Map<String, dynamic>),
     );
   }

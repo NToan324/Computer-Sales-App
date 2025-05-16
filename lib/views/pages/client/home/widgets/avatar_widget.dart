@@ -122,6 +122,7 @@ class AvatarWidget extends StatelessWidget {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('accessToken');
         await prefs.remove('user');
+        await prefs.remove('cart');
         await prefs.remove('isCartSynced');
         if (context.mounted) {
           final userProvider =

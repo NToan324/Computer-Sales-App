@@ -17,12 +17,16 @@ class CartProvider with ChangeNotifier {
 
   Future<void> getCartByUserId() async {
     isLoading = true;
+    notifyListeners();
+
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken');
     cartItems.clear();
 
     if (token == null) {
       await _loadLocalCart();
+      isLoading = false;
+      notifyListeners();
     } else {
       try {
         final isCartSynced = prefs.getBool('isCartSynced') ?? false;
@@ -41,13 +45,12 @@ class CartProvider with ChangeNotifier {
               quantity: quantity,
             );
           }).toList();
-
           await Future.wait(addToCartFutures);
-
           await prefs.setBool('isCartSynced', true);
         }
 
         await Future.delayed(Duration(milliseconds: 1000));
+
         final response = await cartService.getCartByUserId();
 
         for (var item in response.items) {
@@ -74,6 +77,7 @@ class CartProvider with ChangeNotifier {
         await prefs.setStringList('cart', simpleCartItems);
       } catch (e) {
         errorMessage = 'Error fetching cart: $e';
+        print('Error fetching cart: $e');
       } finally {
         isLoading = false;
         notifyListeners();
@@ -273,7 +277,6 @@ class CartProvider with ChangeNotifier {
             ?.map((item) => jsonDecode(item) as Map<String, dynamic>)
             .toList() ??
         [];
-
     for (var item in productVariantItems) {
       final productVariantId = item['productVariantId'];
       final product =

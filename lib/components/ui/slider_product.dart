@@ -121,7 +121,10 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
                                     : null,
                               ),
                               child: FadeInNetworkImage(
-                                imageUrl: widget.imagesUrl[index],
+                                imageUrl: (widget.imagesUrl[index].isNotEmpty &&
+                                        widget.imagesUrl[index].isNotEmpty)
+                                    ? widget.imagesUrl[index]
+                                    : 'https://placehold.co/600x400.png',
                                 fit: BoxFit.cover,
                               ),
                             ),

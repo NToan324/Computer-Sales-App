@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:computer_sales_app/services/user.service.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier {
   String? _id;
@@ -14,6 +18,18 @@ class UserProvider with ChangeNotifier {
   String? get role => _role;
   String? get address => _address;
   int? get point => _point;
+
+  final userService = UserService();
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? userJson = prefs.getString('user');
+    if (userJson != null) {
+      Map<String, dynamic> userMap = jsonDecode(userJson);
+      setUser(userMap);
+    }
+  }
 
   void setUser(Map<String, dynamic> user) {
     _id = user['id'];

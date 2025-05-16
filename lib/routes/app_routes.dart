@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/admin/admin_screen.dart';
 import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_view.dart';
 import 'package:computer_sales_app/views/pages/client/cart/cart_view.dart';
-import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/verifyotp_view.dart';
