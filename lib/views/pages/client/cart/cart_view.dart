@@ -139,11 +139,11 @@ class _CartViewState extends State<CartView> {
     );
   }
 
-  Widget _buildSummary(List<CartModel> cartItems) {
+  Widget _buildSummary(List<ProductForCartModel> cartItems) {
     double calculateSubTotal() {
       double subTotal = 0;
       for (var item in cartItems) {
-        subTotal += item.items.unitPrice * item.items.quantity;
+        subTotal += item.unitPrice * item.quantity;
       }
       return subTotal;
     }
@@ -327,7 +327,7 @@ class _CartViewState extends State<CartView> {
                                               final itemCart = cartItems[index];
                                               return Slidable(
                                                 key: ValueKey(itemCart
-                                                    .items.productVariantId),
+                                                    .productVariantId),
                                                 closeOnScroll: true,
                                                 endActionPane: ActionPane(
                                                   motion: const ScrollMotion(),
@@ -339,7 +339,7 @@ class _CartViewState extends State<CartView> {
                                                       onPressed: (_) => {
                                                         cartProvider
                                                             .handleDeleteToCart(
-                                                                itemCart.items
+                                                                itemCart
                                                                     .productVariantId),
                                                         showCustomSnackBar(
                                                             context,

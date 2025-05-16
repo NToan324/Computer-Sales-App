@@ -1,3 +1,4 @@
+import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/admin/admin_screen.dart';
 import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_view.dart';
@@ -35,7 +36,7 @@ class AppRoutes {
     login: (context) => LoginView(),
     verifyOtp: (context) => VerifyOtpView(),
     changePassword: (context) => CreateNewPasswordView(),
-    home: (context) => HomeView(),
+    home: (context) => BottomNavigationBarCustom(),
     product: (context) => ProductPageView(),
     productDetails: (context) => ProductDetailsView(
           productId: '',

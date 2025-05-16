@@ -39,17 +39,18 @@ class AvatarWidget extends StatelessWidget {
                     )
                   : SizedBox(),
               CartWidget(),
-              // Sử dụng PopupMenuButton để hiển thị menu khi nhấp vào avatar
               PopupMenuButton<String>(
                 color: Colors.white,
                 onSelected: (value) {
                   _handleMenuSelection(value, context);
                 },
                 offset: Offset(
-                    0, 50), // Điều chỉnh vị trí của menu (dịch xuống dưới)
+                  0,
+                  50,
+                ),
                 itemBuilder: (BuildContext context) {
                   return [
-                    if (userId != null)
+                    if (userId != null && Responsive.isDesktop(context))
                       PopupMenuItem<String>(
                         value: 'profile',
                         child: Row(
@@ -100,11 +101,9 @@ class AvatarWidget extends StatelessWidget {
     );
   }
 
-  // Xử lý sự kiện khi người dùng chọn một tùy chọn trong menu
   void _handleMenuSelection(String value, BuildContext context) async {
     switch (value) {
       case 'profile':
-        // Điều hướng đến trang thông tin cá nhân
         Navigator.of(context).pushNamed('profile');
         break;
       case 'home':
@@ -115,18 +114,15 @@ class AvatarWidget extends StatelessWidget {
           ),
           (Route<dynamic> route) => false,
         );
-        // Điều hướng đến trang thông báo
         break;
       case 'login':
         Navigator.of(context).pushNamed('login');
-        // Điều hướng đến trang đăng nhập
         break;
       case 'logout':
-        // Xử lý đăng xuất
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('accessToken');
         await prefs.remove('user');
-        // Xóa thông tin người dùng khỏi provider
+        await prefs.remove('isCartSynced');
         if (context.mounted) {
           final userProvider =
               Provider.of<UserProvider>(context, listen: false);

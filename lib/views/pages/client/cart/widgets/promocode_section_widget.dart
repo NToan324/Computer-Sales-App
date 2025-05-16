@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class PromocodeSectionWidget extends StatefulWidget {
   const PromocodeSectionWidget({super.key, required this.cartItems});
-  final List<CartModel> cartItems;
+  final List<ProductForCartModel> cartItems;
 
   @override
   State<PromocodeSectionWidget> createState() => _PromocodeSectionWidgetState();
@@ -15,7 +15,7 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
   final TextEditingController _promoCodeController = TextEditingController();
 
   double get subtotal => widget.cartItems
-      .fold(0, (sum, item) => sum + item.items.unitPrice * item.items.quantity);
+      .fold(0, (sum, item) => sum + item.unitPrice * item.quantity);
 
   double get deliveryFee => 5.0;
   // Example delivery fee

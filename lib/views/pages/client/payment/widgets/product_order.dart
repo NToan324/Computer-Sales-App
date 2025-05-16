@@ -4,7 +4,7 @@ import 'package:computer_sales_app/models/cart.model.dart';
 import 'package:flutter/material.dart';
 
 class ProductOrdered extends StatelessWidget {
-  final CartModel item;
+  final ProductForCartModel item;
 
   const ProductOrdered({
     super.key,
@@ -33,7 +33,7 @@ class ProductOrdered extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       image: DecorationImage(
-                        image: NetworkImage(item.items.images.url),
+                        image: NetworkImage(item.images.url),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -44,7 +44,7 @@ class ProductOrdered extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.items.productVariantName,
+                          item.productVariantName,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -55,7 +55,7 @@ class ProductOrdered extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          formatMoney(item.items.unitPrice),
+                          formatMoney(item.unitPrice),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.black,
@@ -72,7 +72,7 @@ class ProductOrdered extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Text(
-                'x${item.items.quantity}',
+                'x${item.quantity}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
@@ -86,9 +86,9 @@ class ProductOrdered extends StatelessWidget {
               flex: 1,
               child: Text(
                 formatMoney(
-                  (item.items.unitPrice +
-                          (item.items.unitPrice * item.items.discount)) *
-                      item.items.quantity,
+                  (item.unitPrice +
+                          (item.unitPrice * item.discount)) *
+                      item.quantity,
                 ),
                 textAlign: TextAlign.end,
                 style: const TextStyle(

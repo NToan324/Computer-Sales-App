@@ -6,7 +6,7 @@ import 'package:computer_sales_app/models/product.model.dart';
 class CartModel {
   String? id;
   String? userId;
-  ProductForCartModel items;
+  List<ProductForCartModel> items;
 
   CartModel({
     this.id,
@@ -18,7 +18,7 @@ class CartModel {
     return <String, dynamic>{
       'id': id,
       'userId': userId,
-      'items': items.toMap(),
+      'items': items.map((item) => item.toMap()).toList(),
     };
   }
 
@@ -26,7 +26,10 @@ class CartModel {
     return CartModel(
       id: map['_id'] as String,
       userId: map['user_id'] as String,
-      items: ProductForCartModel.fromMap(map['items'] as Map<String, dynamic>),
+      items: (map['items'] as List<dynamic>)
+          .map((item) =>
+              ProductForCartModel.fromMap(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 

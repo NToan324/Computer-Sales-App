@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
 import 'package:computer_sales_app/components/custom/my_text_field.dart';
 import 'package:computer_sales_app/provider/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,10 @@ class _LoginViewState extends State<LoginView> {
       if (mounted) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.setUser(response['user']);
-        Navigator.pushReplacementNamed(context, 'home');
+        Navigator.pushReplacementNamed(
+          context,
+          'home',
+        );
       }
       // Navigate to the home screen
     } on BadRequestException catch (e) {

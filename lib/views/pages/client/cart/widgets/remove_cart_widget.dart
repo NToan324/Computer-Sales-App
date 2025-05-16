@@ -11,7 +11,7 @@ class RemoveCartWidget extends StatefulWidget {
       required this.quantityToRemove,
       required this.removeItem});
 
-  final List<CartModel> cartItems;
+  final List<ProductForCartModel> cartItems;
   final int? itemToRemove;
   final VoidCallback cancelRemoveItem;
   late int quantityToRemove;
