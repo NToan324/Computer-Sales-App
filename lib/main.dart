@@ -1,3 +1,5 @@
+import 'package:computer_sales_app/provider/brand_provider.dart';
+import 'package:computer_sales_app/provider/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:computer_sales_app/provider/cart_provider.dart';
@@ -12,6 +14,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => BrandProvider())
       ],
       child: const MyApp(),
     ),

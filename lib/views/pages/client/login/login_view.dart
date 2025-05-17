@@ -58,40 +58,64 @@ class _LoginViewState extends State<LoginView> {
     }
 
     if (password.length < 6) {
-      _focusAndShowError(
-          _passwordFocus, 'Password must be at least 6 characters');
+      _focusAndShowError(_passwordFocus, 'Password must be at least 6 characters');
       return;
     }
+
     setState(() => _loading = true);
     final authService = AuthService();
 
     try {
-      final response = await authService.login(email, password);
+      final response = await authService.post('auth/login', {
+        'email': email,
+        'password': password,
+      });
+      print('Raw login response: $response'); // Debug log
+      if (response == null || response['accessToken'] == null || response['user'] == null) {
+        throw BadRequestException('Login failed: Invalid response format');
+      }
+      final mappedResponse = {
+        'access_token': response['accessToken'],
+        'user': response['user'],
+      };
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('access_token', response['access_token']);
-      await prefs.setString('user', jsonEncode(response['user']));
-      //Store user in provider
+      await prefs.setString('access_token', mappedResponse['access_token']);
+      await prefs.setString('user', jsonEncode(mappedResponse['user']));
       if (mounted) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        userProvider.setUser(response['user']);
-        Navigator.pushReplacementNamed(context, 'home');
+        userProvider.setUser(mappedResponse['user']);
+        final role = mappedResponse['user']['role']?.toString().toUpperCase();
+        if (role == 'ADMIN') {
+          Navigator.pushReplacementNamed(context, 'admin');
+        } else {
+          Navigator.pushReplacementNamed(context, 'home');
+        }
       }
-      // Navigate to the home screen
     } on BadRequestException catch (e) {
       if (mounted) {
         showCustomSnackBar(context, e.message, type: SnackBarType.error);
+      }
+    } catch (e) {
+      if (mounted) {
+        showCustomSnackBar(context, 'Unexpected error: $e', type: SnackBarType.error);
       }
     } finally {
       setState(() => _loading = false);
     }
   }
-
   Future<void> _isLogin() async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('access_token');
-    if (accessToken != null) {
+    final userJson = prefs.getString('user');
+    if (accessToken != null && userJson != null) {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, 'home');
+        final user = jsonDecode(userJson) as Map<String, dynamic>;
+        final userRole = user['role']?.toString().toUpperCase();
+        if (userRole == 'ADMIN') {
+          Navigator.pushReplacementNamed(context, 'admin');
+        } else {
+          Navigator.pushReplacementNamed(context, 'home');
+        }
       }
     }
   }

@@ -1,4 +1,3 @@
-// lib/sidebar.dart
 import 'package:flutter/material.dart';
 
 class CustomSidebar extends StatelessWidget {
@@ -29,9 +28,6 @@ class CustomSidebar extends StatelessWidget {
                   children: [
                     const CircleAvatar(
                       radius: 25,
-                      backgroundImage: NetworkImage(
-                        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-                      ),
                     ),
                     const SizedBox(width: 10),
                     Column(
@@ -62,12 +58,7 @@ class CustomSidebar extends StatelessWidget {
               onTap: () => onMenuTap("Dashboard"),
             ),
             const SizedBox(height: 10),
-            _buildMenuItem(
-              icon: Icons.local_offer,
-              title: "Product",
-              isSelected: selectedMenu == "Product",
-              onTap: () => onMenuTap("Product"),
-            ),
+            _buildProductDropdown(),
             const SizedBox(height: 10),
             _buildMenuItem(
               icon: Icons.person,
@@ -122,34 +113,131 @@ class CustomSidebar extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      SizedBox(
-        width: 220,
-        child: ListTile(
-          leading: Icon(
-            icon,
-            color: isSelected ? Colors.white : Colors.black54,
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black87,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 14,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        SizedBox(
+          width: 220,
+          child: ListTile(
+            leading: Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.black54,
             ),
+            title: Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black87,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+            tileColor: isSelected ? Colors.orange : null,
+            shape: isSelected
+                ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.horizontal(
+                left: Radius.circular(30), // Bo góc bên trái
+                right: Radius.circular(0), // Giữ nguyên bên phải
+              ),
+            )
+                : null,
+            onTap: onTap,
           ),
-          tileColor: isSelected ? Colors.orange : null,
-          shape: isSelected
-              ? RoundedRectangleBorder(
-                  borderRadius: BorderRadius.horizontal(
-                    left: Radius.circular(30), // Bo góc bên trái
-                    right: Radius.circular(0), // Giữ nguyên bên phải
-                  ),
-                )
-              : null,
-          onTap: onTap,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductDropdown() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        SizedBox(
+          width: 220,
+          child: ExpansionTile(
+            leading: const Icon(
+              Icons.local_offer,
+              color: Colors.black54,
+            ),
+            title: const Text(
+              "Product",
+              style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+            tilePadding: EdgeInsets.symmetric(horizontal: 16),
+            backgroundColor: Colors.transparent,
+            collapsedBackgroundColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.horizontal(
+                left: Radius.circular(30),
+                right: Radius.circular(0),
+              ),
+            ),
+            collapsedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.horizontal(
+                left: Radius.circular(30),
+                right: Radius.circular(0),
+              ),
+            ),
+            children: [
+              _buildSubMenuItem(
+                title: "Product",
+                isSelected: selectedMenu == "Product",
+                onTap: () => onMenuTap("Product"),
+              ),
+              _buildSubMenuItem(
+                title: "Product Discount",
+                isSelected: selectedMenu == "Product Discount",
+                onTap: () => onMenuTap("Product Discount"),
+              ),
+              _buildSubMenuItem(
+                title: "Category",
+                isSelected: selectedMenu == "Category",
+                onTap: () => onMenuTap("Category"),
+              ),
+              _buildSubMenuItem(
+                title: "Brand",
+                isSelected: selectedMenu == "Brand",
+                onTap: () => onMenuTap("Brand"),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubMenuItem({
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(
+        Icons.list,
+        color: isSelected ? Colors.white : Colors.black54,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.black87,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          fontSize: 14,
         ),
       ),
-    ]);
+      contentPadding: EdgeInsets.only(left: 30), // Thụt vào để hiển thị là mục con
+      tileColor: isSelected ? Colors.orange : null,
+      shape: isSelected
+          ? RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(
+          left: Radius.circular(30), // Bo góc bên trái
+          right: Radius.circular(0), // Giữ nguyên bên phải
+        ),
+      )
+          : null,
+      onTap: onTap,
+    );
   }
 }

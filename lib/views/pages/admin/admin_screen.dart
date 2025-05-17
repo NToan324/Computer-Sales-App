@@ -1,4 +1,6 @@
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/views/pages/admin/brand/brand_screen.dart';
+import 'package:computer_sales_app/views/pages/admin/category/category_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/admin/dashboard/dashboard_screen.dart';
 import 'package:computer_sales_app/views/pages/admin/customer/customer_screen.dart';
@@ -9,6 +11,7 @@ import 'package:computer_sales_app/views/pages/admin/coupon/coupon_screen.dart';
 import 'package:computer_sales_app/views/pages/admin/support/support_screen.dart';
 import 'package:computer_sales_app/components/custom/sidebar.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -20,8 +23,31 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   String _selectedMenu = "Dashboard";
   Widget _currentScreen = const DashboardScreen();
-  bool _hideAppBar = false; // Trạng thái để ẩn AppBar trên mobile
+  bool _hideAppBar = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _checkToken();
+  }
+
+  Future<void> _checkToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('access_token');
+    if (accessToken == null) {
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, 'login');
+      }
+    }
+  }
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('access_token');
+    await prefs.remove('user');
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, 'login');
+    }
+  }
   void _onMenuTap(String menu) {
     setState(() {
       _selectedMenu = menu;
@@ -33,6 +59,10 @@ class _AdminScreenState extends State<AdminScreen> {
         case "Product":
           _currentScreen = const ProductManagementScreen();
           break;
+        case "Category":
+          _currentScreen = CategoryManagementScreen();
+        case "Brand":
+          _currentScreen = BrandManagementScreen();
         case "Customer":
           _currentScreen = CustomerManagementScreen();
           break;
@@ -55,7 +85,7 @@ class _AdminScreenState extends State<AdminScreen> {
           );
           break;
         case "Logout":
-          Navigator.pushReplacementNamed(context, 'login');
+          _logout();
           return;
         default:
           _currentScreen = const DashboardScreen();

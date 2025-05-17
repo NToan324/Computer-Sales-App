@@ -1,12 +1,39 @@
+import 'dart:io';
+
 import 'package:computer_sales_app/models/product.model.dart';
 import 'package:computer_sales_app/services/base_client.dart';
+import 'package:dio/dio.dart';
 
 class ProductService extends BaseClient {
   ProductService() : super();
 
+  //Upload ảnh sản phẩm
+  Future<Map<String, String>> uploadProductImage(dynamic image) async {
+    try {
+      FormData formData;
+      if (image is File) {
+        formData = FormData.fromMap({
+          'file': await MultipartFile.fromFile(image.path, filename: 'product_image.jpg'),
+        });
+      } else {
+        formData = FormData.fromMap({
+          'file': MultipartFile.fromBytes(image as List<int>, filename: 'product_image.jpg'),
+        });
+      }
+
+      final res = await upload('product/upload', formData);
+      return {
+        'url': res['url'] as String,
+        'publicId': res['public_id'] as String,
+      };
+    } catch (e) {
+      print('Upload product image error: $e');
+      rethrow;
+    }
+  }
   // Lấy danh sách sản phẩm (basic)
   Future<List<dynamic>> getProducts() async {
-    final res = await get('products');
+    final res = await get('product');
     return res['data'];
   }
 
@@ -19,7 +46,7 @@ class ProductService extends BaseClient {
   // Tạo sản phẩm mới
   Future<Map<String, dynamic>> createProduct(
       Map<String, dynamic> productData) async {
-    final res = await post('products', productData);
+    final res = await post('product', productData);
     return res['data'];
   }
 

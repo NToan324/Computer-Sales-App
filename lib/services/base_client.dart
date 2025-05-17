@@ -124,7 +124,26 @@ class BaseClient {
       return _handleDioException(e);
     }
   }
-
+  // Trong BaseClient
+  Future<dynamic> upload(String api, FormData data) async {
+    final uri = Uri.parse('$baseUrl$api');
+    try {
+      final options = Options(
+        contentType: Headers.multipartFormDataContentType,
+        headers: {
+          'Accept': 'application/json', // Giữ Accept nếu cần
+        },
+      );
+      final response = await dio.post(uri.toString(), data: data, options: options);
+      return response.data;
+    } on SocketException {
+      throw FetchDataException('No Internet connection', api);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API timeout', uri.toString());
+    } on DioException catch (e) {
+      return _handleDioException(e);
+    }
+  }
   // Xử lý phản hồi dựa trên mã trạng thái
   dynamic _processResponse(Response response) {
     switch (response.statusCode) {

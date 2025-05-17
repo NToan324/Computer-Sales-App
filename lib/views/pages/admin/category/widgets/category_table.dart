@@ -1,29 +1,28 @@
-import 'package:computer_sales_app/models/product_entity.dart';
-import 'package:computer_sales_app/provider/product_provider.dart';
+import 'package:computer_sales_app/models/category.model.dart';
+import 'package:computer_sales_app/provider/category_provider.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../../models/product.model.dart';
-import 'product_form.dart';
+import 'category_form.dart';
 
-class ProductTable extends StatefulWidget {
-  final List<ProductEntity> products;
+class CategoryTable extends StatefulWidget {
+  final List<CategoryModel> categories;
 
-  const ProductTable({super.key, required this.products});
+  const CategoryTable({super.key, required this.categories});
 
   @override
-  State<ProductTable> createState() => _ProductTableState();
+  State<CategoryTable> createState() => _CategoryTableState();
 }
 
-class _ProductTableState extends State<ProductTable> {
+class _CategoryTableState extends State<CategoryTable> {
   final TextEditingController _searchController = TextEditingController();
 
-  List<ProductEntity> get filteredProducts {
+  List<CategoryModel> get filteredCategories {
     if (_searchController.text.isEmpty) {
-      return widget.products;
+      return widget.categories;
     } else {
-      return widget.products.where((product) {
-        return product.productName
+      return widget.categories.where((category) {
+        return category.name
             .toLowerCase()
             .contains(_searchController.text.toLowerCase());
       }).toList();
@@ -34,21 +33,21 @@ class _ProductTableState extends State<ProductTable> {
     switch (status) {
       case 'Active':
         return Colors.green;
-      case 'Disabled':
+      case 'Inactive':
         return Colors.red;
       default:
         return Colors.grey;
     }
   }
 
-  void _showProductForm(ProductEntity product) {
+  void _showCategoryForm(CategoryModel category) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           title: Text(
-            product.productName,
+            category.name,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 20,
@@ -66,42 +65,35 @@ class _ProductTableState extends State<ProductTable> {
                 floatingLabelStyle: TextStyle(color: Colors.orange),
               ),
             ),
-            child: ProductForm(
+            child: CategoryForm(
               buttonLabel: 'Save',
-              initialProduct: {
-                '_id': product.id.toString(),
-                'name': product.productName,
-                'stock': 10.toString(),
-                'category': product.categoryId,
-                'brand': product.brandId,
-                'product_image': product.productImage?.toMap(),
-                'disabled': product.isActive == false,
-                'variants': product.variants.map((variant) => variant.toMap()).toList(),
+              initialCategory: {
+                '_id': category.id,
+                'name': category.name,
+                'category_image': category.image?.toMap(),
+                'isActive': category.isActive,
               },
-              onSubmit: (updatedProductData) {
-                setState(() {
-                  final index = widget.products.indexOf(product);
-                  if (index != -1) {
-                    widget.products[index] = ProductEntity(
-                      id: product.id,
-                      productName: updatedProductData['name'],
-                      isActive: !updatedProductData['disabled'],
-                      categoryId: updatedProductData['category'] ?? product.categoryId,
-                      brandId: updatedProductData['brand'] ?? product.brandId,
-                      productImage: product.productImage, // Sử dụng ProductImage
-                      variants: (updatedProductData['variants'] as List<dynamic>)
-                          .map((item) => ProductModel.fromMap(item as Map<String, dynamic>))
-                          .toList(),
-                    );
-                  }
-                });
-                Navigator.of(context).pop();
+              onSubmit: (updatedCategoryData) async {
+                try {
+                  await Provider.of<CategoryProvider>(context, listen: false)
+                      .updateCategory(category.id, updatedCategoryData);
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update category: $e')),
+                  );
+                }
               },
-              onDelete: () {
-                setState(() {
-                  widget.products.remove(product);
-                });
-                Navigator.of(context).pop();
+              onDelete: () async {
+                try {
+                  await Provider.of<CategoryProvider>(context, listen: false)
+                      .deleteCategory(category.id);
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to delete category: $e')),
+                  );
+                }
               },
             ),
           ),
@@ -127,78 +119,61 @@ class _ProductTableState extends State<ProductTable> {
     );
   }
 
-  TableRow buildProductRow(ProductEntity product, List<double> colWidths) {
+  TableRow buildCategoryRow(CategoryModel category, List<double> colWidths) {
     final isMobile = Responsive.isMobile(context);
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
 
     String getShortId(String id) {
       return id.length > 5 ? id.substring(0, 5) : id;
     }
 
-    String categoryName = productProvider.categories.isNotEmpty
-        ? (productProvider.getNameCategoryById([product.categoryId]).firstOrNull ?? 'Unknown')
-        : 'Loading...';
-    String brandName = productProvider.brands.isNotEmpty
-        ? (productProvider.getNameBrandById([product.brandId]).firstOrNull ?? 'Unknown')
-        : 'Loading...';
-
-    final totalStock = product.variants.isNotEmpty
-        ? product.variants
-        .map((variant) => variant.quantity)
-        .reduce((a, b) => a + b)
-        .toString()
-        : '0';
-
     return TableRow(
       children: isMobile
           ? [
         InkWell(
-          onTap: () => _showProductForm(product),
-          child: cellText(getShortId(product.id.toString()), colWidths[0]),
+          onTap: () => _showCategoryForm(category),
+          child: cellText(getShortId(category.id), colWidths[0]),
         ),
         InkWell(
-          onTap: () => _showProductForm(product),
-          child: productCell(product, colWidths[1]),
+          onTap: () => _showCategoryForm(category),
+          child: categoryCell(category, colWidths[1]),
         ),
         InkWell(
-          onTap: () => _showProductForm(product),
-          child: cellText(
-              product.isActive ? 'Active' : 'Disabled', colWidths[2]),
+          onTap: () => _showCategoryForm(category),
+          child: Container(
+            width: colWidths[2],
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Chip(
+              label: Text(
+                category.isActive ? 'Active' : 'Inactive',
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor:
+              _getStatusColor(category.isActive ? 'Active' : 'Inactive'),
+            ),
+          ),
         ),
       ]
           : [
         InkWell(
-          onTap: () => _showProductForm(product),
-          child: cellText(getShortId(product.id.toString()), colWidths[0]),
+          onTap: () => _showCategoryForm(category),
+          child: cellText(getShortId(category.id), colWidths[0]),
         ),
         InkWell(
-          onTap: () => _showProductForm(product),
-          child: productCell(product, colWidths[1]),
+          onTap: () => _showCategoryForm(category),
+          child: categoryCell(category, colWidths[1]),
         ),
         InkWell(
-          onTap: () => _showProductForm(product),
-          child: cellText(totalStock, colWidths[2]),
-        ),
-        InkWell(
-          onTap: () => _showProductForm(product),
-          child: cellText(categoryName, colWidths[3]),
-        ),
-        InkWell(
-          onTap: () => _showProductForm(product),
-          child: cellText(brandName, colWidths[4]),
-        ),
-        InkWell(
-          onTap: () => _showProductForm(product),
+          onTap: () => _showCategoryForm(category),
           child: Container(
-            width: colWidths[5],
+            width: colWidths[2],
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Chip(
               label: Text(
-                product.isActive ? 'Active' : 'Disabled',
+                category.isActive ? 'Active' : 'Inactive',
                 style: const TextStyle(color: Colors.white),
               ),
               backgroundColor:
-              _getStatusColor(product.isActive ? 'Active' : 'Disabled'),
+              _getStatusColor(category.isActive ? 'Active' : 'Inactive'),
             ),
           ),
         ),
@@ -218,12 +193,12 @@ class _ProductTableState extends State<ProductTable> {
     );
   }
 
-  Widget productCell(ProductEntity product, double width) {
+  Widget categoryCell(CategoryModel category, double width) {
     String getShortId(String id) {
       return id.length > 5 ? id.substring(0, 5) : id;
     }
 
-    print('Product ${product.id} image URL: ${product.productImage?.url}'); // Debug
+    print('Category ${category.id} image URL: ${category.image?.url}'); // Debug
 
     return Container(
       width: width,
@@ -236,12 +211,12 @@ class _ProductTableState extends State<ProductTable> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: product.productImage?.url != null && product.productImage!.url!.isNotEmpty
+            child: category.image?.url != null && category.image!.url.isNotEmpty
                 ? Image.network(
-              product.productImage!.url!, // Sử dụng ! vì đã kiểm tra null
+              category.image!.url,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
-                print('Image.network error for product ${product.id}: $error');
+                print('Image.network error for category ${category.id}: $error');
                 return Container(
                   color: Colors.grey[300],
                   child: const Center(child: Text("No Image")),
@@ -259,7 +234,7 @@ class _ProductTableState extends State<ProductTable> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  product.productName,
+                  category.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -268,7 +243,7 @@ class _ProductTableState extends State<ProductTable> {
                   maxLines: 2,
                 ),
                 Text(
-                  'ID: ${getShortId(product.id)}',
+                  'ID: ${getShortId(category.id)}',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -292,19 +267,16 @@ class _ProductTableState extends State<ProductTable> {
         final tableWidth = constraints.maxWidth;
 
         final List<double> colWidths = isMobile
-            ? [tableWidth * 0.08, tableWidth * 0.55, tableWidth * 0.25]
+            ? [tableWidth * 0.15, tableWidth * 0.50, tableWidth * 0.25]
             : [
-          tableWidth * 0.08,
-          tableWidth * 0.35,
-          tableWidth * 0.10,
           tableWidth * 0.15,
+          tableWidth * 0.65,
           tableWidth * 0.15,
-          tableWidth * 0.12,
         ];
 
         final headers = isMobile
-            ? ['ID', 'Product', 'Status']
-            : ['ID', 'Product', 'Stock', 'Category', 'Brand', 'Status'];
+            ? ['ID', 'Category', 'Status']
+            : ['ID', 'Category', 'Status'];
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -327,7 +299,7 @@ class _ProductTableState extends State<ProductTable> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Product List',
+                    'Category List',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -370,8 +342,8 @@ class _ProductTableState extends State<ProductTable> {
                     border: TableBorder.all(color: Colors.grey.shade300),
                     children: [
                       buildHeaderRow(headers, colWidths),
-                      ...filteredProducts
-                          .map((product) => buildProductRow(product, colWidths)),
+                      ...filteredCategories
+                          .map((category) => buildCategoryRow(category, colWidths)),
                     ],
                   ),
                 ),

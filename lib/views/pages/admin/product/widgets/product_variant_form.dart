@@ -27,7 +27,7 @@ class _ProductVariantFormState extends State<ProductVariantForm> {
   late TextEditingController priceController;
   late TextEditingController discountController;
   late TextEditingController quantityController;
-  List<dynamic> images = [];
+  List<dynamic> images = []; // Lưu trữ Uint8List, File, hoặc Map (từ API)
   bool isActive = true;
 
   final ImagePicker _picker = ImagePicker();
@@ -36,30 +36,55 @@ class _ProductVariantFormState extends State<ProductVariantForm> {
   void initState() {
     super.initState();
     final initialVariant = widget.initialVariant;
-    variantNameController = TextEditingController(text: initialVariant?['variant_name'] ?? '');
-    variantColorController = TextEditingController(text: initialVariant?['variant_color'] ?? '');
-    variantDescriptionController = TextEditingController(text: initialVariant?['variant_description'] ?? '');
+    print('Initial variant: $initialVariant'); // Debug
+    variantNameController = TextEditingController(text: initialVariant?['variantName'] ?? '');
+    variantColorController = TextEditingController(text: initialVariant?['variantColor'] ?? '');
+    variantDescriptionController = TextEditingController(text: initialVariant?['variantDescription'] ?? '');
     priceController = TextEditingController(text: initialVariant?['price']?.toString() ?? '');
     discountController = TextEditingController(text: initialVariant?['discount']?.toString() ?? '0');
     quantityController = TextEditingController(text: initialVariant?['quantity']?.toString() ?? '');
     isActive = initialVariant?['isActive'] ?? true;
-    images = List<dynamic>.from(initialVariant?['images'] ?? []);
+
+    // Xử lý images từ initialVariant
+    if (initialVariant?['images'] != null) {
+      final imageList = initialVariant!['images'] as List;
+      images = imageList.map((img) {
+        if (img is Map<String, dynamic>) {
+          return img; // Đã là Map từ API
+        } else if (img is String) {
+          return {'url': img, 'publicId': ''}; // Chỉ có URL (từ form trước đó)
+        }
+        return {'url': '', 'publicId': ''}; // Placeholder
+      }).toList();
+    }
+  }
+
+  Future<Map<String, String>> _uploadImage(dynamic image) async {
+    // Giả lập API upload hình ảnh
+    // Trong thực tế, gửi Uint8List hoặc File lên server và nhận về url/publicId
+    await Future.delayed(Duration(seconds: 1)); // Giả lập thời gian upload
+    return {
+      'url': 'https://example.com/uploaded_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      'publicId': 'uploaded_${DateTime.now().millisecondsSinceEpoch}'
+    };
   }
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      setState(() {
-        if (kIsWeb) {
-          pickedFile.readAsBytes().then((bytes) {
-            setState(() {
-              images.add(bytes);
-            });
-          });
-        } else {
-          images.add(File(pickedFile.path));
-        }
-      });
+      if (kIsWeb) {
+        final bytes = await pickedFile.readAsBytes();
+        final uploadResult = await _uploadImage(bytes);
+        setState(() {
+          images.add(uploadResult); // Thêm Map với url và publicId
+        });
+      } else {
+        final file = File(pickedFile.path);
+        final uploadResult = await _uploadImage(file);
+        setState(() {
+          images.add(uploadResult); // Thêm Map với url và publicId
+        });
+      }
     }
   }
 
@@ -118,6 +143,9 @@ class _ProductVariantFormState extends State<ProductVariantForm> {
                 final discount = double.tryParse(value) ?? 0;
                 if (discount > 0.5) {
                   discountController.text = '0.5';
+                  discountController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: discountController.text.length),
+                  );
                 }
               },
             ),
@@ -131,10 +159,10 @@ class _ProductVariantFormState extends State<ProductVariantForm> {
                 border: OutlineInputBorder(),
               ),
             ),
-            if (widget.initialVariant != null && widget.initialVariant!['avarage_rating'] != null) ...[
+            if (widget.initialVariant != null && widget.initialVariant!['averageRating'] != null) ...[
               const SizedBox(height: 20),
               Text(
-                'Average Rating: ${widget.initialVariant!['avarage_rating']}',
+                'Average Rating: ${widget.initialVariant!['averageRating']}',
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
@@ -163,25 +191,26 @@ class _ProductVariantFormState extends State<ProductVariantForm> {
                   ...images.asMap().entries.map((entry) {
                     final index = entry.key;
                     final image = entry.value;
+                    String? imageUrl;
+                    if (image is Map<String, dynamic>) {
+                      imageUrl = image['url'] as String?;
+                    } else if (image is String) {
+                      imageUrl = image;
+                    }
                     return ListTile(
                       leading: SizedBox(
                         width: 50,
                         height: 50,
-                        child: kIsWeb
-                            ? Image.memory(
-                                image,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Text('Error');
-                                },
-                              )
-                            : Image.file(
-                                image,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Text('Error');
-                                },
-                              ),
+                        child: imageUrl != null
+                            ? Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            print('Image.network error: $error');
+                            return const Text('Error');
+                          },
+                        )
+                            : const Text('No Image'),
                       ),
                       title: Text('Image ${index + 1}'),
                       trailing: IconButton(
@@ -223,16 +252,17 @@ class _ProductVariantFormState extends State<ProductVariantForm> {
 
                   final variantData = {
                     'product_id': widget.initialProduct?['_id'] ?? '',
-                    'variant_name': variantNameController.text,
-                    'variant_color': variantColorController.text,
-                    'variant_description': variantDescriptionController.text,
+                    'variantName': variantNameController.text,
+                    'variantColor': variantColorController.text,
+                    'variantDescription': variantDescriptionController.text,
                     'price': double.tryParse(priceController.text) ?? 0.0,
                     'discount': double.tryParse(discountController.text) ?? 0.0,
                     'quantity': int.tryParse(quantityController.text) ?? 0,
-                    'images': images,
+                    'images': images, // Đã là List<Map> với url và publicId
                     'isActive': isActive,
-                    if (widget.initialVariant != null) 'avarage_rating': widget.initialVariant!['avarage_rating'],
+                    if (widget.initialVariant != null) 'averageRating': widget.initialVariant!['averageRating'],
                   };
+                  print('Submitted variantData: $variantData'); // Debug
                   widget.onSubmit(variantData);
                 },
                 style: ElevatedButton.styleFrom(
