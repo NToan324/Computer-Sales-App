@@ -12,7 +12,9 @@ import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:provider/provider.dart';
 
 class ProductListViewWidget extends StatefulWidget {
-  const ProductListViewWidget({super.key});
+  const ProductListViewWidget({
+    super.key,
+  });
 
   @override
   State<ProductListViewWidget> createState() => _ProductListViewWidgetState();
@@ -49,6 +51,7 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
     final products = provider.products;
     final totalPage = provider.totalPage;
     final currentPage = provider.page;
+
     return Column(
       children: [
         GridView.builder(
@@ -69,6 +72,7 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
                 ? Skeleton()
                 : ProductView(
                     id: variant?.id ?? '',
+                    categoryId: variant?.categoryId ?? '',
                     variantName: variant?.variantName ?? '',
                     images: (variant?.images as List<ProductImage>),
                     price: (variant?.price as double),
@@ -103,6 +107,7 @@ class ProductView extends StatelessWidget {
   final String variantDescription;
   final String averageRating;
   final String id;
+  final String categoryId;
 
   const ProductView({
     super.key,
@@ -112,12 +117,16 @@ class ProductView extends StatelessWidget {
     required this.price,
     required this.variantDescription,
     required this.averageRating,
+    required this.categoryId,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/product-details/$id'),
+      onTap: () =>
+          Navigator.pushNamed(context, '/product-details/$id', arguments: {
+        'categoryId': categoryId,
+      }),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -183,7 +192,7 @@ class ProductView extends StatelessWidget {
                     children: [
                       const Icon(Icons.star, size: 15, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(averageRating),
+                      Text(double.parse(averageRating).toStringAsFixed(1)),
                     ],
                   ),
                 ],

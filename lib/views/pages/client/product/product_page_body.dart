@@ -675,6 +675,7 @@ class _ProductListState extends State<ProductList> {
                 ? Skeleton()
                 : ProductView(
                     id: variant?.id ?? '',
+                    categoryId: variant?.categoryId ?? '',
                     variantName: variant?.variantName ?? '',
                     images: (variant?.images as List<ProductImage>),
                     price: (variant?.price as double),

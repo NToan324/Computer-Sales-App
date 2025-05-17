@@ -39,6 +39,7 @@ class AppRoutes {
     product: (context) => ProductPageView(),
     productDetails: (context) => ProductDetailsView(
           productId: '',
+          categoryId: '',
         ),
     chat: (context) => ChatView(),
     payment: (context) => PaymentView(),
@@ -61,8 +62,14 @@ class AppRoutes {
     if (settings.name != null &&
         settings.name!.startsWith('/product-details/')) {
       final id = settings.name!.split('/').last;
+
+      final args = settings.arguments as Map<String, dynamic>?;
+
       return MaterialPageRoute(
-        builder: (context) => ProductDetailsView(productId: id),
+        builder: (context) => ProductDetailsView(
+          productId: id,
+          categoryId: args?['categoryId'], // Lấy categoryId từ arguments
+        ),
       );
     }
 

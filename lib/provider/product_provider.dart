@@ -212,13 +212,14 @@ class ProductProvider with ChangeNotifier {
       limit: limit,
     );
 
+
     // Cập nhật danh sách filters để hiển thị ra giao diện
     final Set<String> combined = {
       if (minPrice != null && maxPrice != null) ...[
         '${formatMoney(minPrice)} - ${formatMoney(maxPrice)}'
       ],
       if (brandIds != null) ...getNameBrandById(brandIds),
-      if (categoryIds != null) ...getNamCatrgoryById(categoryIds),
+      if (categoryIds != null) ...getNamCategoryById(categoryIds),
       if (rating != null && rating.value != null) rating.label,
     };
 
@@ -261,7 +262,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   //Get name of category by id
-  List<String> getNamCatrgoryById(List<String> categoryIds) {
+  List<String> getNamCategoryById(List<String> categoryIds) {
     return categoryIds
         .map((categoryId) =>
             categories.firstWhere((category) => category.id == categoryId).name)
