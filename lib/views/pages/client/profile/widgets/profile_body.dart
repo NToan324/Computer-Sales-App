@@ -1,9 +1,11 @@
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/provider/user_provider.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/my_account.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/order_management.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/payment_management.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/support.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfileBody extends StatefulWidget {
   const ProfileBody({super.key});
@@ -24,10 +26,19 @@ class _ProfileBodyState extends State<ProfileBody> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.loadUserData();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final name = userProvider.name;
+    final point = userProvider.point;
+    final avatar = userProvider.avatarUrl;
+
     return Container(
       color: Colors.white,
       width: double.infinity,
@@ -65,24 +76,30 @@ class _ProfileBodyState extends State<ProfileBody> {
                         ),
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              AssetImage('assets/images/avatar.jpeg'),
+                          backgroundImage: avatar != null
+                              ? NetworkImage(avatar)
+                              : const AssetImage('assets/images/avatar.jpeg'),
                         ),
                       ),
                       Positioned(
                         bottom: -10,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          child: Text(
-                            '20% Completed',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: Text(
+                              '${point?.toStringAsFixed(0)} Points',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -92,7 +109,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'John Doe, 20',
+                  'Hi, $name',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

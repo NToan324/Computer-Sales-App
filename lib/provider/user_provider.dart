@@ -10,14 +10,17 @@ class UserProvider with ChangeNotifier {
   String? _name;
   String? _role;
   String? _address;
-  int? _point;
+  double? _point;
+  AvatarUser? _avatar;
 
+  String? get avatarId => _avatar?.publicId;
+  String? get avatarUrl => _avatar?.url;
   String? get id => _id;
   String? get phone => _phone;
   String? get name => _name;
   String? get role => _role;
   String? get address => _address;
-  int? get point => _point;
+  double? get point => _point;
 
   final userService = UserService();
 
@@ -38,6 +41,9 @@ class UserProvider with ChangeNotifier {
     _role = user['role'];
     _point = user['point'];
     _address = user['address'];
+    _avatar =
+        user['avatar'] != null ? AvatarUser.fromJson(user['avatar']) : null;
+
     notifyListeners();
   }
 
@@ -53,6 +59,24 @@ class UserProvider with ChangeNotifier {
     _role = null;
     _point = null;
     _address = null;
+    _avatar = null;
     notifyListeners();
+  }
+}
+
+class AvatarUser {
+  String? url;
+  String? publicId;
+
+  AvatarUser({this.url, this.publicId});
+  AvatarUser.fromJson(Map<String, dynamic> json) {
+    url = json['url'];
+    publicId = json['public_id'];
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['url'] = url;
+    data['public_id'] = publicId;
+    return data;
   }
 }
