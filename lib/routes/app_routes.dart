@@ -1,8 +1,8 @@
+import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/admin/admin_screen.dart';
 import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_view.dart';
 import 'package:computer_sales_app/views/pages/client/cart/cart_view.dart';
-import 'package:computer_sales_app/views/pages/client/home/home_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/login_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/newpass_view.dart';
 import 'package:computer_sales_app/views/pages/client/login/verifyotp_view.dart';
@@ -35,10 +35,11 @@ class AppRoutes {
     login: (context) => LoginView(),
     verifyOtp: (context) => VerifyOtpView(),
     changePassword: (context) => CreateNewPasswordView(),
-    home: (context) => HomeView(),
+    home: (context) => BottomNavigationBarCustom(),
     product: (context) => ProductPageView(),
     productDetails: (context) => ProductDetailsView(
           productId: '',
+          categoryId: '',
         ),
     chat: (context) => ChatView(),
     payment: (context) => PaymentView(),
@@ -61,8 +62,14 @@ class AppRoutes {
     if (settings.name != null &&
         settings.name!.startsWith('/product-details/')) {
       final id = settings.name!.split('/').last;
+
+      final args = settings.arguments as Map<String, dynamic>?;
+
       return MaterialPageRoute(
-        builder: (context) => ProductDetailsView(productId: id),
+        builder: (context) => ProductDetailsView(
+          productId: id,
+          categoryId: args?['categoryId'], // Lấy categoryId từ arguments
+        ),
       );
     }
 

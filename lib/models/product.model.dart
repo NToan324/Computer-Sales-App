@@ -11,6 +11,8 @@ class ProductModel {
   final double discount;
   final int quantity;
   final double? averageRating;
+  final String? brandId;
+  final String? categoryId;
   final int? reviewCount;
   final List<ProductImage> images;
   final bool isActive;
@@ -24,6 +26,8 @@ class ProductModel {
     required this.price,
     required this.discount,
     required this.quantity,
+    this.brandId,
+    this.categoryId,
     required this.averageRating,
     required this.reviewCount,
     required this.images,
@@ -40,6 +44,8 @@ class ProductModel {
       'price': price,
       'discount': discount,
       'quantity': quantity,
+      'brandId': brandId,
+      'categoryId': categoryId,
       'averageRating': averageRating,
       'reviewCount': reviewCount,
       'images': images.map((x) => x.toMap()).toList(),
@@ -56,6 +62,8 @@ class ProductModel {
       variantDescription: map['variant_description'] as String,
       price: map['price'] as double,
       discount: map['discount'] as double,
+      brandId: map['brand_id'] as String?,
+      categoryId: map['category_id'] as String?,
       quantity: map['quantity'] as int,
       averageRating: (map['average_rating'] as double?) ?? 0.0,
       reviewCount: (map['review_count'] as int?) ?? 0,
@@ -70,22 +78,26 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     var imagesList = json['images'] as List;
-    List<ProductImage> imageObjects =
-        imagesList.map((image) => ProductImage.fromJson(image)).toList();
+    List<ProductImage> imageObjects = imagesList.map((image) {
+      return ProductImage.fromJson(image);
+    }).toList();
 
     return ProductModel(
-      id: json['_id'],
-      productId: json['product_id'],
-      variantName: json['variant_name'],
-      variantColor: json['variant_color'],
-      variantDescription: json['variant_description'],
-      price: json['price'].toDouble(),
+      id: json['_id'] ?? '',
+      productId: json['product_id'] ?? '',
+      variantName: json['variant_name'] ?? '',
+      variantColor: json['variant_color'] ?? '',
+      variantDescription: json['variant_description'] ?? '',
+      price: double.tryParse(json['price'].toString()) ?? 0.0,
+      discount: double.tryParse(json['discount'].toString()) ?? 0.0,
+      brandId: json['brand_id'] ?? '',
+      categoryId: json['category_id'] ?? '',
+      quantity: int.tryParse(json['quantity'].toString()) ?? 0,
+      averageRating:
+          double.tryParse(json['average_rating']?.toString() ?? '') ?? 0.0,
+      reviewCount: int.tryParse(json['review_count']?.toString() ?? '') ?? 0,
       images: imageObjects,
-      discount: json['discount'].toDouble(),
-      quantity: json['quantity'],
-      averageRating: json['average_rating']?.toDouble(),
-      reviewCount: json['review_count'],
-      isActive: json['isActive'],
+      isActive: json['isActive'] == true,
     );
   }
 }
@@ -117,7 +129,7 @@ class ProductImage {
   factory ProductImage.fromJson(Map<String, dynamic> json) {
     return ProductImage(
       url: json['url'] as String,
-      publicId: json['public_id'] as String,
+      publicId: json['public_id'] ?? '',
     );
   }
 }

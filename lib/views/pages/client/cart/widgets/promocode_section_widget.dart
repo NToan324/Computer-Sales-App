@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class PromocodeSectionWidget extends StatefulWidget {
   const PromocodeSectionWidget({super.key, required this.cartItems});
-  final List<CartItem> cartItems;
+  final List<ProductForCartModel> cartItems;
 
   @override
   State<PromocodeSectionWidget> createState() => _PromocodeSectionWidgetState();

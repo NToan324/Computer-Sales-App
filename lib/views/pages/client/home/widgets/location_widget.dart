@@ -123,7 +123,7 @@ class _LocationWidgetState extends State<LocationWidget> {
                 size: IconSize.large,
               ),
               Text(
-                TextHelper.textLimit(_location, 30),
+                TextHelper.textLimit(_location, 25),
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 14,

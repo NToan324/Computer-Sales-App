@@ -37,6 +37,11 @@ class ProductService extends BaseClient {
     return res['data'];
   }
 
+  Future<ProductModel> getProductVariantById(String id) async {
+    final res = await get('product/variant/$id');
+    return ProductModel.fromJson(res['data']['productVariant']);
+  }
+
   // Lấy chi tiết sản phẩm
   Future<Map<String, dynamic>> getProductDetail(String id) async {
     final res = await get('product/$id');
@@ -67,14 +72,25 @@ class ProductService extends BaseClient {
     return res['data'];
   }
 
-  Future<List<dynamic>> getVariants() async {
-    final res = await get('product/variant');
-    return res['data']['data'];
-  }
-
-  Future<List<dynamic>> getVariantsByProduct(String productId) async {
-    final res = await get('product/$productId/variant');
-    return res['data'];
+  Future<Map<String, dynamic>> getVariants(
+      {num page = 1, num limit = 10}) async {
+    final res = await get('product/variant?page=$page&limit=$limit');
+    if (res['data'].length == 0) {
+      return {
+        'data': [] as List<ProductModel>,
+        'totalPages': 0,
+        'page': 0,
+        'limit': 0,
+      };
+    }
+    return {
+      'totalPages': res['data']['totalPages'],
+      'page': res['data']['page'],
+      'limit': res['data']['limit'],
+      'data': res['data']['data']
+          .map<ProductModel>((item) => ProductModel.fromJson(item))
+          .toList() as List<ProductModel>
+    };
   }
 
   Future<Map<String, dynamic>> createProductVariant(
@@ -100,7 +116,7 @@ class ProductService extends BaseClient {
 
   // 🔍 Tìm kiếm biến thể
 
-  Future<List<ProductModel>> searchProductVariants({
+  Future<Map<String, dynamic>> searchProductVariants({
     String? name,
     List<String>? categoryIds,
     List<String>? brandIds,
@@ -109,6 +125,8 @@ class ProductService extends BaseClient {
     String? sortPrice, // "asc" | "desc"
     String? sortName, // "asc" | "desc"
     num? ratings,
+    int page = 1,
+    int limit = 12,
   }) async {
     final queryList = <String>[];
 
@@ -128,11 +146,19 @@ class ProductService extends BaseClient {
     if (ratings != null) queryList.add('ratings=$ratings');
     if (sortPrice != null) queryList.add('sort_price=$sortPrice');
     if (sortName != null) queryList.add('sort_name=$sortName');
+    queryList.add('page=$page');
+    queryList.add('limit=$limit');
 
     final uri = Uri.parse("product/variant/search?${queryList.join('&')}");
     final res = await get(uri.toString());
-    return res['data']
-        .map<ProductModel>((item) => ProductModel.fromJson(item))
-        .toList();
+
+    return {
+      'totalPages': res['data']['totalPages'],
+      'page': res['data']['page'],
+      'limit': res['data']['limit'],
+      'data': res['data']['data']
+          .map<ProductModel>((item) => ProductModel.fromJson(item))
+          .toList() as List<ProductModel>
+    };
   }
 }

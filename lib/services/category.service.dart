@@ -7,9 +7,7 @@ class CategoryService extends BaseClient {
   Future<List<CategoryModel>> getCategories() async {
     try {
       final res = await get('category');
-      print('API Response (getCategories): $res'); // Debug
       if (res['data'] == null || res['data']['categories'] == null) {
-        print('Invalid API response: $res');
         throw Exception('No categories data found in response');
       }
       final data = res['data']['categories'] as List<dynamic>;
@@ -36,7 +34,6 @@ class CategoryService extends BaseClient {
       }
 
       final res = await upload('category/upload', formData);
-      print('API Response (uploadCategoryImage): $res'); // Debug
       return {
         'url': res['url'] as String,
         'publicId': res['public_id'] as String,

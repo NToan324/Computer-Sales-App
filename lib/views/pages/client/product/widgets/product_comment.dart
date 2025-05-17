@@ -1,201 +1,180 @@
+import 'package:computer_sales_app/components/custom/pagination.dart';
+import 'package:computer_sales_app/components/custom/skeleton.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/helpers/formatMoney.dart';
+import 'package:computer_sales_app/models/review.model.dart.dart';
+import 'package:computer_sales_app/services/socket_io_client.dart';
+import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 class ProductComment extends StatefulWidget {
-  const ProductComment({super.key});
+  const ProductComment({
+    super.key,
+    required this.socketService,
+    required this.productId,
+    required this.comments,
+    this.isLoading = false,
+  });
+
+  final SocketService socketService;
+  final String productId;
+  final List<ReviewModel> comments;
+  final bool isLoading;
 
   @override
   State<ProductComment> createState() => _ProductCommentState();
 }
 
 class _ProductCommentState extends State<ProductComment> {
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
-  final List<Map<String, String>> _comments = [];
-
-  static const int commentsPerPage = 3;
-  int _currentPage = 0;
+  bool isSending = false;
+  int currentPage = 1;
+  int totalPage = 1;
+  int limit = 10;
 
   void _addComment() {
-    final comment = _commentController.text.trim();
-
-    if (comment.isEmpty) return;
-
     setState(() {
-      _comments.insert(0, {
-        'comment': comment,
+      isSending = true;
+    });
+    final comment = _commentController.text.trim();
+    if (comment.isEmpty) {
+      showCustomSnackBar(context, 'Please enter a comment');
+      setState(() {
+        isSending = false;
       });
-      _nameController.clear();
-      _commentController.clear();
-      _currentPage = 0;
+      return;
+    }
+
+    try {
+      widget.socketService.sendReview(
+        productVariantId: widget.productId,
+        review: _commentController.text,
+        onError: (err) {
+          showCustomSnackBar(
+            context,
+            'Failed to add comment',
+          );
+        },
+      );
+
+      setState(() {
+        _commentController.clear();
+      });
+    } catch (e) {
+      showCustomSnackBar(context, 'Failed to add comment. Please try again.');
+    }
+    setState(() {
+      isSending = false;
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    // _initSocketAndLoadComments();
+  }
+
+  @override
+  void dispose() {
+    widget.socketService.disconnect();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final totalPages = (_comments.length / commentsPerPage).ceil();
-    final start = _currentPage * commentsPerPage;
-    final end = (_currentPage + 1) * commentsPerPage;
-    final visibleComments = _comments.sublist(
-      start,
-      end > _comments.length ? _comments.length : end,
-    );
+    final totalPage =
+        widget.comments.length > 10 ? (widget.comments.length / 10).ceil() : 1;
+
+    final commentPagination =
+        widget.comments.skip((currentPage - 1) * limit).take(limit).toList();
 
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10,
       children: [
-        Text(
+        const Text(
           'Comments',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        SizedBox(height: 12),
         TextField(
-          controller: _commentController,
           cursorColor: Colors.black,
+          controller: _commentController,
           maxLines: 2,
           decoration: InputDecoration(
             hintText: 'Leave a comment',
-            hintStyle: const TextStyle(
-              color: Colors.grey,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Colors.grey,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: AppColors.primary,
-              ),
+              borderSide: const BorderSide(color: AppColors.primary),
             ),
           ),
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: SizedBox(
-            height: 45,
-            child: ElevatedButton(
-              onPressed: _addComment,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Send',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  )),
-            ),
-          ),
+        SizedBox(height: 12),
+        MyButton(
+          text: 'Send',
+          isLoading: isSending,
+          onTap: (_) {
+            _addComment();
+          },
         ),
-        ...visibleComments.map((comment) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.grey,
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                comment['name'] ?? 'Anonymous',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '1 day ago',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
+        const SizedBox(height: 12),
+        widget.isLoading
+            ? ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 10,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 10),
+                itemBuilder: (context, index) => SkeletonHorizontalProduct(),
+              )
+            : commentPagination.isEmpty
+                ? const Center(
+                    child: Text('No comments yet'),
+                  )
+                : ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: commentPagination.length >= 10
+                        ? 10
+                        : commentPagination.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final comment = commentPagination[index];
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          tileColor: Colors.grey[100],
+                          leading: const CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Colors.black12,
+                            child: Icon(Icons.person, color: Colors.black),
                           ),
-                          Text(comment['comment'] ?? ''),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )),
-
-        // Phân trang
-        if (_comments.length > commentsPerPage)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                onPressed: _currentPage > 0
-                    ? () => setState(() => _currentPage--)
-                    : null,
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-              ),
-              ...List.generate(totalPages, (index) {
-                final isActive = index == _currentPage;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: ElevatedButton(
-                    onPressed: () => setState(() => _currentPage = index),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isActive ? AppColors.primary : Colors.grey[300],
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      minimumSize: Size(0, 36),
-                    ),
-                    child: Text(
-                      '${index + 1}',
-                      style: TextStyle(
-                        color: isActive ? Colors.white : Colors.black,
-                      ),
-                    ),
+                          title: Text(comment.user?.name ?? 'Anonymous'),
+                          subtitle: Text(comment.content),
+                          trailing: Text(
+                            formatDate(comment.createdAt.toString()),
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              }),
-              IconButton(
-                onPressed: _currentPage < totalPages - 1
-                    ? () => setState(() => _currentPage++)
-                    : null,
-                icon: const Icon(Icons.arrow_forward_ios),
-              ),
-            ],
-          ),
+        SizedBox(
+          height: 10,
+        ),
+        PaginationWidget(
+          currentPage: currentPage,
+          totalPages: totalPage,
+          onPageChanged: (page) {
+            setState(() {
+              currentPage = page;
+            });
+          },
+        ),
       ],
     );
   }

@@ -4,14 +4,41 @@ import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
-class PaymentDetails extends StatelessWidget {
+class PaymentDetails extends StatefulWidget {
   final double totalAmount;
 
-  PaymentDetails({super.key, required this.totalAmount});
-  final TextEditingController _emailController = TextEditingController();
-  final FocusNode _emailFocus = FocusNode();
+  const PaymentDetails({
+    super.key,
+    required this.totalAmount,
+    required this.name,
+    required this.address,
+    required this.phone,
+  });
+
+  final String name;
+  final String address;
+  final String phone;
+
+  @override
+  State<PaymentDetails> createState() => _PaymentDetailsState();
+}
+
+class _PaymentDetailsState extends State<PaymentDetails> {
+  final TextEditingController _nameController = TextEditingController();
+  final FocusNode _nameFocus = FocusNode();
+
   final TextEditingController _addressControler = TextEditingController();
   final FocusNode _addressFocus = FocusNode();
+
+  final TextEditingController _phoneController = TextEditingController();
+  final FocusNode _phoneFocus = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+    _phoneController.text = widget.phone;
+    _addressControler.text = widget.address;
+    _nameController.text = widget.name;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +66,25 @@ class PaymentDetails extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Customer Name
+          const Text('Phone'),
+          const SizedBox(height: 4),
+          MyTextField(
+            hintText: 'Phone',
+            prefixIcon: Icons.phone,
+            controller: _phoneController,
+            focusNode: _phoneFocus,
+            obscureText: false,
+          ),
+          const SizedBox(height: 16),
+
+          // Customer Name
           const Text('Customer Name'),
           const SizedBox(height: 4),
           MyTextField(
             hintText: 'Full name',
             prefixIcon: Icons.person_outline_rounded,
-            controller: _emailController,
-            focusNode: _emailFocus,
+            controller: _nameController,
+            focusNode: _nameFocus,
             obscureText: false,
           ),
           const SizedBox(height: 16),
@@ -67,6 +106,7 @@ class PaymentDetails extends StatelessWidget {
           Container(
             color: Colors.white,
             child: DropdownButtonFormField<String>(
+              isExpanded: true,
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(10),
               items: const [
@@ -91,7 +131,10 @@ class PaymentDetails extends StatelessWidget {
                   borderSide: BorderSide(color: Colors.grey, width: 1),
                 ),
                 hintText: 'Select payment method',
-                hintStyle: const TextStyle(fontSize: 14),
+                hintStyle: const TextStyle(
+                  fontSize: 14,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: AppColors.primary,
@@ -112,10 +155,11 @@ class PaymentDetails extends StatelessWidget {
               child: Column(
                 children: [
                   _buildRowWithLabel(
-                      label: 'Subtotal', value: formatMoney(totalAmount)),
+                      label: 'Subtotal',
+                      value: formatMoney(widget.totalAmount)),
                   _buildRowWithLabel(label: 'Shipping', value: 'FREE'),
                   _buildRowWithLabel(
-                      label: 'Total', value: formatMoney(totalAmount)),
+                      label: 'Total', value: formatMoney(widget.totalAmount)),
                 ],
               )),
 

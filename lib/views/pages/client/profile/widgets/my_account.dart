@@ -477,6 +477,7 @@ class _AddressPageState extends State<AddressPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('currentAddress: $currentAddress');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBarMobile(
@@ -534,9 +535,14 @@ class _AddressPageState extends State<AddressPage> {
                       trailing: Radio<String>(
                         value: address,
                         groupValue: currentAddress,
-                        onChanged: (value) {
+                        onChanged: (value) async {
+                          // Thực hiện công việc async bên ngoài setState
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setString('location_current', value!);
+
+                          // Sau khi xong, cập nhật trạng thái trong setState (đồng bộ)
                           setState(() {
-                            currentAddress = value!;
+                            currentAddress = value;
                             _addressOption = 'saved';
                           });
                         },

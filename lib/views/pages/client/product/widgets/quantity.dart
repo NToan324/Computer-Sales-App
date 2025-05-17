@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Quantity extends StatefulWidget {
-  Quantity(
+  const Quantity(
       {super.key,
       required this.onIncrease,
       required this.onDecrease,
@@ -22,14 +22,6 @@ class _QuantityState extends State<Quantity> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10,
       children: [
-        Text(
-          'Quantity',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           spacing: 15,

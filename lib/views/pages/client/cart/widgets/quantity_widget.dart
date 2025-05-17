@@ -1,5 +1,8 @@
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/provider/cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuantitySelector extends StatefulWidget {
   const QuantitySelector({
@@ -7,11 +10,17 @@ class QuantitySelector extends StatefulWidget {
     required this.initialQuantity,
     required this.onQuantityChanged,
     this.maxQuantity,
+    required this.productId,
+    this.onChangeProgressing,
+    this.isProcessing = false,
   });
 
   final int initialQuantity;
   final ValueChanged<int> onQuantityChanged;
   final int? maxQuantity;
+  final String productId;
+  final bool isProcessing;
+  final Function(bool)? onChangeProgressing;
 
   @override
   _QuantitySelectorState createState() => _QuantitySelectorState();
@@ -36,28 +45,62 @@ class _QuantitySelectorState extends State<QuantitySelector> {
     }
   }
 
-  void _incrementQuantity() {
-    if (widget.maxQuantity == null || _quantity < widget.maxQuantity!) {
-      setState(() {
-        _quantity++;
+  void _incrementQuantity() async {
+    if (widget.isProcessing) return;
+    if (widget.onChangeProgressing != null) widget.onChangeProgressing!(true);
+
+    try {
+      final provider = Provider.of<CartProvider>(context, listen: false);
+
+      if (widget.maxQuantity == null || _quantity < widget.maxQuantity!) {
+        await provider.handleAddToCart(widget.productId, 1);
+
+        setState(() {
+          _quantity++;
+        });
+
+        widget.onQuantityChanged(_quantity);
+      }
+    } finally {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (widget.onChangeProgressing != null) {
+          widget.onChangeProgressing!(false);
+        }
       });
-      widget.onQuantityChanged(_quantity);
     }
   }
 
-  void _decrementQuantity() {
-    if (_quantity > 1) {
-      setState(() {
-        _quantity--;
+  void _decrementQuantity() async {
+    if (widget.isProcessing) return;
+    if (widget.onChangeProgressing != null) widget.onChangeProgressing!(true);
+
+    try {
+      final provider = Provider.of<CartProvider>(context, listen: false);
+
+      if (_quantity > 1) {
+        await provider.handleRemoveToCart(widget.productId, 1);
+
+        setState(() {
+          _quantity--;
+        });
+
+        widget.onQuantityChanged(_quantity);
+      } else {
+        showCustomSnackBar(context, "You can't descrease quantity below 1");
+      }
+    } finally {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (widget.onChangeProgressing != null) {
+          widget.onChangeProgressing!(false);
+        }
       });
-      widget.onQuantityChanged(_quantity);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 90,
+      width: 100,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
