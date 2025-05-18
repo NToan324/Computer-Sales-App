@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:computer_sales_app/provider/coupon_provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
@@ -20,27 +22,48 @@ class CouponForm extends StatefulWidget {
 
 class _CouponFormState extends State<CouponForm> {
   late TextEditingController codeController;
-  late String discountValue;
-  late int usageCount;
-  late int maxUsage;
+  late TextEditingController discountController;
+  late TextEditingController usageLimitController;
+  late bool isActive;
 
   @override
   void initState() {
     super.initState();
     final data = widget.initialCoupon ?? {};
     codeController = TextEditingController(
-      text: data['code'] ??
-          _generateRandomCode(), // Tạo mã ngẫu nhiên nếu là coupon mới
+      text: data['code'] ?? _generateRandomCode(),
     );
-    discountValue = data['discountValue']?.toString() ?? '10000';
-    usageCount = data['usageCount'] ?? 0;
-    maxUsage = data['maxUsage'] ?? 10;
+    discountController = TextEditingController(
+      text: data['discount_amount']?.toString() ?? '0',
+    );
+    usageLimitController = TextEditingController(
+      text: data['usage_limit']?.toString() ?? '1',
+    );
+    isActive = data['isActive'] ?? true;
   }
 
   String _generateRandomCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    return List.generate(5, (index) => chars[Random().nextInt(chars.length)])
-        .join();
+    return List.generate(5, (index) => chars[Random().nextInt(chars.length)]).join();
+  }
+
+  bool _isValidCode(String code) {
+    return RegExp(r'^[A-Z0-9]{5}$').hasMatch(code);
+  }
+
+  String? _validateDiscount(String value) {
+    final numValue = double.tryParse(value);
+    if (numValue == null) return 'Discount must be a number';
+
+    return null;
+  }
+
+  String? _validateUsageLimit(String value) {
+    final intValue = int.tryParse(value);
+    if (intValue == null) return 'Usage limit must be an integer';
+    if (intValue < 1) return 'Usage limit must be at least 1';
+    if (intValue > 10) return 'Usage limit must not exceed 10';
+    return null;
   }
 
   @override
@@ -53,108 +76,114 @@ class _CouponFormState extends State<CouponForm> {
           children: [
             TextField(
               controller: codeController,
-              decoration: const InputDecoration(
-                labelText: "Coupon Code",
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: 'Coupon Code',
+                border: const OutlineInputBorder(),
+                errorText: !_isValidCode(codeController.text)
+                    ? 'Code must be 5 uppercase letters/numbers'
+                    : null,
               ),
-              enabled: widget.initialCoupon == null, // Chỉ chỉnh sửa mã khi tạo mới
+              onChanged: (value) => setState(() {}),
             ),
             const SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Discount Value",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SizedBox(
-                      width: double.infinity,
-                      child: DropdownMenu<String>(
-                        width: constraints.maxWidth,
-                        initialSelection: discountValue,
-                        onSelected: (value) =>
-                            setState(() => discountValue = value!),
-                        dropdownMenuEntries: [
-                          '10000',
-                          '20000',
-                          '50000',
-                          '100000'
-                        ]
-                            .map((value) => DropdownMenuEntry(
-                                  value: value,
-                                  label: "$valueđ",
-                                ))
-                            .toList(),
-                        textStyle:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                        menuStyle: MenuStyle(
-                          maximumSize: WidgetStatePropertyAll(
-                            Size(constraints.maxWidth, double.infinity),
-                          ),
-                          backgroundColor: WidgetStatePropertyAll(Colors.white),
-                        ),
-                        inputDecorationTheme: const InputDecorationTheme(
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
+            TextField(
+              controller: discountController,
+              decoration: InputDecoration(
+                labelText: 'Discount Amount',
+                border: const OutlineInputBorder(),
+                suffixText: 'đ',
+                errorText: _validateDiscount(discountController.text),
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (value) => setState(() {}),
             ),
             const SizedBox(height: 20),
             Text(
-              "Created At: ${DateFormat('dd/MM/yyyy HH:mm').format(widget.initialCoupon?['createdAt'] ?? DateTime.now())}",
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "Usage Count: $usageCount",
+              'Created At: ${DateFormat('dd/MM/yyyy HH:mm').format(widget.initialCoupon?['createdAt'] as DateTime? ?? DateTime.now())}',
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 20),
             TextField(
-              decoration: const InputDecoration(
-                labelText: "Max Usage (up to 10)",
-                border: OutlineInputBorder(),
+              controller: usageLimitController,
+              decoration: InputDecoration(
+                labelText: 'Usage Limit (1-10)',
+                border: const OutlineInputBorder(),
+                errorText: _validateUsageLimit(usageLimitController.text),
               ),
               keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  maxUsage = int.tryParse(value) ?? 10;
-                  if (maxUsage > 10) maxUsage = 10;
-                });
-              },
+              onChanged: (value) => setState(() {}),
             ),
             const SizedBox(height: 20),
+            if (widget.initialCoupon != null) ...[
+              SwitchListTile(
+                title: const Text('Active'),
+                value: isActive,
+                onChanged: (value) => setState(() => isActive = value),
+                contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 20),
+            ],
             Text(
-              "Applied Orders: ${widget.initialCoupon?['appliedOrders']?.join(", ") ?? "None"}",
+              'Applied Orders: ${widget.initialCoupon?['ordersUsed']?.join(', ') ?? 'None'}',
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  final couponData = {
-                    'code': codeController.text,
-                    'createdAt': widget.initialCoupon?['createdAt'] ?? DateTime.now(),
-                    'discountValue': int.parse(discountValue),
-                    'usageCount': widget.initialCoupon?['usageCount'] ?? 0,
-                    'maxUsage': maxUsage,
-                    'appliedOrders': widget.initialCoupon?['appliedOrders'] ?? [],
-                  };
-                  widget.onSubmit(couponData);
+              child: Consumer<CouponProvider>(
+                builder: (context, provider, child) {
+                  return Column(
+                    children: [
+
+                      ElevatedButton(
+                        onPressed: provider.isLoading ||
+                            !_isValidCode(codeController.text) ||
+                            _validateDiscount(discountController.text) != null ||
+                            _validateUsageLimit(usageLimitController.text) != null
+                            ? null
+                            : () async {
+                          final couponData = {
+                            'code': codeController.text,
+                            'createdAt':
+                            widget.initialCoupon?['createdAt'] ?? DateTime.now(),
+                            'discount_amount': double.parse(discountController.text),
+                            'usage_limit': int.parse(usageLimitController.text),
+                            'ordersUsed': widget.initialCoupon?['ordersUsed'] ?? [],
+                            'isActive': isActive,
+                          };
+                          try {
+                            if (widget.initialCoupon == null) {
+                              await provider.createCoupon(
+                                code: codeController.text,
+                                discountAmount: double.parse(discountController.text),
+                                usageLimit: int.parse(usageLimitController.text),
+                                isActive: true,
+                              );
+                            } else {
+                              await provider.updateCoupon(
+                                code: codeController.text,
+                                discountAmount: double.parse(discountController.text),
+                                usageLimit: int.parse(usageLimitController.text),
+                                isActive: isActive,
+                              );
+                              await provider.loadCoupons();
+                            }
+                            widget.onSubmit(couponData);
+                            Navigator.of(context).pop();
+                          } catch (e) {
+
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                        child: provider.isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                          widget.buttonLabel,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  );
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                child: Text(widget.buttonLabel,
-                    style: const TextStyle(color: Colors.white)),
               ),
             ),
           ],

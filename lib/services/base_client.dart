@@ -51,10 +51,13 @@ class BaseClient {
   }
 
   // GET Request
-  Future<dynamic> get(String api) async {
+  Future<dynamic> get(String api, {Map<String, dynamic>? queryParameters}) async {
     final uri = Uri.parse('$baseUrl$api');
     try {
-      final response = await dio.get(uri.toString());
+      final response = await dio.get(
+        uri.toString(),
+        queryParameters: queryParameters,
+      );
       return response.data;
     } on SocketException {
       throw FetchDataException('No Internet connection', api);

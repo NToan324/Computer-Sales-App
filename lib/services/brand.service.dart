@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:computer_sales_app/models/brand.model.dart';
 import 'package:computer_sales_app/services/base_client.dart';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart'; // Added for MIME type lookup
 
 class BrandService extends BaseClient {
   Future<List<BrandModel>> getBrands() async {
@@ -24,24 +27,66 @@ class BrandService extends BaseClient {
   Future<Map<String, String>> uploadBrandImage(dynamic image) async {
     try {
       FormData formData;
+      String fileName;
+      String? contentType;
+
       if (image is File) {
+        fileName = image.path.split('/').last;
+        contentType = lookupMimeType(fileName);
         formData = FormData.fromMap({
-          'file': await MultipartFile.fromFile(image.path, filename: 'brand_image.jpg'),
+          'file': await MultipartFile.fromFile(
+            image.path,
+            filename: fileName,
+            contentType: contentType != null ? MediaType.parse(contentType) : null,
+          ),
+        });
+      } else if (image is Uint8List) {
+        final mimeType = lookupMimeType('', headerBytes: image);
+        if (mimeType == 'image/jpeg') {
+          fileName = 'brand_image.jpg';
+          contentType = 'image/jpeg';
+        } else if (mimeType == 'image/png') {
+          fileName = 'brand_image.png';
+          contentType = 'image/png';
+        } else {
+          throw Exception('Unsupported image type: $mimeType');
+        }
+        formData = FormData.fromMap({
+          'file': MultipartFile.fromBytes(
+            image,
+            filename: fileName,
+            contentType: MediaType.parse(contentType),
+          ),
         });
       } else {
-        formData = FormData.fromMap({
-          'file': MultipartFile.fromBytes(image as List<int>, filename: 'brand_image.jpg'),
-        });
+        throw Exception('Invalid image format');
       }
 
+      // Debug form data
+      formData.fields.forEach((field) => print('Field: ${field.key}, Value: ${field.value}'));
+      formData.files.forEach((field) => print('File: ${field.key}, Filename: ${field.value.filename}, ContentType: ${field.value.contentType}'));
+
       final res = await upload('brand/upload', formData);
-      print('API Response (uploadBrandImage): $res'); // Debug
-      return {
-        'url': res['url'] as String,
-        'publicId': res['public_id'] as String,
-      };
+
+      // Check and parse response
+      if (res is Map<String, dynamic> && res.containsKey('data') && res['data'] is Map<String, dynamic>) {
+        final data = res['data'] as Map<String, dynamic>;
+        final url = data['url'] as String?;
+        final publicId = data['public_id'] as String?;
+
+        if (url == null || publicId == null) {
+          throw Exception('Missing URL or Public ID in response: $res');
+        }
+
+        return {
+          'url': url,
+          'publicId': publicId,
+        };
+      } else {
+        throw Exception('Invalid response format: $res');
+      }
     } catch (e) {
-      print('Upload brand image error: $e');
+      print('Upload brand image error: $e, Response: ${e is DioException ? e.response?.data : e.toString()}');
       rethrow;
     }
   }

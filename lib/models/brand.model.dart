@@ -1,15 +1,25 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
+part 'brand.model.g.dart';
 
+@HiveType(typeId: 4)
 class BrandModel extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
-  final BrandImage? image;
+
+  @HiveField(2)
+  final BrandImage? image; // Made optional
+
+  @HiveField(3)
   final bool isActive;
 
   BrandModel({
     required this.id,
     required this.name,
-    this.image,
+    this.image, // Optional
     required this.isActive,
   });
 
@@ -24,12 +34,12 @@ class BrandModel extends HiveObject {
 
   factory BrandModel.fromMap(Map<String, dynamic> map) {
     return BrandModel(
-      id: map['_id'] as String,
-      name: map['brand_name'] as String,
+      id: map['_id']?.toString() ?? '',
+      name: map['brand_name']?.toString() ?? map['name']?.toString() ?? '',
       image: map['brand_image'] != null
           ? BrandImage.fromMap(map['brand_image'] as Map<String, dynamic>)
           : null,
-      isActive: map['isActive'] as bool,
+      isActive: map['isActive'] is bool ? map['isActive'] : true,
     );
   }
 
@@ -37,18 +47,22 @@ class BrandModel extends HiveObject {
 
   factory BrandModel.fromJson(Map<String, dynamic> json) {
     return BrandModel(
-      id: json['_id'] as String,
-      name: json['brand_name'] as String,
+      id: json['_id']?.toString() ?? '',
+      name: json['brand_name']?.toString() ?? json['name']?.toString() ?? '',
       image: json['brand_image'] != null
           ? BrandImage.fromJson(json['brand_image'] as Map<String, dynamic>)
           : null,
-      isActive: json['isActive'] as bool,
+      isActive: json['isActive'] is bool ? json['isActive'] : true,
     );
   }
 }
 
-class BrandImage {
+@HiveType(typeId: 5)
+class BrandImage extends HiveObject {
+  @HiveField(0)
   final String url;
+
+  @HiveField(1)
   final String publicId;
 
   BrandImage({
@@ -65,8 +79,8 @@ class BrandImage {
 
   factory BrandImage.fromMap(Map<String, dynamic> map) {
     return BrandImage(
-      url: map['url'] as String,
-      publicId: map['public_id'] as String,
+      url: map['url']?.toString() ?? '',
+      publicId: map['public_id']?.toString() ?? '',
     );
   }
 
@@ -74,8 +88,8 @@ class BrandImage {
 
   factory BrandImage.fromJson(Map<String, dynamic> json) {
     return BrandImage(
-      url: json['url'] as String,
-      publicId: json['public_id'] as String,
+      url: json['url']?.toString() ?? '',
+      publicId: json['public_id']?.toString() ?? '',
     );
   }
 }

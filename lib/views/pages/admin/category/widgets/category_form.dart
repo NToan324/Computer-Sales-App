@@ -27,6 +27,7 @@ class CategoryForm extends StatefulWidget {
 
 class _CategoryFormState extends State<CategoryForm> {
   late TextEditingController nameController;
+  late TextEditingController descriptionController;
   File? imageFile;
   Uint8List? imageBytes;
   Map<String, dynamic>? categoryImage;
@@ -42,18 +43,30 @@ class _CategoryFormState extends State<CategoryForm> {
     final data = widget.initialCategory;
     print('initState: initialCategory = $data');
 
+    // Initialize controllers and state
     nameController = TextEditingController(text: data?['category_name']?.toString() ?? '');
-    isActive = data?['isActive'] ?? true;
+    descriptionController = TextEditingController(text: data?['category_description']?.toString() ?? '');
+    isActive = data?['isActive'] is bool ? data!['isActive'] : true;
 
+    // Handle category_image
     if (data?['category_image'] != null && data!['category_image'] is Map<String, dynamic>) {
       final imageMap = data['category_image'] as Map<String, dynamic>;
-      if (imageMap['url'] != null && imageMap['public_id'] != null) {
-        categoryImage = imageMap;
-        print('initState: categoryImage = $categoryImage');
+      if (imageMap['url'] != null && imageMap['url'].toString().isNotEmpty) {
+        categoryImage = {
+          'url': imageMap['url'].toString(),
+          'public_id': imageMap['public_id']?.toString() ?? '',
+        };
       } else {
-        print('initState: Invalid category_image format: $imageMap');
+        print('initState: Invalid category_image, url is missing or empty: $imageMap');
       }
+    } else {
+      print('initState: category_image is null or not a Map: ${data?['category_image']}');
     }
+
+    // Log initialized values for debugging
+    print('initState: nameController.text = ${nameController.text}');
+    print('initState: descriptionController.text = ${descriptionController.text}');
+    print('initState: isActive = $isActive');
   }
 
   Future<Map<String, String>?> _uploadImage(dynamic image) async {
@@ -88,13 +101,13 @@ class _CategoryFormState extends State<CategoryForm> {
       if (kIsWeb) {
         final bytes = await pickedFile.readAsBytes();
         final uploadResult = await _uploadImage(bytes);
-        if (uploadResult != null && uploadResult['url'] != null && uploadResult['publicId'] != null) {
+        if (uploadResult != null && uploadResult['url'] != null && uploadResult['url']!.isNotEmpty) {
           setState(() {
             imageBytes = bytes;
             imageFile = null;
             categoryImage = {
-              'url': uploadResult['url'],
-              'public_id': uploadResult['publicId'],
+              'url': uploadResult['url']!,
+              'public_id': uploadResult['publicId'] ?? '',
             };
             isLoading = false;
             print('pickImage: Web image uploaded, categoryImage = $categoryImage');
@@ -105,13 +118,13 @@ class _CategoryFormState extends State<CategoryForm> {
       } else {
         final file = File(pickedFile.path);
         final uploadResult = await _uploadImage(file);
-        if (uploadResult != null && uploadResult['url'] != null && uploadResult['publicId'] != null) {
+        if (uploadResult != null && uploadResult['url'] != null && uploadResult['url']!.isNotEmpty) {
           setState(() {
             imageFile = file;
             imageBytes = null;
             categoryImage = {
-              'url': uploadResult['url'],
-              'public_id': uploadResult['publicId'],
+              'url': uploadResult['url']!,
+              'public_id': uploadResult['publicId'] ?? '',
             };
             isLoading = false;
             print('pickImage: Mobile image uploaded, categoryImage = $categoryImage');
@@ -140,37 +153,61 @@ class _CategoryFormState extends State<CategoryForm> {
     });
 
     try {
-      if (nameController.text.trim().isEmpty) {
-        throw Exception('Category name is required');
+      // Validation aligned with Zod schema
+      final categoryName = nameController.text.trim();
+      if (categoryName.isEmpty) {
+        throw Exception('Tên danh mục không được để trống');
       }
       if (categoryImage == null || categoryImage!['url'] == null || categoryImage!['url'].isEmpty) {
-        throw Exception('Please upload a valid category image');
+        throw Exception('URL không được để trống');
       }
       if (!Uri.tryParse(categoryImage!['url'])!.isAbsolute) {
         throw Exception('Invalid image URL');
       }
 
+      // Prepare category data
       final categoryData = {
-        'category_name': nameController.text.trim(),
-        'isActive': isActive,
-        'category_image': categoryImage,
+        'category_name': categoryName,
+        'category_image': {
+          'url': categoryImage!['url'],
+          'public_id': categoryImage!['public_id'] ?? '',
+        },
       };
 
+      // Add category_description if provided
+      final description = descriptionController.text.trim();
+      if (description.isNotEmpty) {
+        categoryData['category_description'] = description;
+      }
+
+      // Include isActive only for updates
+      if (widget.initialCategory != null) {
+        categoryData['isActive'] = isActive;
+      }
+
       print('handleSubmit: Sending categoryData = $categoryData');
+
       Map<String, dynamic> result;
       if (widget.initialCategory == null) {
-        result = await Provider.of<CategoryProvider>(context, listen: false)
-            .createCategory(categoryData);
+        // Create new category
+        result = await _categoryService.createCategory(categoryData);
+        print('handleSubmit: Create API response = $result');
       } else {
+        // Update existing category
         final categoryId = widget.initialCategory!['_id']?.toString();
         if (categoryId == null || !RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(categoryId)) {
           throw Exception('Invalid category ID');
         }
-        result = await Provider.of<CategoryProvider>(context, listen: false)
-            .updateCategory(categoryId, categoryData);
+        result = await _categoryService.updateCategory(categoryId, categoryData);
+        print('handleSubmit: Update API response = $result');
       }
 
-      print('handleSubmit: API response = $result');
+      // Validate result
+      if (result is! Map<String, dynamic>) {
+        throw Exception('Invalid API response format');
+      }
+
+      // Call onSubmit and show success message
       widget.onSubmit(result);
       setState(() {
         isLoading = false;
@@ -184,7 +221,10 @@ class _CategoryFormState extends State<CategoryForm> {
       });
       print('handleSubmit: Error = $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save category: ${e.toString().replaceAll('Exception: ', '')}')),
+        SnackBar(
+          content: Text('Failed to save category: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -257,7 +297,7 @@ class _CategoryFormState extends State<CategoryForm> {
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: categoryImage != null && categoryImage!['url'] != null
+                      child: categoryImage != null && categoryImage!['url'] != null && categoryImage!['url'].isNotEmpty
                           ? Image.network(
                         categoryImage!['url'],
                         fit: BoxFit.cover,
@@ -313,6 +353,15 @@ class _CategoryFormState extends State<CategoryForm> {
                           labelText: 'Category Name',
                           border: OutlineInputBorder(),
                         ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: descriptionController,
+                        decoration: const InputDecoration(
+                          labelText: 'Category Description (Optional)',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 3,
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -377,6 +426,7 @@ class _CategoryFormState extends State<CategoryForm> {
   @override
   void dispose() {
     nameController.dispose();
+    descriptionController.dispose();
     super.dispose();
   }
 }

@@ -7,7 +7,7 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/config/font.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/product.model.dart';
-import 'package:computer_sales_app/models/review.model.dart.dart';
+import 'package:computer_sales_app/models/review.model.dart';
 import 'package:computer_sales_app/provider/cart_provider.dart';
 import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/services/review.service.dart';

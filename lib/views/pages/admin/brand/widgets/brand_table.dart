@@ -41,6 +41,7 @@ class _BrandTableState extends State<BrandTable> {
   }
 
   void _showBrandForm(BrandModel brand) {
+    print('showBrandForm: Brand data = ${brand.toJson()}'); // Debug
     showDialog(
       context: context,
       builder: (context) {
@@ -69,7 +70,7 @@ class _BrandTableState extends State<BrandTable> {
               buttonLabel: 'Save',
               initialBrand: {
                 '_id': brand.id,
-                'name': brand.name,
+                'brand_name': brand.name,
                 'brand_image': brand.image?.toMap(),
                 'isActive': brand.isActive,
               },

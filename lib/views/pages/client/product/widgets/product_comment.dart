@@ -3,7 +3,7 @@ import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
-import 'package:computer_sales_app/models/review.model.dart.dart';
+import 'package:computer_sales_app/models/review.model.dart';
 import 'package:computer_sales_app/services/socket_io_client.dart';
 import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
 import 'package:flutter/material.dart';

@@ -106,7 +106,7 @@ class OrderItemModel {
       productVariantId: json['product_variant_id'] as String?,
       productVariantName: json['product_variant_name'] as String?,
       quantity: (json['quantity'] as num?)?.toInt(),
-      unit_price: (json['price'] as num?)?.toDouble(),
+      unit_price: (json['unit_price'] as num?)?.toDouble(),
       discount: (json['discount'] as num?)?.toDouble(),
       images: json['images'] != null
           ? ImageModel.fromJson(json['images'] as Map<String, dynamic>)

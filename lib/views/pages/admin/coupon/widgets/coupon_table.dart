@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:computer_sales_app/provider/coupon_provider.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:intl/intl.dart';
 import 'coupon_form.dart';
 
 class CouponTable extends StatefulWidget {
-  final List<Map<String, dynamic>> coupons; // Nhận coupons từ ngoài
+  final List<Map<String, dynamic>> coupons;
 
   const CouponTable({super.key, required this.coupons});
 
@@ -20,9 +22,7 @@ class _CouponTableState extends State<CouponTable> {
       return widget.coupons;
     } else {
       return widget.coupons.where((coupon) {
-        return coupon['code']
-            .toLowerCase()
-            .contains(_searchController.text.toLowerCase());
+        return coupon['code'].toLowerCase().contains(_searchController.text.toLowerCase());
       }).toList();
     }
   }
@@ -55,14 +55,21 @@ class _CouponTableState extends State<CouponTable> {
             child: CouponForm(
               buttonLabel: "Save",
               initialCoupon: coupon,
-              onSubmit: (updatedCouponData) {
-                setState(() {
-                  final index = widget.coupons.indexOf(coupon);
-                  if (index != -1) {
-                    widget.coupons[index] = updatedCouponData;
-                  }
-                });
-                Navigator.of(context).pop();
+              onSubmit: (updatedCouponData) async {
+                final provider = Provider.of<CouponProvider>(context, listen: false);
+                try {
+                  await provider.updateCoupon(
+                    code: updatedCouponData['code'],
+                    discountAmount: updatedCouponData['discount_amount'].toDouble(),
+                    usageLimit: updatedCouponData['usage_limit'],
+                    isActive: true, // Assume active unless API provides isActive
+                  );
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update coupon: $e')),
+                  );
+                }
               },
             ),
           ),
@@ -94,49 +101,51 @@ class _CouponTableState extends State<CouponTable> {
     return TableRow(
       children: isMobile
           ? [
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText(coupon['code'], colWidths[0]),
-              ),
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText(
-                    DateFormat('dd/MM/yyyy').format(coupon['createdAt']),
-                    colWidths[1]),
-              ),
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText("${coupon['discountValue']}đ", colWidths[2]),
-              ),
-            ]
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText(coupon['code'], colWidths[0]),
+        ),
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText(
+            coupon['createdAt'] != null
+                ? DateFormat('dd/MM/yyyy').format(coupon['createdAt'] as DateTime)
+                : 'N/A',
+            colWidths[1],
+          ),
+        ),
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText("${coupon['discount_amount']}đ", colWidths[2]),
+        ),
+      ]
           : [
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText(coupon['code'], colWidths[0]),
-              ),
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText(
-                    DateFormat('dd/MM/yyyy').format(coupon['createdAt']),
-                    colWidths[1]),
-              ),
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText("${coupon['discountValue']}đ", colWidths[2]),
-              ),
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText(coupon['usageCount'].toString(), colWidths[3]),
-              ),
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText(coupon['maxUsage'].toString(), colWidths[4]),
-              ),
-              InkWell(
-                onTap: () => _showCouponForm(coupon),
-                child: cellText(coupon['appliedOrders'].join(", "), colWidths[5]),
-              ),
-            ],
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText(coupon['code'], colWidths[0]),
+        ),
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText(
+            coupon['createdAt'] != null
+                ? DateFormat('dd/MM/yyyy').format(coupon['createdAt'] as DateTime)
+                : 'N/A',
+            colWidths[1],
+          ),
+        ),
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText("${coupon['discount_amount']}đ", colWidths[2]),
+        ),
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText(coupon['usage_count'].toString(), colWidths[3]),
+        ),
+        InkWell(
+          onTap: () => _showCouponForm(coupon),
+          child: cellText(coupon['usage_limit'].toString(), colWidths[4]),
+        ),
+      ],
     );
   }
 
@@ -144,7 +153,12 @@ class _CouponTableState extends State<CouponTable> {
     return Container(
       width: width,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      child: Text(text),
+      child: Text(
+        text,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        softWrap: false,
+      ),
     );
   }
 
@@ -158,25 +172,22 @@ class _CouponTableState extends State<CouponTable> {
         final List<double> colWidths = isMobile
             ? [tableWidth * 0.3, tableWidth * 0.3, tableWidth * 0.3]
             : [
-                tableWidth * 0.1,
-                tableWidth * 0.2,
-                tableWidth * 0.1,
-                tableWidth * 0.1,
-                tableWidth * 0.1,
-                tableWidth * 0.2,
-              ];
+          tableWidth * 0.15, // Tăng tỷ lệ cho Code
+          tableWidth * 0.25, // Tăng tỷ lệ cho Created At
+          tableWidth * 0.15, // Tăng tỷ lệ cho Discount Value
+          tableWidth * 0.2,  // Tăng tỷ lệ cho Usage ount
+          tableWidth * 0.25, // Tăng tỷ lệ cho Max Usage
+        ];
 
         final headers = isMobile
             ? ["Code", "Created At", "Discount Value"]
             : [
-                "Code",
-                "Created At",
-                "Discount Value",
-                "Usage Count",
-                "Max Usage",
-                "Applied Orders"
-              ];
-
+          "Code",
+          "Created At",
+          "Discount Value",
+          "Usage Count",
+          "Max Usage",
+        ];
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -230,7 +241,7 @@ class _CouponTableState extends State<CouponTable> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: SizedBox(
-                  width: tableWidth - 40,
+                  width: tableWidth,
                   child: Table(
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: {

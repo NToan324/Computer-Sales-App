@@ -188,11 +188,6 @@ class CustomSidebar extends StatelessWidget {
                 onTap: () => onMenuTap("Product"),
               ),
               _buildSubMenuItem(
-                title: "Product Discount",
-                isSelected: selectedMenu == "Product Discount",
-                onTap: () => onMenuTap("Product Discount"),
-              ),
-              _buildSubMenuItem(
                 title: "Category",
                 isSelected: selectedMenu == "Category",
                 onTap: () => onMenuTap("Category"),

@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:computer_sales_app/config/color.dart';
 
-class InvoiceDetailDialog extends StatefulWidget {
+class InvoiceDetailDialog extends StatelessWidget {
   final Map<String, dynamic> invoice;
 
-  const InvoiceDetailDialog({
-    super.key,
-    required this.invoice,
-  });
+  const InvoiceDetailDialog({super.key, required this.invoice});
 
-  @override
-  State<InvoiceDetailDialog> createState() => InvoiceDetailDialogState();
-}
-
-class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -26,7 +17,7 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Invoice Details - ${widget.invoice['id']}",
+            "Invoice Details - ${invoice['id']}",
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -45,7 +36,6 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Invoice Information Section
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -70,7 +60,7 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
                           const Icon(Icons.person, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Customer: ${widget.invoice['customerName']}",
+                            "Customer: ${invoice['customerName'] ?? 'N/A'}",
                             style: const TextStyle(fontSize: 14, color: Colors.black87),
                           ),
                         ],
@@ -81,7 +71,7 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
                           const Icon(Icons.calendar_today, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Invoice Date: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(widget.invoice['orderDate']))}",
+                            "Invoice Date: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(invoice['orderDate']))}",
                             style: const TextStyle(fontSize: 14, color: Colors.black87),
                           ),
                         ],
@@ -92,11 +82,11 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
                           const Icon(Icons.attach_money, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Total Amount: ${widget.invoice['totalAmount']}đ",
+                            "Total Amount: ${(invoice['totalAmount'] as double).toStringAsFixed(0)}đ",
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              color: Colors.blue,
                             ),
                           ),
                         ],
@@ -107,11 +97,8 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
                           const Icon(Icons.discount, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Discount Applied: ${widget.invoice['discountApplied']}đ",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.redAccent,
-                            ),
+                            "Discount Applied: ${(invoice['discountApplied'] as double).toStringAsFixed(0)}đ",
+                            style: const TextStyle(fontSize: 14, color: Colors.redAccent),
                           ),
                         ],
                       ),
@@ -120,8 +107,6 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Products Section
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -141,26 +126,25 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ...widget.invoice['products'].asMap().entries.map<Widget>((entry) {
+                      ...(invoice['products'] as List<dynamic>).asMap().entries.map<Widget>((entry) {
                         final index = entry.key;
-                        final product = entry.value;
+                        final product = entry.value as Map<String, dynamic>;
+                        final unitPrice = product['unit_price'] as double? ?? 0.0;
+                        final quantity = product['quantity'] as int? ?? 0;
                         return Column(
                           children: [
                             ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.grey[200],
-                                child: const Icon(Icons.laptop, color: Colors.grey),
-                              ),
+                              leading: const Icon(Icons.laptop, color: Colors.grey),
                               title: Text(
-                                "${product['name']} (x${product['quantity']})",
+                                "${product['name'] ?? 'Unknown Product'} (x$quantity)",
                                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                               ),
                               trailing: Text(
-                                "${product['price'] * product['quantity']}đ",
-                                style: const TextStyle(fontSize: 14, color: AppColors.primary),
+                                "${(unitPrice * quantity).toStringAsFixed(0)}đ",
+                                style: const TextStyle(fontSize: 14, color: Colors.blue),
                               ),
                             ),
-                            if (index < widget.invoice['products'].length - 1) const Divider(),
+                            if (index < (invoice['products'] as List<dynamic>).length - 1) const Divider(),
                           ],
                         );
                       }).toList(),
@@ -172,6 +156,12 @@ class InvoiceDetailDialogState extends State<InvoiceDetailDialog> {
           ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text("Close", style: TextStyle(color: Colors.grey)),
+        ),
+      ],
     );
   }
 }

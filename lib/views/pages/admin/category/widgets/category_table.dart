@@ -41,6 +41,7 @@ class _CategoryTableState extends State<CategoryTable> {
   }
 
   void _showCategoryForm(CategoryModel category) {
+    print('showCategoryForm: Category data = ${category.toJson()}'); // Debug
     showDialog(
       context: context,
       builder: (context) {
@@ -69,9 +70,10 @@ class _CategoryTableState extends State<CategoryTable> {
               buttonLabel: 'Save',
               initialCategory: {
                 '_id': category.id,
-                'name': category.name,
-                'category_image': category.image?.toMap(),
+                'category_name': category.name, // Fixed key
+                'category_description': category.description ?? '', // Added description
                 'isActive': category.isActive,
+                'category_image': category.image?.toMap(),
               },
               onSubmit: (updatedCategoryData) async {
                 try {
@@ -79,9 +81,7 @@ class _CategoryTableState extends State<CategoryTable> {
                       .updateCategory(category.id, updatedCategoryData);
                   Navigator.of(context).pop();
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to update category: $e')),
-                  );
+                  print(e);
                 }
               },
               onDelete: () async {

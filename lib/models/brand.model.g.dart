@@ -20,8 +20,7 @@ class BrandModelAdapter extends TypeAdapter<BrandModel> {
       id: fields[0] as String,
       name: fields[1] as String,
       image: fields[2] as BrandImage,
-      publicId: fields[3] as String,
-      isActive: fields[4] as bool,
+      isActive: fields[3] as bool,
     );
   }
 
@@ -36,8 +35,6 @@ class BrandModelAdapter extends TypeAdapter<BrandModel> {
       ..writeByte(2)
       ..write(obj.image)
       ..writeByte(3)
-      ..write(obj.publicId)
-      ..writeByte(4)
       ..write(obj.isActive);
   }
 

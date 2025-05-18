@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:computer_sales_app/config/color.dart';
 
 class OrderDetailDialog extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -13,16 +12,17 @@ class OrderDetailDialog extends StatefulWidget {
   });
 
   @override
-  State<OrderDetailDialog> createState() => OrderDetailDialogState();
+  State<OrderDetailDialog> createState() => _OrderDetailDialogState();
 }
 
-class OrderDetailDialogState extends State<OrderDetailDialog> {
+class _OrderDetailDialogState extends State<OrderDetailDialog> {
   late String _selectedStatus;
+  final List<String> _orderStatuses = ['PENDING', 'SHIPPING', 'DELIVERED', 'CANCELLED'];
 
   @override
   void initState() {
     super.initState();
-    _selectedStatus = widget.order['status'];
+    _selectedStatus = widget.order['status'] ?? 'PENDING';
   }
 
   @override
@@ -55,7 +55,6 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Order Information Section
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -77,41 +76,36 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          const Icon(Icons.person,
-                              color: Colors.grey, size: 20),
+                          const Icon(Icons.person, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Customer: ${widget.order['customerName']}",
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black87),
+                            "Customer: ${widget.order['customerName'] ?? 'N/A'}",
+                            style: const TextStyle(fontSize: 14, color: Colors.black87),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today,
-                              color: Colors.grey, size: 20),
+                          const Icon(Icons.calendar_today, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             "Order Date: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(widget.order['orderDate']))}",
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black87),
+                            style: const TextStyle(fontSize: 14, color: Colors.black87),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(Icons.attach_money,
-                              color: Colors.grey, size: 20),
+                          const Icon(Icons.attach_money, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Total Amount: ${widget.order['totalAmount']}đ",
+                            "Total Amount: ${(widget.order['totalAmount'] as double? ?? 0.0).toStringAsFixed(0)}đ",
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              color: Colors.blue,
                             ),
                           ),
                         ],
@@ -119,15 +113,11 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(Icons.discount,
-                              color: Colors.grey, size: 20),
+                          const Icon(Icons.discount, color: Colors.grey, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Discount Applied: ${widget.order['discountApplied']}đ",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.redAccent,
-                            ),
+                            "Discount Applied: ${(widget.order['discountApplied'] as double? ?? 0.0).toStringAsFixed(0)}đ",
+                            style: const TextStyle(fontSize: 14, color: Colors.redAccent),
                           ),
                         ],
                       ),
@@ -136,8 +126,6 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Products Section
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -157,32 +145,28 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ...widget.order['products']
+                      ...(widget.order['products'] as List<dynamic>? ?? [])
                           .asMap()
                           .entries
                           .map<Widget>((entry) {
                         final index = entry.key;
-                        final product = entry.value;
+                        final product = entry.value as Map<String, dynamic>? ?? {};
+                        final unitPrice = product['unit_price'] as double? ?? product['price'] as double? ?? 0.0;
+                        final quantity = product['quantity'] as int? ?? 0;
                         return Column(
                           children: [
                             ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.grey[200],
-                                child: const Icon(Icons.laptop,
-                                    color: Colors.grey),
-                              ),
+                              leading: const Icon(Icons.laptop, color: Colors.grey),
                               title: Text(
-                                "${product['name']} (x${product['quantity']})",
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w500),
+                                "${product['name'] ?? 'Unknown Product'} (x$quantity)",
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                               ),
                               trailing: Text(
-                                "${product['price'] * product['quantity']}đ",
-                                style: const TextStyle(
-                                    fontSize: 14, color: AppColors.primary),
+                                "${(unitPrice * quantity).toStringAsFixed(0)}đ",
+                                style: const TextStyle(fontSize: 14, color: Colors.blue),
                               ),
                             ),
-                            if (index < widget.order['products'].length - 1)
+                            if (index < (widget.order['products'] as List<dynamic>? ?? []).length - 1)
                               const Divider(),
                           ],
                         );
@@ -192,8 +176,6 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Status Section
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -219,37 +201,29 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
                             child: DropdownMenu<String>(
                               initialSelection: _selectedStatus,
                               onSelected: (value) {
-                                setState(() {
-                                  _selectedStatus = value!;
-                                  widget.onStatusChanged(value);
-                                });
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedStatus = value;
+                                  });
+                                }
                               },
-                              dropdownMenuEntries: [
-                                "Pending",
-                                "Confirmed",
-                                "Shipped",
-                                "Delivered"
-                              ]
+                              dropdownMenuEntries: _orderStatuses
                                   .map((value) => DropdownMenuEntry(
-                                        value: value,
-                                        label: value,
-                                      ))
+                                value: value,
+                                label: value,
+                              ))
                                   .toList(),
-                              textStyle: const TextStyle(
-                                  fontSize: 14, color: Colors.black),
+                              textStyle: const TextStyle(fontSize: 14, color: Colors.black),
                               menuStyle: const MenuStyle(
-                                backgroundColor:
-                                    WidgetStatePropertyAll(Colors.white),
+                                backgroundColor: WidgetStatePropertyAll(Colors.white),
                               ),
                               inputDecorationTheme: const InputDecorationTheme(
                                 border: OutlineInputBorder(),
                                 filled: true,
                                 fillColor: Colors.white,
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 12),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.orange, width: 2),
+                                  borderSide: BorderSide(color: Colors.orange, width: 2),
                                 ),
                               ),
                             ),
@@ -267,10 +241,7 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text(
-            "Close",
-            style: TextStyle(color: Colors.grey),
-          ),
+          child: const Text("Close", style: TextStyle(color: Colors.grey)),
         ),
         ElevatedButton(
           onPressed: () {
@@ -278,15 +249,10 @@ class OrderDetailDialogState extends State<OrderDetailDialog> {
             Navigator.of(context).pop();
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            backgroundColor: Colors.blue,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          child: const Text(
-            "Save",
-            style: TextStyle(color: Colors.white),
-          ),
+          child: const Text("Save", style: TextStyle(color: Colors.white)),
         ),
       ],
     );

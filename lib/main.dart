@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:computer_sales_app/provider/cart_provider.dart';
 import 'package:computer_sales_app/provider/product_provider.dart';
 import 'package:computer_sales_app/provider/user_provider.dart';
+import 'package:computer_sales_app/provider/coupon_provider.dart';
 import 'package:computer_sales_app/routes/app_routes.dart';
 
 void main() {
@@ -15,7 +16,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
-        ChangeNotifierProvider(create: (_) => BrandProvider())
+        ChangeNotifierProvider(create: (_) => BrandProvider()),
+        ChangeNotifierProvider(create: (_) => CouponProvider())
       ],
       child: const MyApp(),
     ),
