@@ -14,17 +14,17 @@ jobs:
         working-directory: hosting
     steps:
       - uses: actions/checkout@v4
-      
+
       # Thêm bước cài Flutter SDK
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'  # hoặc version bạn muốn
-      
+          flutter-version: "3.29.0" # hoặc version bạn muốn
+
       # Nếu bạn không cần npm thì bỏ dòng dưới
       # - run: npm ci
-      
+
       - run: flutter build web
-      
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
