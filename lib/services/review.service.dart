@@ -1,4 +1,4 @@
-import 'package:computer_sales_app/models/review.model.dart.dart';
+import 'package:computer_sales_app/models/review.model.dart';
 import 'package:computer_sales_app/services/base_client.dart';
 
 class ReviewService extends BaseClient {

@@ -57,14 +57,24 @@ class ProductProvider with ChangeNotifier {
   }
 
   Future<void> fetchBrands() async {
-    final response = await brandService.getBrands();
-    brands = response.map((brand) => brand).toList();
+    try {
+      final response = await brandService.getBrands();
+      brands = response.map((brand) => brand).toList();
 
-    // Cập nhật cache Hive
-    if (_brandBox != null) {
-      await _brandBox!.clear();
-      for (var brand in brands) {
-        await _brandBox!.put(brand.id, brand);
+      // Lưu cache
+      if (_brandBox != null) {
+        await _brandBox!.clear();
+        for (var brand in brands) {
+          await _brandBox!.put(brand.id, brand);
+        }
+      }
+    } catch (e) {
+      // Nếu lỗi (mất mạng), lấy từ cache
+      if (_brandBox != null && _brandBox!.isNotEmpty) {
+        brands = _brandBox!.values.toList();
+        debugPrint("Đã load brand từ cache do lỗi: $e");
+      } else {
+        debugPrint("Không có dữ liệu brand cache và lỗi xảy ra: $e");
       }
     }
 
@@ -72,9 +82,20 @@ class ProductProvider with ChangeNotifier {
   }
 
   Future<void> fetchCategories() async {
-    final response = await categoryService.getCategories();
-    categories = response.map((category) => category).toList();
-    await _updateCategoryHiveCache(categories);
+    try {
+      final response = await categoryService.getCategories();
+      categories = response.map((category) => category).toList();
+      await _updateCategoryHiveCache(categories);
+    } catch (e) {
+      // Nếu lỗi (mất mạng), lấy từ cache
+      if (_categoryBox != null && _categoryBox!.isNotEmpty) {
+        categories = _categoryBox!.values.toList();
+        debugPrint("Đã load category từ cache do lỗi: $e");
+      } else {
+        debugPrint("Không có dữ liệu category cache và lỗi xảy ra: $e");
+      }
+    }
+
     notifyListeners();
   }
 
@@ -247,21 +268,33 @@ class ProductProvider with ChangeNotifier {
             .value);
       }
     }
+    try {
+      final response = await productService.searchProductVariants(
+        brandIds: brandIds.isNotEmpty ? brandIds : null,
+        categoryIds: categoryIds.isNotEmpty ? categoryIds : null,
+        ratings: ratings,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        page: 1,
+        limit: limit,
+      );
 
-    final response = await productService.searchProductVariants(
-      brandIds: brandIds.isNotEmpty ? brandIds : null,
-      categoryIds: categoryIds.isNotEmpty ? categoryIds : null,
-      ratings: ratings,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
-      page: 1,
-      limit: limit,
-    );
+      if (response['data'].length == 0) {
+        products = [];
+        totalPage = 0;
+        page = 0;
+        limit = 0;
+        return;
+      }
 
-    products = response['data'];
-    totalPage = response['totalPages'];
-    page = response['page'];
-    limit = response['limit'];
+      products = response['data'];
+      totalPage = response['totalPages'];
+      page = response['page'];
+      limit = response['limit'];
+    } catch (e) {
+      errorMessage = e.toString();
+    }
+
     notifyListeners();
   }
 
@@ -290,11 +323,19 @@ class ProductProvider with ChangeNotifier {
         '${formatMoney(minPrice)} - ${formatMoney(maxPrice)}'
       ],
       if (brandIds != null) ...getNameBrandById(brandIds),
-      if (categoryIds != null) ...getNamCategoryById(categoryIds),
+      if (categoryIds != null) ...getNameCategoryById(categoryIds),
       if (rating != null && rating.value != null) rating.label,
     };
 
     updateFilters(combined.toList());
+
+    if (response['data'].length == 0) {
+      products = [];
+      totalPage = 0;
+      this.page = 0;
+      this.limit = 0;
+      return;
+    }
 
     products = response['data'];
     totalPage = response['totalPages'];
@@ -311,8 +352,8 @@ class ProductProvider with ChangeNotifier {
 
   Future<void> removeFilterByName(String name) async {
     filters.removeWhere((item) => item == name);
-    notifyListeners();
     await fetchFilteredProducts();
+    notifyListeners();
   }
 
   void updateFilters(List<String> newFilters) {
@@ -333,7 +374,7 @@ class ProductProvider with ChangeNotifier {
   }
 
   //Get name of category by id
-  List<String> getNamCategoryById(List<String> categoryIds) {
+  List<String> getNameCategoryById(List<String> categoryIds) {
     return categoryIds
         .map((categoryId) =>
             categories.firstWhere((category) => category.id == categoryId).name)
@@ -342,6 +383,52 @@ class ProductProvider with ChangeNotifier {
 
   void setProducts(List<ProductModel> products) {
     this.products = products;
+    notifyListeners();
+  }
+
+  Future<void> getProductsBestSelling() async {
+    try {
+      final response = await productService.getProductsBestSelling();
+
+      if (response['data'].length == 0) {
+        products = [];
+        totalPage = 0;
+        page = 0;
+        limit = 0;
+        notifyListeners();
+        return;
+      }
+
+      products = response['data'];
+      totalPage = response['totalPages'];
+      page = response['page'];
+      limit = response['limit'];
+    } catch (e) {
+      errorMessage = e.toString();
+    }
+    notifyListeners();
+  }
+
+  Future<void> getProductsNewest() async {
+    try {
+      final response = await productService.getProductsNewest();
+
+      if (response['data'].length == 0) {
+        products = [];
+        totalPage = 0;
+        page = 0;
+        limit = 0;
+        notifyListeners();
+        return;
+      }
+
+      products = response['data'];
+      totalPage = response['totalPages'];
+      page = response['page'];
+      limit = response['limit'];
+    } catch (e) {
+      errorMessage = e.toString();
+    }
     notifyListeners();
   }
 }

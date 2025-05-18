@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
@@ -101,10 +102,23 @@ class _PreviewImageState extends State<PreviewImage> {
                                   color: Colors.black26,
                                   width: widget.activeIndex == index ? 2 : 0,
                                 ),
-                                image: DecorationImage(
-                                  image: NetworkImage(widget.imagesUrl[index]),
+                              ),
+                              child: CachedNetworkImage(
+                                imageUrl: widget.imagesUrl[index],
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => SkeletonImage(
+                                  imageHeight:
+                                      widget.direction == Axis.horizontal
+                                          ? 50
+                                          : 120,
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                  'assets/images/image_default_error.png',
                                   fit: BoxFit.cover,
                                 ),
+                                fadeInDuration:
+                                    const Duration(milliseconds: 500),
                               ),
                             )
                           : SkeletonImage(

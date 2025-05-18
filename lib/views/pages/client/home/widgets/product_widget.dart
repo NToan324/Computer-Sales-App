@@ -1,7 +1,9 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:computer_sales_app/components/custom/pagination.dart';
 import 'package:computer_sales_app/components/custom/skeleton.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/provider/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
@@ -29,15 +31,29 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
     _fetchProducts();
   }
 
+  String errorMessage = '';
+
   Future<void> _fetchProducts() async {
     setState(() {
       _isLoading = true;
+      errorMessage = '';
     });
-    Provider.of<ProductProvider>(context, listen: false)
-        .fetchProducts(page: 1, limit: 12, resetFilter: true);
-    setState(() {
-      _isLoading = false;
-    });
+
+    try {
+      await Provider.of<ProductProvider>(context, listen: false).fetchProducts(
+        page: 1,
+        limit: 12,
+        resetFilter: true,
+      );
+    } catch (e) {
+      errorMessage = 'Please check your internet connection';
+      showCustomSnackBar(context, 'Please check your internet connection');
+      debugPrint('Lỗi fetch products: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -51,6 +67,42 @@ class _ProductListViewWidgetState extends State<ProductListViewWidget> {
     final products = provider.products;
     final totalPage = provider.totalPage;
     final currentPage = provider.page;
+
+    if (errorMessage.isNotEmpty && provider.products.isEmpty) {
+      final mediaQuery = MediaQuery.of(context);
+      final remainingHeight =
+          mediaQuery.size.height - 350; // hoặc tính lại nếu cần
+
+      return SizedBox(
+        height: remainingHeight,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/No_Internet.png', // Đường dẫn ảnh bạn muốn hiển thị
+                width: 250, // Chiều rộng bạn muốn
+                height: 250, // Chiều cao bạn muốn
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: 300,
+                child: Text(
+                  errorMessage,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Column(
       children: [
@@ -144,15 +196,15 @@ class ProductView extends StatelessWidget {
                 height: 180,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  child: images[0].url.isNotEmpty
-                      ? Image.network(
-                          images[0].url,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'assets/images/laptop.png',
-                          fit: BoxFit.cover,
-                        ),
+                  child: CachedNetworkImage(
+                    imageUrl: images[0].url,
+                    placeholder: (context, url) => const SkeletonImage(
+                      imageHeight: 160,
+                    ),
+                    errorWidget: (context, url, error) =>
+                        Image.asset('assets/images/image_default_error.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -215,6 +267,8 @@ class FilterHomeProduct extends StatefulWidget {
 class _FilterHomeProductState extends State<FilterHomeProduct> {
   final List<String> filtersList = [
     'All',
+    'Newest',
+    'Best Seller',
     'Low to High',
     'High to Low',
   ];
@@ -250,18 +304,24 @@ class _FilterHomeProductState extends State<FilterHomeProduct> {
             itemBuilder: (context, index) {
               return InkWell(
                 onTap: () {
-                  setState(
-                    () {
-                      isSelectedList = filtersList[index];
+                  setState(() {
+                    isSelectedList = filtersList[index];
+                    final productProvider =
+                        Provider.of<ProductProvider>(context, listen: false);
+
+                    if (filtersList[index] == 'Best Seller') {
+                      productProvider.getProductsBestSelling();
+                    } else if (filtersList[index] == 'Newest') {
+                      productProvider.getProductsNewest();
+                    } else {
                       final valueFilter = switch (filtersList[index]) {
                         'Low to High' => 'Price: Low to High',
                         'High to Low' => 'Price: High to Low',
                         _ => 'All',
                       };
-                      Provider.of<ProductProvider>(context, listen: false)
-                          .handleSortChange(valueFilter);
-                    },
-                  );
+                      productProvider.handleSortChange(valueFilter);
+                    }
+                  });
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 2),

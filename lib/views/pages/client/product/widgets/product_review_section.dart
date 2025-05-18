@@ -2,7 +2,7 @@ import 'package:computer_sales_app/components/custom/pagination.dart';
 import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
-import 'package:computer_sales_app/models/review.model.dart.dart';
+import 'package:computer_sales_app/models/review.model.dart';
 import 'package:computer_sales_app/provider/user_provider.dart';
 import 'package:computer_sales_app/services/review.service.dart';
 import 'package:computer_sales_app/services/socket_io_client.dart';

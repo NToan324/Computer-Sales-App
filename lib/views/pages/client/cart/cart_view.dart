@@ -12,6 +12,7 @@ import 'package:computer_sales_app/views/pages/client/cart/widgets/cart_item_wid
 import 'package:computer_sales_app/views/pages/client/cart/widgets/promocode_section_widget.dart';
 import 'package:computer_sales_app/views/pages/client/cart/widgets/remove_cart_widget.dart';
 import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -259,6 +260,7 @@ class _CartViewState extends State<CartView> {
     return Consumer<CartProvider>(
       builder: (context, cartProvider, _) {
         final cartItems = cartProvider.cartItems;
+        final isError = cartProvider.errorMessage;
         return Stack(
           children: <Widget>[
             Scaffold(
@@ -277,6 +279,37 @@ class _CartViewState extends State<CartView> {
                       children: <Widget>[
                         Column(
                           children: [
+                            if (isError.isNotEmpty && cartItems.isEmpty)
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height - 200,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/No_Internet.png', // Đường dẫn ảnh bạn muốn hiển thị
+                                        width: 250, // Chiều rộng bạn muốn
+                                        height: 250, // Chiều cao bạn muốn
+                                        fit: BoxFit.contain,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      SizedBox(
+                                        width: 300,
+                                        child: Text(
+                                          'No internet connection. Please check your network settings.',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             if (!Responsive.isMobile(context) &&
                                 cartItems.isNotEmpty)
                               _buildHeaderRow(),

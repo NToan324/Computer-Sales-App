@@ -14,6 +14,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
 
+  print('🔧 API_URL: ${dotenv.env['BASE_URL']}');
+
   // Khởi tạo Hive
   await Hive.initFlutter();
 
