@@ -35,6 +35,16 @@ class BrandModel extends HiveObject {
       isActive: json['isActive'] as bool,
     );
   }
+
+  toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'image': image.toJson(),
+      'publicId': publicId,
+      'isActive': isActive,
+    };
+  }
 }
 
 @HiveType(typeId: 5)
@@ -55,5 +65,12 @@ class BrandImage {
       url: json['url'] as String,
       publicId: json['public_id'] as String,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'public_id': publicId,
+    };
   }
 }

@@ -12,10 +12,9 @@ class SocketService {
     final String socketUrl =
         dotenv.env['SOCKET_URL'] ?? 'http://localhost:3000/';
 
-    print('🔌 Kết nối tới Socket.IO: $socketUrl');
 
     socket = IO.io(
-      '$socketUrl/review',
+      '${socketUrl}review',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .enableAutoConnect()
