@@ -118,10 +118,13 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView> {
                       obscureText: true,
                     ),
                     const SizedBox(height: 10),
-                    MyButton(
-                      text: 'Reset Password',
-                      onTap: (_) => newPass(context),
-                      isLoading: _isLoading, // Truyền trạng thái loading
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: MyButton(
+                        text: 'Reset Password',
+                        onTap: (_) => newPass(context),
+                        isLoading: _isLoading, // Truyền trạng thái loading
+                      ),
                     ),
                   ],
                 ),

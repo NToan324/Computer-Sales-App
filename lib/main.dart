@@ -2,6 +2,7 @@ import 'package:computer_sales_app/models/brand.model.dart';
 import 'package:computer_sales_app/models/category.model.dart';
 import 'package:computer_sales_app/models/product.model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:computer_sales_app/provider/cart_provider.dart';
@@ -11,6 +12,7 @@ import 'package:computer_sales_app/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
   // Khởi tạo Hive
   await Hive.initFlutter();

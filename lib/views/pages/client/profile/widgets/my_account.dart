@@ -272,8 +272,7 @@ class _PersonelInformationState extends State<PersonelInformation> {
                               ? FileImage(_selectedFile!)
                               : (_selectedImageBytes != null
                                       ? MemoryImage(_selectedImageBytes!)
-                                      : (widget.userInfo != null &&
-                                              widget.userInfo!.avatar != null
+                                      : (widget.userInfo != null
                                           ? NetworkImage(
                                               widget.userInfo!.avatar.url)
                                           : const AssetImage(

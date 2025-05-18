@@ -3,10 +3,12 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:computer_sales_app/services/app_exceptions.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BaseClient {
-  static const String baseUrl = 'http://localhost:3000/';
+  static final String baseUrl =
+      dotenv.env['BASE_URL'] ?? 'http://localhost:3000/';
   static const int timeOutDuration = 30;
   late Dio dio;
 

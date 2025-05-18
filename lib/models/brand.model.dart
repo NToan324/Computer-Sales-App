@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 part 'brand.model.g.dart';
 
 @HiveType(typeId: 4)
-class BrandModel {
+class BrandModel extends HiveObject {
   @HiveField(0)
   final String id;
 
