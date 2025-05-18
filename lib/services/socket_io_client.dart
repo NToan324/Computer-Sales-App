@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -8,9 +9,13 @@ class SocketService {
   Future<void> connect({required String productVariantId}) async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
+    final String socketUrl =
+        dotenv.env['SOCKET_URL'] ?? 'http://localhost:3000/';
+
+    print('🔌 Kết nối tới Socket.IO: $socketUrl');
 
     socket = IO.io(
-      'http://localhost:3000/review',
+      '$socketUrl/review',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .enableAutoConnect()

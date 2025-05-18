@@ -645,6 +645,7 @@ class _ProductListState extends State<ProductList> {
     });
   }
 
+
   Future<void> _fetchProducts() async {
     setState(() {
       _isLoading = true;

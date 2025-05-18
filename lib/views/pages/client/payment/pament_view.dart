@@ -1,5 +1,4 @@
 import 'package:computer_sales_app/components/custom/snackbar.dart';
-import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/order.model.dart';
 import 'package:computer_sales_app/provider/cart_provider.dart';

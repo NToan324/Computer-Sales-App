@@ -222,18 +222,39 @@ class ListCategoryWidget extends StatefulWidget {
 }
 
 class _ListCategoryWidgetState extends State<ListCategoryWidget> {
+  Future<void> _fetchProducts() async {
+
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
+    //clear filters
+    productProvider.clearFilters();
+    productProvider.fetchProducts(page: 1, limit: 12);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => {
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (_) => ProductPageView(
+        //       categoryId: widget.text,
+        //     ),
+        //   ),
+        // )
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ProductPageView(
-              categoryId: widget.text,
-            ),
-          ),
-        )
+              builder: (context) => ProductPageView(categoryId: widget.text)),
+        ).then((_) {
+          // Mã này sẽ được thực thi khi ProductPageView bị pop
+          // Gọi _fetchProducts() để xóa bộ lọc và tải lại dữ liệu
+          setState(() {
+            _fetchProducts();
+          });
+        })
       },
       child: Column(
         spacing: 10,

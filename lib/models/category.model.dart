@@ -1,6 +1,9 @@
 import 'dart:convert';
 
-class CategoryModel {
+
+@HiveType(typeId: 2)
+class CategoryModel extends HiveObject {
+  @HiveField(0)
   final String id;
   final String name;
   final CategoryImage? image; // Có thể null

@@ -12,7 +12,6 @@ import 'package:computer_sales_app/views/pages/client/payment/pament_view.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_details_view.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:computer_sales_app/views/pages/client/profile/profile_view.dart';
-import 'package:computer_sales_app/views/pages/client/search/search_product_screen.dart';
 import 'package:computer_sales_app/views/pages/client/splash/splash_view.dart';
 import 'package:computer_sales_app/views/pages/client/voucher/voucher_view.dart';
 

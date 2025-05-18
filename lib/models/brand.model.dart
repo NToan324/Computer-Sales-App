@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+
+@HiveType(typeId: 4)
 class BrandModel extends HiveObject {
+  @HiveField(0)
   final String id;
   final String name;
   final BrandImage? image;
