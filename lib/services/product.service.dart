@@ -244,6 +244,14 @@ class ProductService extends BaseClient {
 
     final uri = Uri.parse("product/variant/search?${queryList.join('&')}");
     final res = await get(uri.toString());
+    if (res['data'].length == 0) {
+      return {
+        'data': [],
+        'totalPages': 0,
+        'page': 0,
+        'limit': 0,
+      };
+    }
 
     return {
       'totalPages': res['data']['totalPages'],

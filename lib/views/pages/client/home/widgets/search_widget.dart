@@ -16,11 +16,13 @@ class _SearchWidgetState extends State<SearchWidget> {
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _recentSearches = [
-    "Laptop gaming",
+    "Macbook",
+    "Lenovo",
+    "Asus",
     "Chuột không dây",
     "Bàn phím cơ",
-    "Màn hình 4K",
-    "Tai nghe bluetooth"
+    "Màn hình ",
+    "Tai nghe Gaming"
   ];
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();

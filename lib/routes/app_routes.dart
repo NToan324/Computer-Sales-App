@@ -1,4 +1,6 @@
 import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
+import 'package:computer_sales_app/views/pages/client/order/order_view.dart';
+import 'package:computer_sales_app/views/pages/client/search/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/views/pages/admin/admin_screen.dart';
 import 'package:computer_sales_app/views/pages/client/chat/widgets/chat_view.dart';
@@ -28,7 +30,8 @@ class AppRoutes {
   static const String profile = 'profile';
   static const String cart = 'cart';
   static const String admin = 'admin';
-  static const String searchProduct = 'search-product';
+  static const String searchProduct = 'search';
+  static const String orderView = 'order-view';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => SplashView(),
@@ -37,6 +40,7 @@ class AppRoutes {
     changePassword: (context) => CreateNewPasswordView(),
     home: (context) => BottomNavigationBarCustom(),
     product: (context) => ProductPageView(),
+    orderView: (context) => OrderView(),
     productDetails: (context) => ProductDetailsView(
           productId: '',
           categoryId: '',
@@ -50,15 +54,6 @@ class AppRoutes {
   };
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
-    if (settings.name == searchProduct) {
-      final args = settings.arguments as String?;
-      return MaterialPageRoute(
-        builder: (context) => SearchProductScreen(
-          onSearch: (query) {},
-          initialQuery: args ?? "",
-        ),
-      );
-    }
     if (settings.name != null &&
         settings.name!.startsWith('/product-details/')) {
       final id = settings.name!.split('/').last;
@@ -70,6 +65,15 @@ class AppRoutes {
           productId: id,
           categoryId: args?['categoryId'], // Lấy categoryId từ arguments
         ),
+      );
+    }
+
+    if (settings.name == searchProduct) {
+      final args = settings.arguments as Map<String, dynamic>?;
+      final recentSearches = args?['recentSearches'] ?? <String>[];
+
+      return MaterialPageRoute(
+        builder: (context) => SearchScreen(recentSearches: recentSearches),
       );
     }
 

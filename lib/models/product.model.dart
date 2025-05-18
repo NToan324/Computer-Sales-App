@@ -1,20 +1,50 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
+part 'product.model.g.dart';
 
 //Product is product Variant
-class ProductModel {
+@HiveType(typeId: 0)
+class ProductModel extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String productId;
+
+  @HiveField(2)
   final String variantName;
+
+  @HiveField(3)
   final String variantColor;
+
+  @HiveField(4)
   final String variantDescription;
+
+  @HiveField(5)
   final double price;
+
+  @HiveField(6)
   final double discount;
+
+  @HiveField(7)
   final int quantity;
+
+  @HiveField(8)
   final double? averageRating;
+
+  @HiveField(9)
   final String? brandId;
+
+  @HiveField(10)
   final String? categoryId;
+
+  @HiveField(11)
   final int? reviewCount;
+
+  @HiveField(12)
   final List<ProductImage> images;
+
+  @HiveField(13)
   final bool isActive;
 
   ProductModel({
@@ -102,8 +132,12 @@ class ProductModel {
   }
 }
 
+@HiveType(typeId: 1)
 class ProductImage {
+  @HiveField(0)
   final String url;
+
+  @HiveField(1)
   final String publicId;
 
   ProductImage({

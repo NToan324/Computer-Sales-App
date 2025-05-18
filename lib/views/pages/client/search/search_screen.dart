@@ -1,3 +1,7 @@
+import 'package:computer_sales_app/components/custom/skeleton.dart';
+import 'package:computer_sales_app/models/product.model.dart';
+import 'package:computer_sales_app/services/product.service.dart';
+import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
 import 'package:computer_sales_app/views/pages/client/search/widget/search_field.dart';
@@ -16,7 +20,12 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   late List<String> _recentSearches;
-  String searchQuery = ""; // Trạng thái lưu từ khóa tìm kiếm
+
+  List<ProductModel> _searchResults = [];
+  ProductService productService = ProductService();
+  bool _isLoading = false;
+
+  String searchQuery = "";
 
   @override
   void initState() {
@@ -24,15 +33,32 @@ class _SearchScreenState extends State<SearchScreen> {
     _recentSearches = List.from(widget.recentSearches);
   }
 
-  void _updateSearch(String query) {
+  void _updateSearch(String query) async {
     setState(() {
       searchQuery = query;
+      _isLoading = true;
+    });
+
+    try {
+      final result = await productService.searchProductVariants(name: query);
+      setState(() {
+        _searchResults = result['data'] as List<ProductModel>;
+      });
+
+      // Lưu vào lịch sử tìm kiếm
       if (query.isNotEmpty) {
         _recentSearches.remove(query);
         _recentSearches.insert(0, query);
         if (_recentSearches.length > 5) _recentSearches.removeLast();
       }
-    });
+    } catch (e) {
+      // Xử lý lỗi nếu cần
+      print("Search error: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _clearAllSearches() {
@@ -144,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                           ),
                           Text(
-                            '10 Found',
+                            "${_searchResults.length} results",
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -158,7 +184,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
-                      child: const ProductListViewWidget(),
+                      child: ProductListForSearch(
+                          products: _searchResults, isLoading: _isLoading),
                     ),
                   ],
                 ),
@@ -166,6 +193,60 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ProductListForSearch extends StatefulWidget {
+  final List<ProductModel> products;
+  final bool isLoading;
+
+  const ProductListForSearch({
+    super.key,
+    required this.products,
+    required this.isLoading,
+  });
+
+  @override
+  State<ProductListForSearch> createState() => _ProductListForSearchState();
+}
+
+class _ProductListForSearchState extends State<ProductListForSearch> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GridView.builder(
+          itemCount: widget.isLoading ? 10 : widget.products.length,
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: Responsive.isDesktop(context) ? 4 : 2,
+            childAspectRatio: 0.55,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+            mainAxisExtent: 350,
+          ),
+          itemBuilder: (context, index) {
+            final variant = !widget.isLoading && index < widget.products.length
+                ? widget.products[index]
+                : null;
+
+            return widget.isLoading
+                ? const Skeleton()
+                : ProductView(
+                    id: variant?.id ?? '',
+                    categoryId: variant?.categoryId ?? '',
+                    variantName: variant?.variantName ?? '',
+                    images: (variant?.images as List<ProductImage>),
+                    price: (variant?.price as double),
+                    variantDescription: variant?.variantDescription ??
+                        'No description available',
+                    averageRating: variant?.averageRating.toString() ?? '0.0',
+                  );
+          },
+        ),
+      ],
     );
   }
 }

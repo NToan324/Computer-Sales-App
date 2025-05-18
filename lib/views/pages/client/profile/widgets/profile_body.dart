@@ -16,6 +16,7 @@ class ProfileBody extends StatefulWidget {
 
 class _ProfileBodyState extends State<ProfileBody> {
   double _selectedIndex = 0;
+
   List<String> profileMenuItems = [
     'My Account',
     'Order Management',
@@ -35,9 +36,10 @@ class _ProfileBodyState extends State<ProfileBody> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
-    final name = userProvider.name;
-    final point = userProvider.point;
-    final avatar = userProvider.avatarUrl;
+    final name = userProvider.userModel?.fullName ?? 'Customer';
+    final point = userProvider.userModel?.loyaltyPoints ?? 0;
+    final avatar = userProvider.userModel?.avatar.url;
+
 
     return Container(
       color: Colors.white,
@@ -94,7 +96,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                               borderRadius: BorderRadius.circular(24),
                             ),
                             child: Text(
-                              '${point?.toStringAsFixed(0)} Points',
+                              '${point.toStringAsFixed(0)} Points',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -178,7 +180,9 @@ class _ProfileBodyState extends State<ProfileBody> {
               child: _selectedIndex == 0
                   ? MyAccountView()
                   : _selectedIndex == 1
-                      ? OrderManagement()
+                      ? OrderManagement(
+                          userId: userProvider.userModel?.id ?? '',
+                      )
                       : _selectedIndex == 2
                           ? PaymentManagement()
                           : SupportAccount(),

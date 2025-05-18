@@ -10,7 +10,7 @@ class OrderService extends BaseClient {
     required List<OrderItemModel> items,
   }) async {
     final response = await post(
-      '/order',
+      'order',
       {
         'name': name,
         'email': email,
@@ -19,27 +19,13 @@ class OrderService extends BaseClient {
         'items': items.map((item) => item.toJson()).toList(),
       },
     );
-    return OrderModel.fromJson(response.data);
+    return OrderModel.fromJson(response['data']);
+  }
+
+  Future<List<OrderModel>> getOrdersById() async {
+    final response = await get('user/orders');
+    return response['data']
+        .map<OrderModel>((order) => OrderModel.fromJson(order))
+        .toList();
   }
 }
-
-
-// {
-//     "name": "Nhat Toan",
-//     "email": "nhattoan664t@gmail.com",
-//     "address": "Can Tho",
-//     "payment_method": "BANK_TRANSFER",
-//     "items": [
-//         {"product_variant_id": "682444bda8ae196226ecf6c2", 
-//         "product_variant_name":"Chuột không dây Dell Pro MS5120W" ,
-//         "quantity":10, 
-//         "price": 990000, 
-//         "discount":0.31, 
-//         "images":
-//             {
-//                 "url":"https://bizweb.dktcdn.net/thumb/1024x1024/100/329/122/products/chuot-khong-day-dell-pro-ms5120w-05.jpg?v=1718593724650"
-//             }
-//         }
-//     ]
-
-// }

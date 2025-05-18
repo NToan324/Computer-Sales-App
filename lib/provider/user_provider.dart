@@ -1,65 +1,53 @@
-import 'dart:convert';
-
+import 'package:computer_sales_app/models/user.model.dart';
 import 'package:computer_sales_app/services/user.service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier {
-  String? _id;
-  String? _phone;
-  String? _name;
-  String? _role;
-  String? _address;
-  double? _point;
-  AvatarUser? _avatar;
-
-  String? get avatarId => _avatar?.publicId;
-  String? get avatarUrl => _avatar?.url;
-  String? get id => _id;
-  String? get phone => _phone;
-  String? get name => _name;
-  String? get role => _role;
-  String? get address => _address;
-  double? get point => _point;
-
+  UserModel? userModel;
   final userService = UserService();
 
   Future<void> loadUserData() async {
+    //check if user is logged in
     final prefs = await SharedPreferences.getInstance();
-
-    String? userJson = prefs.getString('user');
-    if (userJson != null) {
-      Map<String, dynamic> userMap = jsonDecode(userJson);
-      setUser(userMap);
+    String? accessToken = prefs.getString('accessToken');
+    if (accessToken == null) {
+      return;
     }
-  }
 
-  void setUser(Map<String, dynamic> user) {
-    _id = user['id'];
-    _phone = user['phone'];
-    _name = user['name'];
-    _role = user['role'];
-    _point = user['point'];
-    _address = user['address'];
-    _avatar =
-        user['avatar'] != null ? AvatarUser.fromJson(user['avatar']) : null;
+    final data = await userService.getUserInfoById();
+    userModel = UserModel(
+        id: data.id,
+        email: data.email,
+        phone: data.phone,
+        fullName: data.fullName,
+        address: data.address,
+        avatar: data.avatar,
+        role: data.role,
+        loyaltyPoints: data.loyaltyPoints,
+        isActive: data.isActive);
 
     notifyListeners();
   }
 
-  void setAddress(String address) {
-    _address = address;
+  void setUser(Map<String, dynamic> user) {
+    userModel = UserModel(
+      id: user['_id'],
+      email: user['email'],
+      phone: user['phone'],
+      fullName: user['name'],
+      address: user['address'] ?? '',
+      avatar: UserImage.fromJson(user['avatar']),
+      role: user['role'],
+      loyaltyPoints: user['loyalty_points'] ?? 0.0,
+      isActive: user['isActive'] ?? true,
+    );
+
     notifyListeners();
   }
 
   void clearUser() {
-    _id = null;
-    _phone = null;
-    _name = null;
-    _role = null;
-    _point = null;
-    _address = null;
-    _avatar = null;
+    userModel = null;
     notifyListeners();
   }
 }

@@ -1,28 +1,54 @@
-import 'package:computer_sales_app/views/pages/client/order/widget/order_item.dart';
-import 'package:computer_sales_app/views/pages/client/order/widget/timeline_list.dart';
+import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/models/order.model.dart';
+import 'package:computer_sales_app/services/order.service.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/pages/client/order/widget/order_item.dart';
+import 'package:computer_sales_app/views/pages/client/order/widget/timeline_list.dart';
 
-class OrderView extends StatelessWidget {
-  OrderView({super.key});
+class OrderView extends StatefulWidget {
+  const OrderView({super.key});
 
-  final List<Map<String, String>> orders = List.generate(
-    100,
-    (index) => {
-      "title": "MacBook Air 13\" M2",
-      "specs": "RAM: 8GB | SSD: 256GB",
-      "price": "15,000,000 VND",
-      "image": "assets/images/laptop.png",
-      "state": index % 3 == 0
-          ? "Track Order"
-          : (index % 3 == 1 ? "Review" : "Re-Order"),
-      "date": "24/03/2025",
-    },
-  );
+  @override
+  State<OrderView> createState() => _OrderViewState();
+}
 
-  Widget buildOrderView(List<Map<String, String>> orders, String state) {
+class _OrderViewState extends State<OrderView>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  OrderService orderService = OrderService();
+
+  List<OrderModel> orders = [];
+
+  Future<void> fetchOrders() async {
+    try {
+      final response = await orderService.getOrdersById();
+      setState(() {
+        orders = response;
+      });
+      // Handle the response as needed
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    fetchOrders();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Widget buildOrderView(List<OrderModel> orders, String state) {
     final filteredOrders =
-        orders.where((order) => order['state'] == state).toList();
+        orders.where((order) => order.status == state).toList();
 
     if (filteredOrders.isEmpty) {
       return const Center(
@@ -42,12 +68,13 @@ class OrderView extends StatelessWidget {
           return OrderItem(order: filteredOrders[index], state: state);
         },
       ),
- desktop: Center(
+      desktop: Center(
         child: Container(
           color: Colors.grey[200], // Nền xám cho giao diện web
           padding: const EdgeInsets.all(16),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800), // Giới hạn chiều rộng
+            constraints:
+                const BoxConstraints(maxWidth: 800), // Giới hạn chiều rộng
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white, // Màu nền trắng
@@ -71,28 +98,68 @@ class OrderView extends StatelessWidget {
   }
 
   @override
- Widget build(BuildContext context) {
-    return Responsive(
-      mobile: Container(
-        color: Colors.white, // Nền trắng trên mobile
-        height: MediaQuery.of(context).size.height,
-        child: TabBarView(
-          children: [
-            buildOrderView(orders, 'Track Order'),
-            buildOrderView(orders, 'Review'),
-            buildOrderView(orders, 'Re-Order'),
-          ],
-        ),
-      ),
-      desktop: Container(
-        color: Colors.grey[200], // Nền xám trên web
-        height: MediaQuery.of(context).size.height,
-        child: TabBarView(
-          children: [
-            buildOrderView(orders, 'Track Order'),
-            buildOrderView(orders, 'Review'),
-            buildOrderView(orders, 'Re-Order'),
-          ],
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: Responsive.isMobile(context)
+            ? AppBar(
+                backgroundColor: AppColors.primary,
+                leading: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_rounded,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                title: Text(
+                  'Order Management',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                bottom: TabBar(
+                  controller: _tabController,
+                  indicatorColor: Colors.white,
+                  tabs: const [
+                    Tab(
+                      child: Text(
+                        'Track Order',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    Tab(
+                      child: Text(
+                        'Shipping',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    Tab(
+                      child: Text(
+                        'Cancelled',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : null,
+        body: Container(
+          color: Responsive.isMobile(context) ? Colors.white : Colors.grey[200],
+          height: MediaQuery.of(context).size.height,
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              buildOrderView(orders, 'PENDING'),
+              buildOrderView(orders, 'SHIPPING'),
+              buildOrderView(orders, 'CANCELLED'),
+            ],
+          ),
         ),
       ),
     );

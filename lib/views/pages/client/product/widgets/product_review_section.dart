@@ -89,7 +89,7 @@ class _ProductReviewSectionState extends State<ProductReviewSection> {
 
     //Get user data
     final userProvider = Provider.of<UserProvider>(context);
-    final userId = userProvider.id ?? '';
+    final userId = userProvider.userModel?.id ?? '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

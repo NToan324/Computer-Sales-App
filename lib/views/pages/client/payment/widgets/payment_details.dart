@@ -2,22 +2,38 @@ import 'package:computer_sales_app/components/custom/my_text_field.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/pages/client/payment/widgets/point_summary.dart';
 import 'package:flutter/material.dart';
 
 class PaymentDetails extends StatefulWidget {
-  final double totalAmount;
-
   const PaymentDetails({
     super.key,
     required this.totalAmount,
     required this.name,
     required this.address,
-    required this.phone,
+    required this.email,
+    required this.onChangeValue,
+    required this.shippingMethod,
+    this.currentPoint = 0,
+    this.handleCreateOrder,
+    this.onUpdateTotalPrice,
   });
 
+  final double totalAmount;
   final String name;
   final String address;
-  final String phone;
+  final String email;
+  final Function({
+    required String name,
+    required String email,
+    required String address,
+    required String paymentMethod,
+  }) onChangeValue;
+
+  final String shippingMethod;
+  final double currentPoint;
+  final Function? handleCreateOrder;
+  final Function(double updatedTotalPrice)? onUpdateTotalPrice;
 
   @override
   State<PaymentDetails> createState() => _PaymentDetailsState();
@@ -30,18 +46,93 @@ class _PaymentDetailsState extends State<PaymentDetails> {
   final TextEditingController _addressControler = TextEditingController();
   final FocusNode _addressFocus = FocusNode();
 
-  final TextEditingController _phoneController = TextEditingController();
-  final FocusNode _phoneFocus = FocusNode();
+  final TextEditingController _emailController = TextEditingController();
+  final FocusNode _emailFocus = FocusNode();
+
+  String _selectedPaymentMethod = 'BANK_TRANSFER';
+
+  double? _lastNotifiedTotalPrice;
+
   @override
   void initState() {
     super.initState();
-    _phoneController.text = widget.phone;
+    _emailController.text = widget.email;
     _addressControler.text = widget.address;
     _nameController.text = widget.name;
+
+    _nameController.addListener(_notify);
+    _emailController.addListener(_notify);
+    _addressControler.addListener(_notify);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateTotalPrice();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant PaymentDetails oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.totalAmount != widget.totalAmount ||
+        oldWidget.currentPoint != widget.currentPoint ||
+        oldWidget.shippingMethod != widget.shippingMethod) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _updateTotalPrice();
+      });
+    }
+  }
+
+  void _notify() {
+    widget.onChangeValue(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      address: _addressControler.text.trim(),
+      paymentMethod: _selectedPaymentMethod,
+    );
+  }
+
+  void _updateTotalPrice() {
+    double maxDiscountFromPoints = widget.totalAmount * 0.5;
+
+    double pointsToUse = widget.currentPoint * 1000 <= maxDiscountFromPoints
+        ? widget.currentPoint.floorToDouble()
+        : (maxDiscountFromPoints / 1000).floorToDouble();
+
+    double vatPrice = (widget.totalAmount * 0.1).floorToDouble();
+
+    double totalPrice = (widget.totalAmount +
+            (widget.shippingMethod == "Pickup at store" ? 0 : 49000) +
+            vatPrice -
+            pointsToUse * 1000)
+        .floorToDouble();
+
+    if (_lastNotifiedTotalPrice != totalPrice) {
+      _lastNotifiedTotalPrice = totalPrice;
+      if (widget.onUpdateTotalPrice != null) {
+        widget.onUpdateTotalPrice!(totalPrice);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Tính toán các giá trị hiển thị, không gọi callback ở đây nữa
+    double maxDiscountFromPoints = widget.totalAmount * 0.5;
+
+    double pointsToUse = widget.currentPoint * 1000 <= maxDiscountFromPoints
+        ? widget.currentPoint.floorToDouble()
+        : (maxDiscountFromPoints / 1000).floorToDouble();
+
+    double pointsToReceive = (widget.totalAmount * 0.0001).floorToDouble();
+
+    double vatPrice = (widget.totalAmount * 0.1).floorToDouble();
+
+    double totalPrice = (widget.totalAmount +
+            (widget.shippingMethod == "Pickup at store" ? 0 : 49000) +
+            vatPrice -
+            pointsToUse * 1000)
+        .floorToDouble();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -51,6 +142,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ... phần UI giữ nguyên, không thay đổi
           const Text(
             'Payment Details',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -64,20 +156,16 @@ class _PaymentDetailsState extends State<PaymentDetails> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Customer Name
           const Text('Phone'),
           const SizedBox(height: 4),
           MyTextField(
-            hintText: 'Phone',
-            prefixIcon: Icons.phone,
-            controller: _phoneController,
-            focusNode: _phoneFocus,
+            hintText: 'Email',
+            prefixIcon: Icons.email_outlined,
+            controller: _emailController,
+            focusNode: _emailFocus,
             obscureText: false,
           ),
           const SizedBox(height: 16),
-
-          // Customer Name
           const Text('Customer Name'),
           const SizedBox(height: 4),
           MyTextField(
@@ -88,7 +176,6 @@ class _PaymentDetailsState extends State<PaymentDetails> {
             obscureText: false,
           ),
           const SizedBox(height: 16),
-          // Shipping Address
           const Text('Shipping Address'),
           const SizedBox(height: 4),
           MyTextField(
@@ -99,27 +186,31 @@ class _PaymentDetailsState extends State<PaymentDetails> {
             obscureText: false,
           ),
           const SizedBox(height: 16),
-
-          // Payment Method
           const Text('Payment Method'),
           const SizedBox(height: 4),
           Container(
             color: Colors.white,
             child: DropdownButtonFormField<String>(
+              value: _selectedPaymentMethod,
               isExpanded: true,
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(10),
               items: const [
                 DropdownMenuItem(
-                  value: 'cash',
+                  value: 'CASH',
                   child: Text('Cash', style: TextStyle(fontSize: 14)),
                 ),
                 DropdownMenuItem(
-                  value: 'bank_transfer',
+                  value: 'BANK_TRANSFER',
                   child: Text('Bank Transfer', style: TextStyle(fontSize: 14)),
                 )
               ],
-              onChanged: (value) {},
+              onChanged: (value) {
+                setState(() {
+                  _selectedPaymentMethod = value!;
+                });
+                _notify();
+              },
               decoration: InputDecoration(
                 prefixIcon: const Icon(
                   Icons.payment_outlined,
@@ -145,24 +236,35 @@ class _PaymentDetailsState extends State<PaymentDetails> {
               ),
             ),
           ),
+          PointSummary(
+            currentPoints: widget.currentPoint,
+            pointsToUse: pointsToUse,
+            pointsToReceive: pointsToReceive,
+          ),
           const SizedBox(height: 24),
           Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.black.withAlpha(30),
+                color: Colors.black.withAlpha(20),
               ),
               child: Column(
                 children: [
                   _buildRowWithLabel(
                       label: 'Subtotal',
                       value: formatMoney(widget.totalAmount)),
-                  _buildRowWithLabel(label: 'Shipping', value: 'FREE'),
                   _buildRowWithLabel(
-                      label: 'Total', value: formatMoney(widget.totalAmount)),
+                      label: 'Vat (10%)', value: formatMoney(vatPrice)),
+                  _buildRowWithLabel(
+                    label: 'Shipping',
+                    value: widget.shippingMethod == "Pickup at store"
+                        ? "Free"
+                        : formatMoney(49000),
+                  ),
+                  _buildRowWithLabel(
+                      label: 'Total', value: formatMoney(totalPrice)),
                 ],
               )),
-
           const SizedBox(height: 16),
           if (!Responsive.isMobile(context))
             SizedBox(
@@ -170,7 +272,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
               height: 40,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, 'payment');
+                  widget.handleCreateOrder?.call();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

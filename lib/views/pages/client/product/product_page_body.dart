@@ -23,7 +23,9 @@ import 'package:provider/provider.dart';
 class ProductPageBody extends StatelessWidget {
   const ProductPageBody({
     super.key,
+    this.categoryId,
   });
+  final String? categoryId;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +109,9 @@ class ProductPageBody extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ShowListProductWidget(),
+                      ShowListProductWidget(
+                        categoryId: categoryId,
+                      ),
                     ],
                   )
                 : Column(
@@ -157,7 +161,9 @@ class ProductPageBody extends StatelessWidget {
                           ),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: ShowListProductWidget(),
+                            child: ShowListProductWidget(
+                              categoryId: categoryId,
+                            ),
                           ),
                         ],
                       ),
@@ -479,7 +485,8 @@ class _RatingFilterState extends State<RatingFilter> {
 }
 
 class ShowListProductWidget extends StatefulWidget {
-  const ShowListProductWidget({super.key});
+  const ShowListProductWidget({super.key, this.categoryId});
+  final String? categoryId;
 
   @override
   State<ShowListProductWidget> createState() => _ShowListProductWidgetState();
@@ -610,7 +617,9 @@ class _ShowListProductWidgetState extends State<ShowListProductWidget> {
               );
             }),
           ),
-          ProductList(),
+          ProductList(
+            categoryId: widget.categoryId,
+          ),
         ],
       ),
     );
@@ -618,7 +627,8 @@ class _ShowListProductWidgetState extends State<ShowListProductWidget> {
 }
 
 class ProductList extends StatefulWidget {
-  const ProductList({super.key});
+  const ProductList({super.key, this.categoryId});
+  final String? categoryId;
 
   @override
   State<ProductList> createState() => _ProductListState();
@@ -630,15 +640,27 @@ class _ProductListState extends State<ProductList> {
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchProducts();
+    });
   }
 
   Future<void> _fetchProducts() async {
     setState(() {
       _isLoading = true;
     });
-    Provider.of<ProductProvider>(context, listen: false)
-        .fetchProducts(page: 1, limit: 12);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
+    //clear filters
+    productProvider.clearFilters();
+
+    if (widget.categoryId != null) {
+      productProvider.filters =
+          widget.categoryId != null ? [widget.categoryId!] : ['PC>ad>'];
+    }
+
+    productProvider.fetchProducts(page: 1, limit: 12);
     setState(() {
       _isLoading = false;
     });

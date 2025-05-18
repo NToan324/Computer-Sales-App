@@ -178,3 +178,45 @@ class SkeletonHorizontalProduct extends StatelessWidget {
     );
   }
 }
+
+class SkeletonCategoryItem extends StatelessWidget {
+  const SkeletonCategoryItem({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: const Color.fromARGB(255, 238, 238, 238),
+      highlightColor: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Vòng tròn biểu tượng
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 238, 238, 238),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(40),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Văn bản tên danh mục
+          Container(
+            height: 14,
+            width: 40,
+            color: const Color.fromARGB(255, 238, 238, 238),
+          ),
+        ],
+      ),
+    );
+  }
+}

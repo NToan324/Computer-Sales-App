@@ -14,10 +14,12 @@ import 'package:computer_sales_app/views/pages/client/cart/widgets/remove_cart_w
 import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-enum ShippingMethod { standard, express }
+enum ShippingMethod {
+  pickupAtStore,
+  expressDelivery,
+}
 
 class CartView extends StatefulWidget {
   const CartView({super.key});
@@ -27,7 +29,7 @@ class CartView extends StatefulWidget {
 }
 
 class _CartViewState extends State<CartView> {
-  ShippingMethod _selectedMethod = ShippingMethod.standard;
+  ShippingMethod _selectedMethod = ShippingMethod.expressDelivery;
   List<ProductModel> products = [];
   int? _itemToRemove;
   final int _quantityToRemove = 1;
@@ -94,7 +96,7 @@ class _CartViewState extends State<CartView> {
         ),
         const SizedBox(height: 10),
         _buildRadioTile(
-          value: ShippingMethod.standard,
+          value: ShippingMethod.pickupAtStore,
           title: Row(
             children: const [
               Text('Store pickup (In 20 min)',
@@ -113,7 +115,7 @@ class _CartViewState extends State<CartView> {
           ),
         ),
         _buildRadioTile(
-          value: ShippingMethod.express,
+          value: ShippingMethod.expressDelivery,
           title: const Text('Delivery at home (Under 2 - 4 days)',
               style: TextStyle(fontSize: 12, color: Colors.black)),
         ),
@@ -192,7 +194,10 @@ class _CartViewState extends State<CartView> {
             height: 40,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, 'payment');
+                Navigator.pushNamed(context, 'payment', arguments: {
+                  'cartItems': cartItems,
+                  'shippingMethod': _selectedMethod.name,
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,

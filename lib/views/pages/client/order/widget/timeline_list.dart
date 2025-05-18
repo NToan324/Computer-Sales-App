@@ -1,9 +1,10 @@
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/models/order.model.dart';
 import 'package:computer_sales_app/views/pages/client/order/widget/order_item.dart';
 import 'package:flutter/material.dart';
 
 class TimelineList extends StatelessWidget {
-  final List<Map<String, String>> orders;
+  final List<OrderModel> orders;
   final String state;
   
   const TimelineList({super.key, required this.orders, required this.state});
@@ -11,7 +12,7 @@ class TimelineList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final filteredOrders =
-        orders.where((order) => order['state'] == state).toList();
+        orders.where((order) => order.status == state).toList();
 
     if (filteredOrders.isEmpty) {
       return const Center(

@@ -36,11 +36,12 @@ class HeaderView extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-              color: ModalRoute.of(context)?.settings.name == route
-                  ? AppColors.primary
-                  : Colors.black54),
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: ModalRoute.of(context)?.settings.name == route
+                ? AppColors.primary
+                : Colors.black54,
+          ),
         ),
       ),
     );
