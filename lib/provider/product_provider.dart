@@ -54,7 +54,6 @@ class ProductProvider with ChangeNotifier {
       if (response['data'] is Map && (response['data']['data'] as List?) != null) {
         variantList = response['data']['data'] as List;
       } else {
-        print('Unexpected data format for product $productId: ${response['data'].runtimeType}');
         return [];
       }
 
@@ -62,14 +61,16 @@ class ProductProvider with ChangeNotifier {
           .map((item) => ProductModel.fromMap(item as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print('Failed to fetch variants for product $productId: $e');
       return [];
     }
   }
 
-  Future<void> fetchFilteredProductsManagement() async {
+  Future<void> fetchFilteredProductsManagement({
+    int page = 1,
+    int limit = 12,
+  }) async {
     try {
-      String endpoint = 'product?page=1&limit=10';
+      String endpoint = 'product?page=$page&limit=$limit';
       if (selectedCategoryId != null) {
         endpoint += '&category_ids=$selectedCategoryId';
       }
@@ -86,7 +87,6 @@ class ProductProvider with ChangeNotifier {
       List<ProductEntity> tempProducts = [];
       for (var item in (response['data']['data'] as List)) {
         try {
-          // Chỉ thêm sản phẩm nếu không có lỗi khi parse
           final product = ProductEntity.fromMap(item);
           final variants = await fetchVariants(product.id);
           tempProducts.add(ProductEntity(
@@ -99,18 +99,22 @@ class ProductProvider with ChangeNotifier {
             variants: variants,
           ));
         } catch (e) {
-          print('Skipping invalid product: $item, Error: $e');
           continue; // Bỏ qua sản phẩm không hợp lệ
         }
       }
 
       productsData = tempProducts;
+      totalPage = response['data']['totalPages'] ?? 1;
+      this.page = response['data']['page'] ?? page;
+      this.limit = response['data']['limit'] ?? limit;
+      errorMessage = null;
       notifyListeners();
     } catch (e) {
+      errorMessage = 'Failed to fetch products: $e';
+      notifyListeners();
       throw Exception('Failed to fetch products: $e');
     }
   }
-
   void setCategoryFilter(String? categoryId) {
     selectedCategoryId = categoryId;
     fetchFilteredProducts();
@@ -173,7 +177,50 @@ class ProductProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<void> searchFilteredProducts({
+    String? name,
+    int page = 1,
+    int limit = 12,
+  }) async {
+    try {
+      final response = await productService.searchProducts(
+        name: name,
+        categoryIds: selectedCategoryId != null ? [selectedCategoryId!] : null,
+        brandIds: selectedBrandId != null ? [selectedBrandId!] : null,
+        page: page,
+        limit: limit,
+      );
 
+      List<ProductEntity> tempProducts = [];
+      for (var product in (response['data'] as List<ProductEntity>)) {
+        try {
+          final variants = await fetchVariants(product.id);
+          tempProducts.add(ProductEntity(
+            id: product.id,
+            productName: product.productName,
+            isActive: product.isActive,
+            categoryId: product.categoryId,
+            brandId: product.brandId,
+            productImage: product.productImage,
+            variants: variants,
+          ));
+        } catch (e) {
+          continue; // Skip invalid products
+        }
+      }
+
+      productsData = tempProducts;
+      this.page = response['page'];
+      this.limit = response['limit'];
+      totalPage = response['totalPages'];
+      errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      errorMessage = 'Failed to search products: $e';
+      notifyListeners();
+      throw Exception('Failed to search products: $e');
+    }
+  }
   Future<void> handleSortChange(String value) async {
     String? sortName;
     String? sortPrice;
@@ -343,7 +390,6 @@ class ProductProvider with ChangeNotifier {
       try {
         return brands.firstWhere((brand) => brand.id == brandId).name;
       } catch (e) {
-        print('Brand not found for ID: $brandId');
         return 'Unknown';
       }
     }).toList();
@@ -354,7 +400,6 @@ class ProductProvider with ChangeNotifier {
       try {
         return categories.firstWhere((category) => category.id == categoryId).name;
       } catch (e) {
-        print('Category not found for ID: $categoryId');
         return 'Unknown';
       }
     }).toList();

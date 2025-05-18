@@ -13,15 +13,6 @@ class ProductManagementScreen extends StatefulWidget {
 
 class _ProductManagementScreenState extends State<ProductManagementScreen> {
   @override
-  void initState() {
-    super.initState();
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
-    productProvider.fetchBrands();
-    productProvider.fetchCategories();
-    productProvider.fetchFilteredProducts();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
@@ -36,7 +27,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen> {
               children: [
                 const AddProductButton(),
                 const SizedBox(height: 16),
-                ProductTable(products: productProvider.productsData),
+                const ProductTable(),
               ],
             ),
           ),

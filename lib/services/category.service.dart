@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 class CategoryService extends BaseClient {
   Future<List<CategoryModel>> getCategories() async {
     try {
-      final res = await get('category');
+      final res = await get('category/admin');
       if (res['data'] == null || res['data']['categories'] == null) {
         throw Exception('No categories data found in response');
       }

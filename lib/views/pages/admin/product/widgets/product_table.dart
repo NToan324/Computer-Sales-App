@@ -1,15 +1,14 @@
-import 'package:computer_sales_app/models/product_entity.dart';
+import 'package:computer_sales_app/models/product_entity.dart' as entity;
+import 'package:computer_sales_app/models/product.model.dart' as model;
 import 'package:computer_sales_app/provider/product_provider.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../../models/product.model.dart';
-import 'product_form.dart';
+import '../../../../../views/pages/admin/product/widgets/product_form.dart';
+import 'dart:async';
 
 class ProductTable extends StatefulWidget {
-  final List<ProductEntity> products;
-
-  const ProductTable({super.key, required this.products});
+  const ProductTable({super.key});
 
   @override
   State<ProductTable> createState() => _ProductTableState();
@@ -17,17 +16,53 @@ class ProductTable extends StatefulWidget {
 
 class _ProductTableState extends State<ProductTable> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
-  List<ProductEntity> get filteredProducts {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch initial data
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    productProvider.fetchBrands();
+    productProvider.fetchCategories();
+    productProvider.fetchFilteredProductsManagement(page: 1, limit: 12);
+    // Listen for search changes
+    _searchController.addListener(() {
+      _onSearchChanged();
+    });
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      if (_searchController.text.isEmpty) {
+        productProvider.fetchFilteredProductsManagement(page: 1, limit: productProvider.limit);
+      } else {
+        productProvider.searchFilteredProducts(
+          name: _searchController.text,
+          page: 1,
+          limit: productProvider.limit,
+        );
+      }
+    });
+  }
+
+  List<entity.ProductEntity> get filteredProducts {
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
     if (_searchController.text.isEmpty) {
-      return widget.products;
+      return productProvider.productsData;
     } else {
-      return widget.products.where((product) {
-        return product.productName
+      return productProvider.productsData.where((product) {
+        return (product.productName ?? '')
             .toLowerCase()
             .contains(_searchController.text.toLowerCase());
       }).toList();
     }
+  }
+
+  List<entity.ProductEntity> _sortProducts(List<entity.ProductEntity> products) {
+    return products..sort((a, b) => b.id.compareTo(a.id)); // Newest first (MongoDB ObjectId)
   }
 
   Color _getStatusColor(String status) {
@@ -41,7 +76,7 @@ class _ProductTableState extends State<ProductTable> {
     }
   }
 
-  void _showProductForm(ProductEntity product) {
+  void _showProductForm(entity.ProductEntity product) {
     showDialog(
       context: context,
       builder: (context) {
@@ -69,39 +104,87 @@ class _ProductTableState extends State<ProductTable> {
             child: ProductForm(
               buttonLabel: 'Save',
               initialProduct: {
-                '_id': product.id.toString(),
-                'name': product.productName,
+                '_id': product.id,
+                'product_name': product.productName, // Đổi từ 'name' để khớp với ProductForm
                 'stock': 10.toString(),
                 'category': product.categoryId,
                 'brand': product.brandId,
                 'product_image': product.productImage?.toMap(),
-                'disabled': product.isActive == false,
+                'disabled': !product.isActive,
                 'variants': product.variants.map((variant) => variant.toMap()).toList(),
               },
-              onSubmit: (updatedProductData) {
-                setState(() {
-                  final index = widget.products.indexOf(product);
-                  if (index != -1) {
-                    widget.products[index] = ProductEntity(
-                      id: product.id,
-                      productName: updatedProductData['name'],
-                      isActive: !updatedProductData['disabled'],
-                      categoryId: updatedProductData['category'] ?? product.categoryId,
-                      brandId: updatedProductData['brand'] ?? product.brandId,
-                      productImage: product.productImage, // Sử dụng ProductImage
-                      variants: (updatedProductData['variants'] as List<dynamic>)
-                          .map((item) => ProductModel.fromMap(item as Map<String, dynamic>))
-                          .toList(),
+              onSubmit: (updatedProductData) async {
+                print('ProductTable onSubmit: updatedProductData = $updatedProductData');
+                final productProvider = Provider.of<ProductProvider>(context, listen: false);
+                try {
+                  setState(() {
+                    final index = productProvider.productsData.indexWhere((p) => p.id == product.id);
+                    if (index != -1) {
+                      productProvider.productsData[index] = entity.ProductEntity(
+                        id: product.id,
+                        productName: updatedProductData['product_name']?.toString() ?? product.productName,
+                        isActive: updatedProductData['disabled'] != null ? !updatedProductData['disabled'] : product.isActive,
+                        categoryId: updatedProductData['category']?.toString() ?? product.categoryId,
+                        brandId: updatedProductData['brand']?.toString() ?? product.brandId,
+                        productImage: updatedProductData['product_image'] is Map<String, dynamic>
+                            ? entity.ProductImage.fromMap(updatedProductData['product_image'] as Map<String, dynamic>)
+                            : product.productImage,
+                        variants: (updatedProductData['variants'] as List<dynamic>?)
+                            ?.map((item) => model.ProductModel.fromMap(item as Map<String, dynamic>))
+                            .toList() ??
+                            product.variants,
+                      );
+                      print('ProductTable: Updated product at index $index: ${productProvider.productsData[index].toJson()}');
+                    } else {
+                      print('ProductTable: Product not found in productsData');
+                    }
+                  });
+                  await productProvider.fetchFilteredProductsManagement(
+                    page: productProvider.page,
+                    limit: productProvider.limit,
+                  );
+                  print('ProductTable onSubmit: fetchFilteredProductsManagement completed');
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  print('ProductTable onSubmit: Error = $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error updating product: $e')),
+                  );
+                }
+              },
+              onDelete: () async {
+                print('ProductTable onDelete: Deleting product ${product.id}');
+                final productProvider = Provider.of<ProductProvider>(context, listen: false);
+                try {
+                  await productProvider.productService.deleteProduct(product.id);
+                  await productProvider.fetchFilteredProductsManagement(
+                    page: productProvider.page,
+                    limit: productProvider.limit,
+                  );
+                  print('ProductTable onDelete: fetchFilteredProductsManagement completed');
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Product deleted successfully')),
+                  );
+                } catch (e) {
+                  print('ProductTable onDelete: Error = $e');
+                  if (e.toString().contains('Sản phẩm không tồn tại')) {
+                    // Product already deleted, treat as success
+                    await productProvider.fetchFilteredProductsManagement(
+                      page: productProvider.page,
+                      limit: productProvider.limit,
+                    );
+                    print('ProductTable onDelete: Product already deleted, treated as success');
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Product deleted successfully')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error deleting product: $e')),
                     );
                   }
-                });
-                Navigator.of(context).pop();
-              },
-              onDelete: () {
-                setState(() {
-                  widget.products.remove(product);
-                });
-                Navigator.of(context).pop();
+                }
               },
             ),
           ),
@@ -127,7 +210,7 @@ class _ProductTableState extends State<ProductTable> {
     );
   }
 
-  TableRow buildProductRow(ProductEntity product, List<double> colWidths) {
+  TableRow buildProductRow(entity.ProductEntity product, List<double> colWidths) {
     final isMobile = Responsive.isMobile(context);
     final productProvider = Provider.of<ProductProvider>(context, listen: false);
 
@@ -135,26 +218,31 @@ class _ProductTableState extends State<ProductTable> {
       return id.length > 5 ? id.substring(0, 5) : id;
     }
 
-    String categoryName = productProvider.categories.isNotEmpty
-        ? (productProvider.getNameCategoryById([product.categoryId]).firstOrNull ?? 'Unknown')
-        : 'Loading...';
-    String brandName = productProvider.brands.isNotEmpty
-        ? (productProvider.getNameBrandById([product.brandId]).firstOrNull ?? 'Unknown')
-        : 'Loading...';
+    String categoryName = product.categoryId != null && productProvider.categories.isNotEmpty
+        ? (productProvider.getNameCategoryById([product.categoryId!]).firstOrNull ?? 'Unknown')
+        : 'N/A';
+    String brandName = product.brandId != null && productProvider.brands.isNotEmpty
+        ? (productProvider.getNameBrandById([product.brandId!]).firstOrNull ?? 'Unknown')
+        : 'N/A';
+
+    print('buildProductRow: categoryId = ${product.categoryId}, categoryName = $categoryName');
+    print('buildProductRow: brandId = ${product.brandId}, brandName = $brandName');
 
     final totalStock = product.variants.isNotEmpty
         ? product.variants
-        .map((variant) => variant.quantity)
+        .map((variant) => variant.quantity ?? 0)
         .reduce((a, b) => a + b)
         .toString()
         : '0';
+
+    print('buildProductRow: totalStock = $totalStock for product ${product.id}');
 
     return TableRow(
       children: isMobile
           ? [
         InkWell(
           onTap: () => _showProductForm(product),
-          child: cellText(getShortId(product.id.toString()), colWidths[0]),
+          child: cellText(getShortId(product.id), colWidths[0]),
         ),
         InkWell(
           onTap: () => _showProductForm(product),
@@ -162,14 +250,13 @@ class _ProductTableState extends State<ProductTable> {
         ),
         InkWell(
           onTap: () => _showProductForm(product),
-          child: cellText(
-              product.isActive ? 'Active' : 'Disabled', colWidths[2]),
+          child: cellText(product.isActive ? 'Active' : 'Disabled', colWidths[2]),
         ),
       ]
           : [
         InkWell(
           onTap: () => _showProductForm(product),
-          child: cellText(getShortId(product.id.toString()), colWidths[0]),
+          child: cellText(getShortId(product.id), colWidths[0]),
         ),
         InkWell(
           onTap: () => _showProductForm(product),
@@ -197,8 +284,7 @@ class _ProductTableState extends State<ProductTable> {
                 product.isActive ? 'Active' : 'Disabled',
                 style: const TextStyle(color: Colors.white),
               ),
-              backgroundColor:
-              _getStatusColor(product.isActive ? 'Active' : 'Disabled'),
+              backgroundColor: _getStatusColor(product.isActive ? 'Active' : 'Disabled'),
             ),
           ),
         ),
@@ -218,12 +304,12 @@ class _ProductTableState extends State<ProductTable> {
     );
   }
 
-  Widget productCell(ProductEntity product, double width) {
+  Widget productCell(entity.ProductEntity product, double width) {
     String getShortId(String id) {
       return id.length > 5 ? id.substring(0, 5) : id;
     }
 
-    print('Product ${product.id} image URL: ${product.productImage?.url}'); // Debug
+    print('productCell: productImage.url = ${product.productImage?.url} for product ${product.id}');
 
     return Container(
       width: width,
@@ -238,10 +324,9 @@ class _ProductTableState extends State<ProductTable> {
             ),
             child: product.productImage?.url != null && product.productImage!.url!.isNotEmpty
                 ? Image.network(
-              product.productImage!.url!, // Sử dụng ! vì đã kiểm tra null
+              product.productImage!.url!,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
-                print('Image.network error for product ${product.id}: $error');
                 return Container(
                   color: Colors.grey[300],
                   child: const Center(child: Text("No Image")),
@@ -284,8 +369,56 @@ class _ProductTableState extends State<ProductTable> {
     );
   }
 
+  Widget _buildPagination(ProductProvider productProvider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: productProvider.page > 1
+              ? () {
+            productProvider.fetchFilteredProductsManagement(
+              page: productProvider.page - 1,
+              limit: productProvider.limit,
+            );
+          }
+              : null,
+        ),
+        Text('Page ${productProvider.page} of ${productProvider.totalPage}'),
+        IconButton(
+          icon: const Icon(Icons.chevron_right),
+          onPressed: productProvider.page < productProvider.totalPage
+              ? () {
+            productProvider.fetchFilteredProductsManagement(
+              page: productProvider.page + 1,
+              limit: productProvider.limit,
+            );
+          }
+              : null,
+        ),
+        const SizedBox(width: 16),
+        DropdownButton<int>(
+          value: productProvider.limit,
+          items: [12, 24, 48].map((value) => DropdownMenuItem(
+            value: value,
+            child: Text('$value per page'),
+          )).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              productProvider.fetchFilteredProductsManagement(page: 1, limit: value);
+            }
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<ProductProvider>(context);
+    final sortedProducts = _sortProducts(filteredProducts);
+    print('filteredProducts: searchText = ${_searchController.text}, filteredCount = ${sortedProducts.length}');
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = Responsive.isMobile(context);
@@ -295,11 +428,11 @@ class _ProductTableState extends State<ProductTable> {
             ? [tableWidth * 0.08, tableWidth * 0.55, tableWidth * 0.25]
             : [
           tableWidth * 0.08,
-          tableWidth * 0.35,
-          tableWidth * 0.10,
-          tableWidth * 0.15,
-          tableWidth * 0.15,
+          tableWidth * 0.30,
           tableWidth * 0.12,
+          tableWidth * 0.15,
+          tableWidth * 0.15,
+          tableWidth * 0.15,
         ];
 
         final headers = isMobile
@@ -323,6 +456,7 @@ class _ProductTableState extends State<ProductTable> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header + Search
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -336,8 +470,7 @@ class _ProductTableState extends State<ProductTable> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                         hintText: 'Search by name',
                         prefixIcon: const Icon(Icons.search, size: 18),
                         border: OutlineInputBorder(
@@ -357,6 +490,7 @@ class _ProductTableState extends State<ProductTable> {
                 ],
               ),
               const SizedBox(height: 16),
+              // Table
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: SizedBox(
@@ -364,22 +498,29 @@ class _ProductTableState extends State<ProductTable> {
                   child: Table(
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: {
-                      for (int i = 0; i < colWidths.length; i++)
-                        i: FixedColumnWidth(colWidths[i]),
+                      for (int i = 0; i < colWidths.length; i++) i: FixedColumnWidth(colWidths[i]),
                     },
                     border: TableBorder.all(color: Colors.grey.shade300),
                     children: [
                       buildHeaderRow(headers, colWidths),
-                      ...filteredProducts
-                          .map((product) => buildProductRow(product, colWidths)),
+                      ...sortedProducts.map((product) => buildProductRow(product, colWidths)),
                     ],
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              _buildPagination(productProvider),
             ],
           ),
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
   }
 }

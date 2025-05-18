@@ -129,10 +129,7 @@ class BaseClient {
     final uri = Uri.parse('$baseUrl$api');
     try {
       final options = Options(
-        contentType: Headers.multipartFormDataContentType,
-        headers: {
-          'Accept': 'application/json', // Giữ Accept nếu cần
-        },
+        headers: {'Accept': 'application/json', 'Content-Type': 'multipart/form-data'},
       );
       final response = await dio.post(uri.toString(), data: data, options: options);
       return response.data;
@@ -141,7 +138,11 @@ class BaseClient {
     } on TimeoutException {
       throw ApiNotRespondingException('API timeout', uri.toString());
     } on DioException catch (e) {
-      return _handleDioException(e);
+      if (e.response != null) {
+        return _processResponse(e.response!);
+      } else {
+        throw FetchDataException('Network error', uri.toString());
+      }
     }
   }
   // Xử lý phản hồi dựa trên mã trạng thái
@@ -158,6 +159,8 @@ class BaseClient {
         final message = _parseErrorMessage(response.data);
         throw UnAuthorizedException(message, response.requestOptions.path);
       case 500:
+        final message = _parseErrorMessage(response.data);
+        print('Server error: $message, Response: ${response.data}');
         throw FetchDataException('Error occurred: ${response.statusCode}',
             response.requestOptions.uri.toString());
       default:

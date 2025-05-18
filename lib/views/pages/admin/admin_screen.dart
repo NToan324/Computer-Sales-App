@@ -33,7 +33,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
   Future<void> _checkToken() async {
     final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('access_token');
+    final accessToken = prefs.getString('accessToken');
     if (accessToken == null) {
       if (mounted) {
         Navigator.pushReplacementNamed(context, 'login');
@@ -42,7 +42,7 @@ class _AdminScreenState extends State<AdminScreen> {
   }
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');
+    await prefs.remove('accessToken');
     await prefs.remove('user');
     if (mounted) {
       Navigator.pushReplacementNamed(context, 'login');

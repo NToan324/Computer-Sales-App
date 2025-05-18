@@ -52,7 +52,6 @@ class ProductForm extends StatefulWidget {
 
 class _ProductFormState extends State<ProductForm> {
   late TextEditingController nameController;
-  late TextEditingController stockController;
   File? imageFile;
   Uint8List? imageBytes;
   ProductImage? productImage;
@@ -60,29 +59,25 @@ class _ProductFormState extends State<ProductForm> {
   String? selectedBrandId;
   bool isDisabled = false;
   List<Map<String, dynamic>> variants = [];
-  bool isLoading = false; // Thêm trạng thái loading
+  bool isLoading = false;
 
   final ImagePicker _picker = ImagePicker();
-  final ProductService _productService = ProductService(); // Khởi tạo ProductService
+  final ProductService _productService = ProductService();
 
   @override
   void initState() {
     super.initState();
     final data = widget.initialProduct;
-    print('Initial product: $data'); // Debug
 
-    nameController = TextEditingController(text: data?['name'] ?? '');
-    stockController = TextEditingController(text: data?['stock']?.toString() ?? '');
-    selectedCategoryId = data?['category'];
-    selectedBrandId = data?['brand'];
-    isDisabled = data?['disabled'] ?? false;
+    nameController = TextEditingController(text: data?['product_name']?.toString() ?? '');
+    selectedCategoryId = data?['category']?.toString();
+    selectedBrandId = data?['brand']?.toString();
+    isDisabled = data?['disabled']?.toString().toLowerCase() == 'true';
 
-    // Ánh xạ productImage từ initialProduct
     if (data?['product_image'] != null) {
       productImage = ProductImage.fromMap(data!['product_image'] as Map<String, dynamic>);
     }
 
-    // Chuyển đổi variants từ API hoặc initialProduct
     if (data?['variants'] != null) {
       if (data?['variants'] is List<ProductModel>) {
         variants = (data?['variants'] as List<ProductModel>)
@@ -114,81 +109,100 @@ class _ProductFormState extends State<ProductForm> {
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        isLoading = true;
-      });
-      if (kIsWeb) {
-        final bytes = await pickedFile.readAsBytes();
-        final uploadResult = await _uploadImage(bytes);
-        if (uploadResult != null) {
-          setState(() {
-            imageBytes = bytes;
-            imageFile = null;
-            productImage = ProductImage(url: uploadResult['url'], publicId: uploadResult['publicId']);
-            isLoading = false;
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      } else {
-        final file = File(pickedFile.path);
-        final uploadResult = await _uploadImage(file);
-        if (uploadResult != null) {
-          setState(() {
-            imageFile = file;
-            imageBytes = null;
-            productImage = ProductImage(url: uploadResult['url'], publicId: uploadResult['publicId']);
-            isLoading = false;
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      }
-    }
-  }
 
-  Future<void> _handleSubmit() async {
+    if (pickedFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No image selected.')),
+      );
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
 
     try {
-      // Tính tổng stock từ variants khi thêm mới
-      final totalStock = variants.isNotEmpty
-          ? variants.map((v) => v['quantity'] as int? ?? 0).reduce((a, b) => a + b)
-          : 0;
+      if (kIsWeb) {
+        final bytes = await pickedFile.readAsBytes();
+        final uploadResult = await _uploadImage(bytes);
+        if (uploadResult != null && uploadResult['url'] != null && uploadResult['publicId'] != null) {
+          setState(() {
+            imageBytes = bytes;
+            imageFile = null;
+            productImage = ProductImage(
+              url: uploadResult['url'],
+              publicId: uploadResult['publicId'],
+            );
+            isLoading = false;
+          });
+        } else {
+          throw Exception('Upload failed. Please try again.');
+        }
+      } else {
+        final file = File(pickedFile.path);
+        final uploadResult = await _uploadImage(file);
+        if (uploadResult != null && uploadResult['url'] != null && uploadResult['publicId'] != null) {
+          setState(() {
+            imageFile = file;
+            imageBytes = null;
+            productImage = ProductImage(
+              url: uploadResult['url'],
+              publicId: uploadResult['publicId'],
+            );
+            isLoading = false;
+          });
+        } else {
+          throw Exception('Upload failed. Please try again.');
+        }
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleAddProduct() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      if (nameController.text.trim().isEmpty) {
+        throw Exception('Product name is required');
+      }
+      if (selectedCategoryId == null ||
+          selectedCategoryId!.trim().isEmpty ||
+          !RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(selectedCategoryId!.trim())) {
+        throw Exception('Please select a valid category with a 24-character ID');
+      }
+      if (selectedBrandId == null ||
+          selectedBrandId!.trim().isEmpty ||
+          !RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(selectedBrandId!.trim())) {
+        throw Exception('Please select a valid brand with a 24-character ID');
+      }
+      if (productImage == null || productImage!.url == null || productImage!.url!.isEmpty) {
+        throw Exception('Please upload a valid product image');
+      }
+      if (!Uri.tryParse(productImage!.url!)!.isAbsolute) {
+        throw Exception('Invalid image URL');
+      }
 
       final productData = {
-        'product_name': nameController.text,
-        'isActive': !isDisabled,
-        'category_id': selectedCategoryId,
-        'brand_id': selectedBrandId,
-        // 'variants': variants,
+        'product_name': nameController.text.trim(),
+        'category_id': selectedCategoryId!.trim(),
+        'brand_id': selectedBrandId!.trim(),
+        'product_image': productImage!.toMap(),
       };
 
-      if (productImage != null) {
-        productData['product_image'] = productImage!.toMap();
-      }
-      productData['variants'] = variants;
+      final result = await _productService.createProduct(productData);
 
-      print('Product data sent to API: $productData'); // Debug
-
-      Map<String, dynamic> result;
-      if (widget.initialProduct == null) {
-        // Thêm sản phẩm mới
-        result = await _productService.createProduct(productData);
-      } else {
-        // Cập nhật sản phẩm
-        productData['stock'] = int.tryParse(stockController.text) ?? 0;
-        result = await _productService.updateProduct(widget.initialProduct!['_id'], productData);
-      }
-
-      // Gửi dữ liệu đã cập nhật qua onSubmit
       widget.onSubmit(result);
       setState(() {
         isLoading = false;
@@ -197,23 +211,75 @@ class _ProductFormState extends State<ProductForm> {
       setState(() {
         isLoading = false;
       });
-      print('Error submitting product: $e');
+      print('Error adding product: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save product: $e')),
+        SnackBar(content: Text('Failed to add product: ${e.toString().replaceAll('Exception: ', '')}')),
       );
     }
   }
 
-  Future<void> _handleDelete() async {
-    if (widget.initialProduct == null || widget.onDelete == null) return;
+  Future<void> _handleUpdateProduct() async {
+    if (widget.initialProduct == null) {
+      print('handleUpdateProduct: initialProduct is null');
+      return;
+    }
 
     setState(() {
       isLoading = true;
     });
 
     try {
-      await _productService.deleteProduct(widget.initialProduct!['_id']);
-      widget.onDelete!();
+      final productId = widget.initialProduct!['_id']?.toString();
+      print('handleUpdateProduct: productId = $productId');
+      if (productId == null || !RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(productId)) {
+        throw Exception('Invalid product ID');
+      }
+
+      final productData = <String, dynamic>{};
+
+      final productName = nameController.text.trim();
+      if (productName.isNotEmpty) {
+        productData['product_name'] = productName;
+      }
+
+      final categoryId = selectedCategoryId?.trim();
+      if (categoryId != null && categoryId.isNotEmpty && RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(categoryId)) {
+        productData['category_id'] = categoryId;
+      }
+
+      final brandId = selectedBrandId?.trim();
+      if (brandId != null && brandId.isNotEmpty && RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(brandId)) {
+        productData['brand_id'] = brandId;
+      }
+
+      if (productImage != null &&
+          productImage!.url != null &&
+          productImage!.url!.isNotEmpty &&
+          Uri.tryParse(productImage!.url!)?.isAbsolute == true &&
+          productImage!.publicId != null &&
+          productImage!.publicId!.isNotEmpty) {
+        productData['product_image'] = productImage!.toMap();
+      }
+
+      productData['isActive'] = !isDisabled;
+
+      if (productData.isEmpty) {
+        throw Exception('No valid data to update');
+      }
+
+      print('handleUpdateProduct: Sending productData = $productData');
+
+      final result = await _productService.updateProduct(productId, productData);
+      print('handleUpdateProduct: API response = $result');
+
+      // Kiểm tra result trước khi gọi onSubmit
+      if (result is! Map<String, dynamic>) {
+        throw Exception('Invalid API response format');
+      }
+      print('handleUpdateProduct: Calling onSubmit with result = $result');
+      widget.onSubmit(result);
+      print('handleUpdateProduct: onSubmit completed');
+
       setState(() {
         isLoading = false;
       });
@@ -221,13 +287,61 @@ class _ProductFormState extends State<ProductForm> {
       setState(() {
         isLoading = false;
       });
-      print('Error deleting product: $e');
+      print('handleUpdateProduct: Error = $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete product: $e')),
+        SnackBar(content: Text('Failed to update product: ${e.toString().replaceAll('Exception: ', '')}')),
       );
+      rethrow; // Ném lại lỗi để debug dễ hơn
     }
   }
+  Future<void> _handleDelete() async {
+    if (widget.initialProduct == null || widget.onDelete == null) return;
 
+    final productId = widget.initialProduct!['_id']?.toString();
+    if (productId == null || productId.isEmpty || !RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(productId)) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid product ID')),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      print('handleDelete: Deleting product $productId');
+      await _productService.deleteProduct(productId);
+      widget.onDelete!();
+      setState(() {
+        isLoading = false;
+      });
+      print('handleDelete: Product deleted successfully');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Product deleted successfully')),
+      );
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('handleDelete: Error = $e');
+      if (e.toString().contains('Sản phẩm không tồn tại')) {
+        // Product already deleted, treat as success
+        widget.onDelete!();
+        print('handleDelete: Product $productId already deleted, treated as success');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Product deleted successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete product: $e')),
+        );
+      }
+    }
+  }
   void _showVariantForm({Map<String, dynamic>? initialVariant, int? index}) {
     showDialog(
       context: context,
@@ -243,12 +357,13 @@ class _ProductFormState extends State<ProductForm> {
             onSubmit: (variantData) async {
               setState(() {
                 if (index != null) {
-                  variants[index] = variantData; // Cập nhật variant
+                  variants[index] = variantData;
                 } else {
-                  variants.add(variantData); // Thêm variant mới
+                  variants.add(variantData);
                 }
               });
               Navigator.of(context).pop();
+
             },
             initialProduct: widget.initialProduct,
             initialVariant: initialVariant,
@@ -333,7 +448,6 @@ class _ProductFormState extends State<ProductForm> {
                       TextField(
                         controller: nameController,
                         decoration: const InputDecoration(
-                          labelText: 'Product Name',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -423,18 +537,7 @@ class _ProductFormState extends State<ProductForm> {
                           ),
                         ],
                       ),
-                      if (widget.initialProduct != null) ...[
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: stockController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          decoration: const InputDecoration(
-                            labelText: 'Stock Quantity',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ],
+
                       const SizedBox(height: 20),
                       Row(
                         children: [
@@ -519,7 +622,9 @@ class _ProductFormState extends State<ProductForm> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: isLoading ? null : _handleSubmit,
+                              onPressed: isLoading
+                                  ? null
+                                  : (widget.initialProduct == null ? _handleAddProduct : _handleUpdateProduct),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
                                 minimumSize: const Size(double.infinity, 48),

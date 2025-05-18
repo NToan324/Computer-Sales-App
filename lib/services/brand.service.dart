@@ -6,8 +6,7 @@ import 'package:dio/dio.dart';
 class BrandService extends BaseClient {
   Future<List<BrandModel>> getBrands() async {
     try {
-      final res = await get('brand');
-      print('API Response (getBrands): $res'); // Debug
+      final res = await get('brand/admin');
       if (res['data'] == null || res['data']['brands'] == null) {
         print('Invalid API response: $res');
         throw Exception('No brands data found in response');

@@ -72,15 +72,16 @@ class _LoginViewState extends State<LoginView> {
         'password': password,
       });
       print('Raw login response: $response'); // Debug log
-      if (response == null || response['accessToken'] == null || response['user'] == null) {
+      final data = response['data'];
+      if (data == null || data['accessToken'] == null || data['user'] == null) {
         throw BadRequestException('Login failed: Invalid response format');
       }
       final mappedResponse = {
-        'access_token': response['accessToken'],
-        'user': response['user'],
+        'accessToken': data['accessToken'],
+        'user': data['user'],
       };
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('access_token', mappedResponse['access_token']);
+      await prefs.setString('accessToken', mappedResponse['accessToken']);
       await prefs.setString('user', jsonEncode(mappedResponse['user']));
       if (mounted) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -106,7 +107,7 @@ class _LoginViewState extends State<LoginView> {
   }
   Future<void> _isLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('access_token');
+    final accessToken = prefs.getString('accessToken');
     final userJson = prefs.getString('user');
     if (accessToken != null && userJson != null) {
       if (mounted) {
