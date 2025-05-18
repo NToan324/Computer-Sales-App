@@ -188,7 +188,7 @@ class _CartViewState extends State<CartView> {
           ),
           _buildRowWithLabel(
               label: 'Subtotal', value: formatMoney(calculateSubTotal())),
-          _buildRowWithLabel(label: 'Shipping', value: 'FREE'),
+          _buildRowWithLabel(label: 'Shipping', value: formatMoney(0)),
           _buildRowWithLabel(label: 'Total', value: formatMoney(5000000)),
           SizedBox(
             width: double.infinity,

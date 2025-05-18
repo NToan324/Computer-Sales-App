@@ -77,11 +77,17 @@ class _PaymentViewState extends State<PaymentView> {
       if (mounted) {
         showCustomSnackBar(context, e.message);
       }
+      setState(() {
+        isLoading = false;
+      });
       return;
     } on BadRequestException catch (e) {
       if (mounted) {
         showCustomSnackBar(context, e.message);
       }
+      setState(() {
+        isLoading = false;
+      });
       return;
     } catch (e) {
       if (mounted) {
