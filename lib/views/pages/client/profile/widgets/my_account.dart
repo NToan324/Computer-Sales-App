@@ -1,15 +1,25 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:computer_sales_app/components/custom/my_text_field.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/models/user.model.dart';
+import 'package:computer_sales_app/provider/user_provider.dart';
+import 'package:computer_sales_app/services/app_exceptions.dart';
+import 'package:computer_sales_app/services/user.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/utils/widget/CustomAppBarMobile.dart';
 import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
 import 'package:computer_sales_app/views/pages/client/login/widgets/otp_input.dart';
 import 'package:computer_sales_app/views/pages/client/profile/widgets/listTile_custom.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyAccountView extends StatefulWidget {
@@ -25,60 +35,89 @@ class _MyAccountView extends State<MyAccountView> {
     {'title': 'Change Password', 'icon': CupertinoIcons.lock},
     {'title': 'Address', 'icon': CupertinoIcons.location_north},
   ];
+
+  Future<void> fetchUserInfo() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.loadUserData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchUserInfo();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) => listTileCustom(
-        myAccountItems[index]['icon'],
-        myAccountItems[index]['title'],
-        onTap: () {
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PersonelInformation(),
-              ),
+    return Consumer<UserProvider>(
+      builder: (context, value, child) {
+        final isExistUser = value.userModel != null;
+        final userInfo = value.userModel;
+
+        // Lọc danh sách dựa trên trạng thái user
+        final visibleItems = List<Map<String, dynamic>>.from(myAccountItems);
+        if (!isExistUser) {
+          visibleItems.removeWhere((item) =>
+              item['title'] == 'Personal Information' ||
+              item['title'] == 'Change Password');
+        }
+
+        return ListView.separated(
+          itemBuilder: (context, index) {
+            final item = visibleItems[index];
+            return listTileCustom(
+              item['icon'],
+              item['title'],
+              onTap: () {
+                switch (item['title']) {
+                  case 'Personal Information':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              PersonelInformation(userInfo: userInfo)),
+                    );
+                    break;
+                  case 'Change Password':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ChangePassword()),
+                    );
+                    break;
+                  case 'Address':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddressPage()),
+                    );
+                    break;
+                }
+              },
             );
-          }
-          if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChangePassword(),
-              ),
-            );
-          }
-          if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddressPage(),
-              ),
-            );
-          }
-        },
-      ),
-      separatorBuilder: (context, index) => Divider(
-        color: Colors.grey.shade300,
-        thickness: 1,
-        height: 0,
-      ),
-      itemCount: myAccountItems.length,
+          },
+          separatorBuilder: (context, index) => Divider(
+            color: Colors.grey.shade300,
+            thickness: 1,
+            height: 0,
+          ),
+          itemCount: visibleItems.length,
+        );
+      },
     );
   }
 }
 
 //Personal Information
 class PersonelInformation extends StatefulWidget {
-  const PersonelInformation({super.key});
+  const PersonelInformation({super.key, required this.userInfo});
+  final UserModel? userInfo;
 
   @override
   State<PersonelInformation> createState() => _PersonelInformationState();
 }
 
 class _PersonelInformationState extends State<PersonelInformation> {
-  final bool _loading = false;
-
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -88,6 +127,113 @@ class _PersonelInformationState extends State<PersonelInformation> {
   final FocusNode _phoneNumberFocusNode = FocusNode();
   final FocusNode _addressFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
+
+  UserService userService = UserService();
+
+  bool _isLoading = false;
+  File? _selectedFile;
+  Uint8List? _selectedImageBytes;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+
+    if (pickedFile != null) {
+      if (kIsWeb) {
+        // Web: đọc bytes
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _selectedImageBytes = bytes;
+          _selectedFile = null;
+        });
+      } else {
+        // Mobile: dùng File
+        setState(() {
+          _selectedFile = File(pickedFile.path);
+          _selectedImageBytes = null;
+        });
+      }
+    }
+  }
+
+  void _removeImage() {
+    setState(() {
+      _selectedFile = null;
+      _selectedImageBytes = null;
+    });
+  }
+
+  Future<void> handleChangeInfomation() async {
+    final fullName = _fullNameController.text.trim();
+    final phone = _phoneNumberController.text.trim();
+    final address = _addressController.text.trim();
+
+    if (fullName.isEmpty || address.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all required fields')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      UserImage? uploadedAvatar;
+      if (_selectedFile != null) {
+        uploadedAvatar = await userService.uploadAvatar(file: _selectedFile!);
+      } else if (_selectedImageBytes != null) {
+        uploadedAvatar = await userService.uploadAvatar(
+            bytes: _selectedImageBytes, filename: 'avatar.jpg');
+      }
+
+      debugPrint(
+          'upload, ${uploadedAvatar?.public_id}, ${uploadedAvatar?.url}');
+
+      await userService.updateUserInfo(
+        fullName: fullName,
+        phone: phone,
+        address: address,
+        avatar: uploadedAvatar,
+      );
+
+      await Provider.of<UserProvider>(context, listen: false).loadUserData();
+
+      showCustomSnackBar(context, 'Information updated successfully',
+          type: SnackBarType.success);
+    } on FetchDataException catch (e) {
+      debugPrint('Failed to update info: ${e.message}');
+      showCustomSnackBar(context, 'Failed to update information');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.userInfo != null) {
+      _fullNameController.text = widget.userInfo!.fullName;
+      _phoneNumberController.text = widget.userInfo!.phone ?? '';
+      _addressController.text = widget.userInfo!.address ?? '';
+      _emailController.text = widget.userInfo!.email;
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _fullNameController.dispose();
+    _phoneNumberController.dispose();
+    _addressController.dispose();
+    _emailController.dispose();
+    _fullNameFocusNode.dispose();
+    _phoneNumberFocusNode.dispose();
+    _addressFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _selectedFile = null;
+    _selectedImageBytes = null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +251,6 @@ class _PersonelInformationState extends State<PersonelInformation> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 15,
             children: [
               Stack(
                 clipBehavior: Clip.none,
@@ -116,13 +261,24 @@ class _PersonelInformationState extends State<PersonelInformation> {
                       color: Colors.white,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.primary,
+                        color: AppColors.primary, // đổi màu nếu cần
                         width: 3,
                       ),
                     ),
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundImage: AssetImage('assets/images/avatar.jpeg'),
+                      backgroundImage:
+                          _selectedFile != null
+                              ? FileImage(_selectedFile!)
+                              : (_selectedImageBytes != null
+                                      ? MemoryImage(_selectedImageBytes!)
+                                      : (widget.userInfo != null &&
+                                              widget.userInfo!.avatar != null
+                                          ? NetworkImage(
+                                              widget.userInfo!.avatar.url)
+                                          : const AssetImage(
+                                              'assets/images/avatar.jpeg')))
+                                  as ImageProvider,
                     ),
                   ),
                   Positioned(
@@ -138,9 +294,18 @@ class _PersonelInformationState extends State<PersonelInformation> {
                           const CircleBorder(),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        if (_selectedFile != null ||
+                            _selectedImageBytes != null) {
+                          _removeImage();
+                        } else {
+                          _pickImage();
+                        }
+                      },
                       icon: Icon(
-                        CupertinoIcons.camera,
+                        (_selectedFile != null || _selectedImageBytes != null)
+                            ? CupertinoIcons.xmark
+                            : CupertinoIcons.camera,
                         color: Colors.white,
                         size: 20,
                       ),
@@ -148,114 +313,89 @@ class _PersonelInformationState extends State<PersonelInformation> {
                   )
                 ],
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 10,
-                children: [
-                  Text(
-                    'Full Name',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  MyTextField(
-                    hintText: 'Seibon',
-                    prefixIcon: CupertinoIcons.person,
-                    controller: _fullNameController,
-                    focusNode: _fullNameFocusNode,
-                    obscureText: false,
-                  )
-                ],
+              const SizedBox(height: 16),
+              // Các trường thông tin cá nhân ở đây...
+              _buildLabeledTextField(
+                label: 'Full Name',
+                controller: _fullNameController,
+                focusNode: _fullNameFocusNode,
+                hint: 'Seibon',
+                icon: CupertinoIcons.person,
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 10,
-                children: [
-                  Text(
-                    'Phone Number',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  MyTextField(
-                    hintText: '0357378876',
-                    prefixIcon: CupertinoIcons.phone,
-                    controller: _phoneNumberController,
-                    focusNode: _phoneNumberFocusNode,
-                    obscureText: false,
-                  )
-                ],
+              _buildLabeledTextField(
+                label: 'Phone Number',
+                controller: _phoneNumberController,
+                focusNode: _phoneNumberFocusNode,
+                hint: 'Phone Number',
+                icon: CupertinoIcons.phone,
+                fieldType: TextInputType.phone,
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 10,
-                children: [
-                  Text(
-                    'Email',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  MyTextField(
-                    hintText: 'example@gmail.com',
-                    prefixIcon: CupertinoIcons.envelope,
-                    controller: _emailController,
-                    focusNode: _emailFocusNode,
-                    obscureText: false,
-                  )
-                ],
+              _buildLabeledTextField(
+                label: 'Email',
+                controller: _emailController,
+                focusNode: _emailFocusNode,
+                hint: 'example@gmail.com',
+                icon: CupertinoIcons.envelope,
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 10,
-                children: [
-                  Text(
-                    'Address',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  MyTextField(
-                    hintText: 'District 1, HCM City',
-                    prefixIcon: CupertinoIcons.location,
-                    controller: _addressController,
-                    focusNode: _addressFocusNode,
-                    obscureText: false,
-                  )
-                ],
+              _buildLabeledTextField(
+                label: 'Address',
+                controller: _addressController,
+                focusNode: _addressFocusNode,
+                hint: 'District 1, HCM City',
+                icon: CupertinoIcons.location,
               ),
-              SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 200,
-                    maxWidth: 350,
-                  ),
+                  constraints:
+                      const BoxConstraints(minWidth: 200, maxWidth: 350),
                   child: MyButton(
                     text: 'Change Information',
-                    isLoading: _loading,
-                    onTap: (_) => {},
+                    isLoading: _isLoading,
+                    onTap: (_) => {handleChangeInfomation()},
                   ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLabeledTextField({
+    required String label,
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required String hint,
+    required IconData icon,
+    TextInputType? fieldType,
+  }) {
+    fieldType = fieldType ?? TextInputType.text;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 6,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54),
+          ),
+          MyTextField(
+            hintText: hint,
+            prefixIcon: icon,
+            controller: controller,
+            focusNode: focusNode,
+            obscureText: false,
+            disable: label == 'Email' ? true : false,
+            fieldType: fieldType,
+          ),
+        ],
       ),
     );
   }
@@ -477,7 +617,6 @@ class _AddressPageState extends State<AddressPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('currentAddress: $currentAddress');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBarMobile(

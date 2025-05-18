@@ -1,9 +1,19 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
+part 'category.model.g.dart';
 
+@HiveType(typeId: 2)
 class CategoryModel {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final CategoryImage image;
+
+  @HiveField(3)
   final bool isActive;
 
   CategoryModel({
@@ -42,8 +52,12 @@ class CategoryModel {
   }
 }
 
+@HiveType(typeId: 3)
 class CategoryImage {
+  @HiveField(0)
   final String url;
+
+  @HiveField(1)
   final String publicId;
 
   CategoryImage({

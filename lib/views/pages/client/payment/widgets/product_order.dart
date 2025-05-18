@@ -55,7 +55,8 @@ class ProductOrdered extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          formatMoney(item.unitPrice),
+                          formatMoney(item.unitPrice -
+                              (item.unitPrice * item.discount)),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.black,
@@ -86,8 +87,7 @@ class ProductOrdered extends StatelessWidget {
               flex: 1,
               child: Text(
                 formatMoney(
-                  (item.unitPrice +
-                          (item.unitPrice * item.discount)) *
+                  (item.unitPrice - (item.unitPrice * item.discount)) *
                       item.quantity,
                 ),
                 textAlign: TextAlign.end,

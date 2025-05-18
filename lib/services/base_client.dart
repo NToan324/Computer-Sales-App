@@ -125,12 +125,37 @@ class BaseClient {
     }
   }
 
+  // POST Multipart Request
+  Future<dynamic> upload(String api, FormData data) async {
+    final uri = Uri.parse('$baseUrl$api');
+    try {
+      final options = Options(
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data'
+        },
+      );
+      final response =
+          await dio.post(uri.toString(), data: data, options: options);
+      return response.data;
+    } on SocketException {
+      throw FetchDataException('No Internet connection', api);
+    } on TimeoutException {
+      throw ApiNotRespondingException('API timeout', uri.toString());
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return _processResponse(e.response!);
+      } else {
+        throw FetchDataException('Network error', uri.toString());
+      }
+    }
+  }
+
   // Xử lý phản hồi dựa trên mã trạng thái
   dynamic _processResponse(Response response) {
     switch (response.statusCode) {
       case 400:
         final message = _parseErrorMessage(response.data);
-        print('Error Dio: $message');
         throw BadRequestException(message, response.requestOptions.path);
       case 401:
         final message = _parseErrorMessage(response.data);

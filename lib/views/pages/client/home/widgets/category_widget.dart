@@ -1,10 +1,15 @@
 import 'dart:ui';
 
+import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/config/color.dart';
+import 'package:computer_sales_app/models/category.model.dart';
 import 'package:computer_sales_app/models/product_card.model.dart';
+import 'package:computer_sales_app/provider/product_provider.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
+import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class CategoryWidget extends StatefulWidget {
   const CategoryWidget({super.key});
@@ -14,19 +19,22 @@ class CategoryWidget extends StatefulWidget {
 }
 
 class _CategoryWidgetState extends State<CategoryWidget> {
+  bool isSeeAll = false;
+  bool isHoverButton = false;
+  bool isLoading = true;
+
+  List<CategoryModel> categories = [];
+
   final Map<String, String> categoriesIcon = {
-    'All': 'assets/icons/Category00008.svg',
-    'Deals': 'assets/icons/Category00001.svg',
+    'PC': 'assets/icons/Category00003.svg',
+    'Monitor': 'assets/icons/Category00004.svg',
     'Laptop': 'assets/icons/Category00002.svg',
     'Best Seller': 'assets/icons/laptop.svg',
+    'Keyboard': 'assets/icons/Category00006.svg',
+    'Mouse': 'assets/icons/Category00007.svg',
     'Desktop': 'assets/icons/Category00003.svg',
-    'New Arrival': 'assets/icons/laptop.svg',
-    'Monitor': 'assets/icons/Category00004.svg',
-    'Mouse': 'assets/icons/Category00006.svg',
-    'Headphone': 'assets/icons/Category00007.svg',
-    'Keyboard': 'assets/icons/Category00005.svg',
+    'Headphone': 'assets/icons/Category00005.svg',
   };
-
   final List<ProductPromotion> productsPromotion = [
     ProductPromotion(
       name: 'Macbook Pro',
@@ -66,10 +74,34 @@ class _CategoryWidgetState extends State<CategoryWidget> {
     ),
   ];
 
-  bool isSeeAll = false;
-  bool isHoverButton = false;
+  Future<void> fetchCategories() async {
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+    await productProvider.fetchCategories();
+
+    setState(() {
+      categories = productProvider.categories;
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchCategories();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final maxVisible = Responsive.isDesktop(context)
+        ? categories.length
+        : (Responsive.isTablet(context) ? 6 : 4);
+    final itemCount = isSeeAll
+        ? categories.length
+        : (categories.length > maxVisible ? maxVisible : categories.length);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
@@ -102,29 +134,42 @@ class _CategoryWidgetState extends State<CategoryWidget> {
           ],
         ),
         // Danh mục sản phẩm
-        GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: Responsive.isDesktop(context)
-                ? categoriesIcon.length
-                : Responsive.isTablet(context)
-                    ? 6
-                    : 4,
-            crossAxisSpacing: 5,
-            mainAxisSpacing: 10,
-          ),
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: isSeeAll
-              ? categoriesIcon.length
-              : (Responsive.isDesktop(context)
-                  ? categoriesIcon.length
-                  : (Responsive.isTablet(context) ? 6 : 4)),
-          itemBuilder: (context, index) => ListCategoryWidget(
-            isHoverButton: isHoverButton,
-            icon: categoriesIcon.values.elementAt(index),
-            text: categoriesIcon.keys.elementAt(index),
-          ),
-        ),
+        isLoading
+            ? GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: Responsive.isDesktop(context)
+                      ? categoriesIcon.length
+                      : Responsive.isTablet(context)
+                          ? 6
+                          : 4,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 10,
+                ),
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: categoriesIcon.length,
+                itemBuilder: (context, index) => SkeletonCategoryItem(),
+              )
+            : GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: Responsive.isDesktop(context)
+                      ? categoriesIcon.length
+                      : Responsive.isTablet(context)
+                          ? 6
+                          : 4,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 10,
+                ),
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: itemCount,
+                itemBuilder: (context, index) => ListCategoryWidget(
+                  isHoverButton: isHoverButton,
+                  icon: categoriesIcon[categories[index].name] ??
+                      'assets/icons/Category00008.svg',
+                  text: categories[index].name,
+                ),
+              ),
         SizedBox(
           width: double.infinity,
           child: Column(
@@ -179,41 +224,56 @@ class ListCategoryWidget extends StatefulWidget {
 class _ListCategoryWidgetState extends State<ListCategoryWidget> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      spacing: 10,
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color:
-                widget.isHoverButton ? AppColors.orangePastel : AppColors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(40),
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
+    return GestureDetector(
+      onTap: () => {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductPageView(
+              categoryId: widget.text,
+            ),
           ),
-          child: SvgPicture.asset(
-            widget.icon,
-            colorFilter: ColorFilter.mode(AppColors.black, BlendMode.srcIn),
-            width: 30,
+        )
+      },
+      child: Column(
+        spacing: 10,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: widget.isHoverButton
+                  ? AppColors.orangePastel
+                  : AppColors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(40),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: SvgPicture.asset(
+              widget.icon,
+              colorFilter: ColorFilter.mode(AppColors.black, BlendMode.srcIn),
+              width: 30,
+            ),
           ),
-        ),
-        Text(
-          widget.text,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            color: widget.isHoverButton ? AppColors.primary : Colors.black,
+          Text(
+            widget.text,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: widget.isHoverButton ? AppColors.primary : Colors.black,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -228,90 +288,93 @@ class ProductCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            minWidth: 280,
-            maxWidth: 280,
-          ),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-            height: 250,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              color: BackgroundColor.primary,
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(50),
-                  blurRadius: 10,
-                  offset: Offset(10, 10),
+    return GestureDetector(
+      onTap: () {},
+      child: Stack(
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: 280,
+              maxWidth: 280,
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              height: 250,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: BackgroundColor.primary,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(50),
+                    blurRadius: 10,
+                    offset: Offset(10, 10),
+                  ),
+                ],
+                image: DecorationImage(
+                  image: AssetImage(productsPromotion.imageUrl),
+                  fit: BoxFit.cover,
                 ),
-              ],
-              image: DecorationImage(
-                image: AssetImage(productsPromotion.imageUrl),
-                fit: BoxFit.cover,
               ),
             ),
           ),
-        ),
-        Positioned(
-          bottom: 30,
-          right: 10,
-          left: 10,
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(18)),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 10,
-                sigmaY: 10,
-              ),
-              child: Container(
-                padding: EdgeInsets.all(10),
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(130),
+          Positioned(
+            bottom: 30,
+            right: 10,
+            left: 10,
+            child: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(18)),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 10,
+                  sigmaY: 10,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          productsPromotion.name,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(130),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            productsPromotion.name,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text('From ${productsPromotion.price}'),
-                        Text('${productsPromotion.discount}% off'),
-                      ],
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
+                          Text('From ${productsPromotion.price}'),
+                          Text('${productsPromotion.discount}% off'),
+                        ],
                       ),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.add,
-                          color: Colors.white,
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }

@@ -138,7 +138,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       final filterReviewsRating = res['data']
           .where((review) => review.userId != null && review.rating != 0)
           .toList();
-      print('filterReviewsRating: $filterReviewsRating');
       if (res['data'].isNotEmpty) {
         setState(() {
           reviews.addAll(

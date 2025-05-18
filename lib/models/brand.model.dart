@@ -1,8 +1,21 @@
+import 'package:hive/hive.dart';
+part 'brand.model.g.dart';
+
+@HiveType(typeId: 4)
 class BrandModel {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final BrandImage image;
+
+  @HiveField(3)
   final String publicId;
+
+  @HiveField(4)
   final bool isActive;
 
   BrandModel({
@@ -24,8 +37,12 @@ class BrandModel {
   }
 }
 
+@HiveType(typeId: 5)
 class BrandImage {
+  @HiveField(0)
   final String url;
+
+  @HiveField(1)
   final String publicId;
 
   BrandImage({

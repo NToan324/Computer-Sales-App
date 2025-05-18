@@ -92,7 +92,7 @@ class _LoginViewState extends State<LoginView> {
 
   Future<void> _isLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('access_token');
+    final accessToken = prefs.getString('accessToken');
     if (accessToken != null) {
       if (mounted) {
         Navigator.pushReplacementNamed(context, 'home');

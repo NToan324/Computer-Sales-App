@@ -7,6 +7,8 @@ class MyTextField extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
   final bool obscureText;
+  final bool disable;
+  final TextInputType fieldType;
 
   const MyTextField({
     super.key,
@@ -14,6 +16,8 @@ class MyTextField extends StatefulWidget {
     required this.prefixIcon,
     required this.controller,
     this.focusNode,
+    this.disable = false,
+    this.fieldType = TextInputType.text,
     required this.obscureText,
   });
 
@@ -43,12 +47,12 @@ class _MyTextFieldState extends State<MyTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final hasText = widget.controller.text.isNotEmpty;
-
     return Container(
-      color: hasText ? const Color.fromARGB(255, 255, 244, 240) : Colors.white,
+      color: Colors.white,
       width: 350,
       child: TextField(
+        enabled: !widget.disable,
+        keyboardType: widget.fieldType,
         controller: widget.controller,
         focusNode: widget.focusNode,
         obscureText: _obscure,

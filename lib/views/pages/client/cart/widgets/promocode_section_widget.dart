@@ -13,11 +13,19 @@ class PromocodeSectionWidget extends StatefulWidget {
 
 class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
   final TextEditingController _promoCodeController = TextEditingController();
+  String _selectedShippingMethod = 'Express delivery';
 
-  double get subtotal => widget.cartItems
-      .fold(0, (sum, item) => sum + item.unitPrice * item.quantity);
+  final List<String> _shippingMethods = [
+    'Pickup at store',
+    'Express delivery',
+  ];
 
-  double get deliveryFee => 5.0;
+  double get subtotal => widget.cartItems.fold(
+      0,
+      (sum, item) =>
+          sum +
+          (item.unitPrice - item.unitPrice * item.discount) * item.quantity);
+
   // Example delivery fee
   double _discount = 10.0;
 
@@ -28,8 +36,6 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
       _discount = value;
     });
   }
-
-  double get total => subtotal + deliveryFee - discount;
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +91,34 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Shipping method',
+                  style: TextStyle(fontSize: 14, color: Colors.black),
+                ),
+                DropdownButton<String>(
+                  elevation: 1,
+                  dropdownColor: Colors.white,
+                  value: _selectedShippingMethod,
+                  items: _shippingMethods.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value, style: TextStyle(fontSize: 13)),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedShippingMethod = newValue!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
           const Divider(
             color: Colors.black12,
             height: 1,
@@ -106,7 +140,7 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
                         style: TextStyle(fontSize: 14, color: Colors.black),
                       ),
                       Text(
-                        formatMoney(total),
+                        formatMoney(subtotal),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -122,7 +156,9 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
                     height: 40,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, 'payment');
+                        Navigator.pushNamed(context, 'payment', arguments: {
+                          'shippingMethod': _selectedShippingMethod,
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

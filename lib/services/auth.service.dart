@@ -8,11 +8,13 @@ class AuthService extends BaseClient {
   Future<Map<String, dynamic>> signup({
     required String name,
     required String email,
+    required String address,
     required String password,
   }) async {
     final res = await post('auth/signup', {
       'fullName': name,
       'email': email,
+      'address': address,
       'password': password,
     });
     return res['data'];

@@ -2,6 +2,7 @@ import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart'
 import 'package:computer_sales_app/components/custom/cart.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/provider/user_provider.dart';
+import 'package:computer_sales_app/routes/app_routes.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AvatarWidget extends StatelessWidget {
-  const AvatarWidget({
+   AvatarWidget({
     super.key,
     this.userName,
     this.userId,
@@ -18,8 +19,21 @@ class AvatarWidget extends StatelessWidget {
 
   final String? userName;
   final String? userId;
+
+    final List<String> recentSearches = [
+    "Macbook",
+    "Lenovo",
+    "Asus",
+    "Chuột không dây",
+    "Bàn phím cơ",
+    "Màn hình ",
+    "Tai nghe Gaming"
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final avatarUrl = userProvider.userModel?.avatar.url;
     return Padding(
       padding: const EdgeInsets.only(right: 20),
       child: Row(
@@ -35,7 +49,13 @@ class AvatarWidget extends StatelessWidget {
                         FeatherIcons.search,
                         size: 25,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                       Navigator.of(context).pushNamed(
+                          AppRoutes.searchProduct,
+                          arguments: {'recentSearches': recentSearches},
+                        );
+
+                      },
                     )
                   : SizedBox(),
               CartWidget(),
@@ -90,7 +110,10 @@ class AvatarWidget extends StatelessWidget {
                   ];
                 },
                 child: CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/avatar.jpeg'),
+                  backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                      ? NetworkImage(avatarUrl)
+                      : const AssetImage('assets/images/avatar.jpeg')
+                          as ImageProvider,
                   radius: Responsive.isDesktop(context) ? 25 : 20,
                 ),
               ),

@@ -266,6 +266,8 @@ class CartProvider with ChangeNotifier {
         notifyListeners();
       }
     }
+    isLoading = false;
+    notifyListeners();
   }
 
   Future<void> _loadLocalCart() async {
@@ -300,7 +302,9 @@ class CartProvider with ChangeNotifier {
   double get subTotalPrice {
     return cartItems.fold(
       0,
-      (total, item) => total + (item.unitPrice * item.quantity),
+      (total, item) =>
+          total +
+          ((item.unitPrice - item.unitPrice * item.discount) * item.quantity),
     );
   }
 }

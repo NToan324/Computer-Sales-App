@@ -19,11 +19,13 @@ class _SignUpViewState extends State<SignUpView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmedPasswordController = TextEditingController();
+  final _addressController = TextEditingController();
 
   final _nameFocus = FocusNode();
   final _emailFocus = FocusNode();
   final _passwordFocus = FocusNode();
   final _confirmFocus = FocusNode();
+  final _addressFocus = FocusNode();
 
   bool _loading = false;
 
@@ -33,11 +35,13 @@ class _SignUpViewState extends State<SignUpView> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmedPasswordController.dispose();
+    _addressController.dispose();
 
     _nameFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
     _confirmFocus.dispose();
+    _addressFocus.dispose();
 
     super.dispose();
   }
@@ -50,6 +54,7 @@ class _SignUpViewState extends State<SignUpView> {
   Future<void> signUp() async {
     final name = _userNameController.text.trim();
     final email = _emailController.text.trim();
+    final address = _addressController.text.trim();
     final pass = _passwordController.text.trim();
     final confirm = _confirmedPasswordController.text.trim();
 
@@ -63,6 +68,11 @@ class _SignUpViewState extends State<SignUpView> {
       return;
     }
 
+    if (address.isEmpty) {
+      _focusAndShowError(_addressFocus, 'Please enter your address');
+      return;
+    }
+
     if (pass.isEmpty) {
       _focusAndShowError(_passwordFocus, 'Please enter your password');
       return;
@@ -73,9 +83,21 @@ class _SignUpViewState extends State<SignUpView> {
       return;
     }
 
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        .hasMatch(email)) {
+      _focusAndShowError(_emailFocus, 'Please enter a valid email address');
+      return;
+    }
+
     if (pass != confirm) {
       _confirmedPasswordController.clear();
       _focusAndShowError(_confirmFocus, 'Passwords do not match');
+      return;
+    }
+
+    if (pass.length < 6) {
+      _focusAndShowError(
+          _passwordFocus, 'Password must be at least 6 characters');
       return;
     }
 
@@ -83,7 +105,7 @@ class _SignUpViewState extends State<SignUpView> {
 
     try {
       final auth = AuthService();
-      await auth.signup(name: name, email: email, password: pass);
+      await auth.signup(name: name, email: email, address:address, password: pass);
       await Future.delayed(const Duration(milliseconds: 1000));
       showCustomSnackBar(context, 'Sign up successfully',
           type: SnackBarType.success);
@@ -156,6 +178,13 @@ class _SignUpViewState extends State<SignUpView> {
                     prefixIcon: Icons.email,
                     controller: _emailController,
                     focusNode: _emailFocus,
+                    obscureText: false,
+                  ),
+                  MyTextField(
+                    hintText: 'Address',
+                    prefixIcon: Icons.home,
+                    controller: _addressController,
+                    focusNode: _addressFocus,
                     obscureText: false,
                   ),
                   MyTextField(

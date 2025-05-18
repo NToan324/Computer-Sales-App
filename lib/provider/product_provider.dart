@@ -8,6 +8,7 @@ import 'package:computer_sales_app/services/category.service.dart';
 import 'package:computer_sales_app/services/product.service.dart';
 import 'package:flutter/material.dart';
 import 'package:computer_sales_app/models/product.model.dart';
+import 'package:hive/hive.dart';
 
 class ProductProvider with ChangeNotifier {
   List<ProductModel> products = [];
@@ -19,20 +20,71 @@ class ProductProvider with ChangeNotifier {
   int totalPage = 0;
   String? errorMessage;
 
+  Box<ProductModel>? _productBox;
+  Box<CategoryModel>? _categoryBox;
+  Box<BrandModel>? _brandBox;
+
   final BrandService brandService = BrandService();
   final CategoryService categoryService = CategoryService();
   final ProductService productService = ProductService();
 
+  ProductProvider() {
+    _initHive();
+  }
+
+  Future<void> _initHive() async {
+    _productBox = await Hive.openBox<ProductModel>('productsBox');
+    _categoryBox = await Hive.openBox<CategoryModel>('categoriesBox');
+    _brandBox =
+        await Hive.openBox<BrandModel>('brandsBox'); // mở box cho brands
+
+    final cachedProducts = _productBox!.values.toList();
+    if (cachedProducts.isNotEmpty) {
+      products = cachedProducts;
+    }
+
+    final cachedCategories = _categoryBox!.values.toList();
+    if (cachedCategories.isNotEmpty) {
+      categories = cachedCategories;
+    }
+
+    final cachedBrands = _brandBox!.values.toList();
+    if (cachedBrands.isNotEmpty) {
+      brands = cachedBrands;
+    }
+
+    notifyListeners();
+  }
+
   Future<void> fetchBrands() async {
     final response = await brandService.getBrands();
-    brands.addAll(response.map((brand) => brand).toList());
+    brands = response.map((brand) => brand).toList();
+
+    // Cập nhật cache Hive
+    if (_brandBox != null) {
+      await _brandBox!.clear();
+      for (var brand in brands) {
+        await _brandBox!.put(brand.id, brand);
+      }
+    }
+
     notifyListeners();
   }
 
   Future<void> fetchCategories() async {
     final response = await categoryService.getCategories();
-    categories.addAll(response.map((category) => category).toList());
+    categories = response.map((category) => category).toList();
+    await _updateCategoryHiveCache(categories);
     notifyListeners();
+  }
+
+  Future<void> _updateCategoryHiveCache(
+      List<CategoryModel> newCategories) async {
+    if (_categoryBox == null) return;
+    await _categoryBox!.clear();
+    for (var category in newCategories) {
+      await _categoryBox!.put(category.id, category);
+    }
   }
 
   Future<void> fetchProducts(
@@ -77,14 +129,34 @@ class ProductProvider with ChangeNotifier {
         minPrice: minPrice,
         maxPrice: maxPrice,
       );
+      if (data['data'].length == 0) {
+        products = [];
+        totalPage = 0;
+        this.page = 0;
+        this.limit = 0;
+        return;
+      }
       products = data['data'];
       totalPage = data['totalPages'];
       this.page = data['page'];
       this.limit = data['limit'];
+
+      await _updateHiveCache(products);
     } on BadRequestException catch (e) {
-      errorMessage = e.message;
+      if (_productBox != null && _productBox!.isNotEmpty) {
+        products = _productBox!.values.toList();
+      }
+      errorMessage = e.toString();
     } finally {
       notifyListeners();
+    }
+  }
+
+  Future<void> _updateHiveCache(List<ProductModel> newProducts) async {
+    if (_productBox == null) return;
+    await _productBox!.clear();
+    for (var product in newProducts) {
+      await _productBox!.put(product.id, product);
     }
   }
 
@@ -211,7 +283,6 @@ class ProductProvider with ChangeNotifier {
       page: page,
       limit: limit,
     );
-
 
     // Cập nhật danh sách filters để hiển thị ra giao diện
     final Set<String> combined = {

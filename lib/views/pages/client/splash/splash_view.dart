@@ -4,7 +4,6 @@ import 'package:computer_sales_app/services/user.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/splash/widgets/splash_image_view.dart';
 import 'package:flutter/material.dart';
-import 'package:get/instance_manager.dart';
 import 'package:provider/provider.dart';
 
 void main(List<String> args) {

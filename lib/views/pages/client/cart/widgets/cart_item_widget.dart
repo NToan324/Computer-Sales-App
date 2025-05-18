@@ -83,9 +83,11 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                               ),
                             ),
                             Text(
-                              formatMoney(widget.itemCart.unitPrice +
-                                  (widget.itemCart.unitPrice *
-                                      widget.itemCart.discount)),
+                              formatMoney(
+                                widget.itemCart.unitPrice -
+                                    (widget.itemCart.unitPrice *
+                                        widget.itemCart.discount),
+                              ),
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: AppColors.black,
@@ -129,7 +131,8 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                     flex: 1,
                     child: Text(
                       formatMoney(
-                          widget.itemCart.unitPrice * widget.itemCart.quantity),
+                        widget.itemCart.unitPrice * widget.itemCart.quantity,
+                      ),
                       textAlign: TextAlign.start,
                       style: const TextStyle(
                         fontSize: 14,

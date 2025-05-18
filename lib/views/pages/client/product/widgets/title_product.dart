@@ -34,7 +34,7 @@ class TitleProduct extends StatelessWidget {
           spacing: 10,
           children: [
             Text(
-              formatMoney(price - discount! * price),
+              formatMoney(price),
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -43,7 +43,7 @@ class TitleProduct extends StatelessWidget {
               softWrap: true,
             ),
             Text(
-              formatMoney(price),
+              formatMoney(price - discount! * price),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
