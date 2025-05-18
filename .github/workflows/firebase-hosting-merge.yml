@@ -9,10 +9,22 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hosting
     steps:
       - uses: actions/checkout@v4
+      
+      # Thêm bước cài Flutter SDK
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'  # hoặc version bạn muốn
+      
+      # Nếu bạn không cần npm thì bỏ dòng dưới
       # - run: npm ci
+      
       - run: flutter build web
+      
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -21,6 +33,3 @@ jobs:
           projectId: ecommerce-765f7
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
-    defaults:
-      run:
-        working-directory: hosting
