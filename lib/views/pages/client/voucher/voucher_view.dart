@@ -1,4 +1,5 @@
 import 'package:computer_sales_app/components/custom/my_text_field.dart';
+import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:flutter/material.dart';
@@ -53,8 +54,9 @@ class _VoucherViewState extends State<VoucherView> {
                     onPressed: () => _goToPage(0),
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor:
-                          _currentPage == 0 ? Colors.white : AppColors.primary,
+                      backgroundColor: _currentPage == 0
+                          ? AppColors.white
+                          : AppColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -64,13 +66,13 @@ class _VoucherViewState extends State<VoucherView> {
                       spacing: 10,
                       children: [
                         Icon(
-                          Icons.wallet,
+                          Icons.edit,
                           color: _currentPage == 0
                               ? AppColors.primary
                               : Colors.white,
                         ),
                         Text(
-                          'My Wallet',
+                          'Enter Code',
                           style: TextStyle(
                             color: _currentPage == 0
                                 ? AppColors.primary
@@ -87,9 +89,8 @@ class _VoucherViewState extends State<VoucherView> {
                     onPressed: () => _goToPage(1),
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: _currentPage == 1
-                          ? AppColors.white
-                          : AppColors.primary,
+                      backgroundColor:
+                          _currentPage == 1 ? Colors.white : AppColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -99,13 +100,13 @@ class _VoucherViewState extends State<VoucherView> {
                       spacing: 10,
                       children: [
                         Icon(
-                          Icons.edit,
+                          Icons.wallet,
                           color: _currentPage == 1
                               ? AppColors.primary
                               : Colors.white,
                         ),
                         Text(
-                          'Enter Code',
+                          'My Wallet',
                           style: TextStyle(
                             color: _currentPage == 1
                                 ? AppColors.primary
@@ -133,7 +134,7 @@ class _VoucherViewState extends State<VoucherView> {
                 },
                 itemBuilder: (context, index) => Container(
                   color: Colors.white,
-                  child: index == 0 ? VoucherWidget() : EnterVoucherCode(),
+                  child: index == 0 ? EnterVoucherCode() : VoucherWidget(),
                 ),
               ),
             ),
@@ -251,6 +252,79 @@ class EnterVoucherCode extends StatelessWidget {
 
   final TextEditingController controller = TextEditingController();
 
+  void handleApplyCode(BuildContext context) {
+    final discountAmount = 50000.0; // ví dụ giảm 50.000 VNĐ
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle_outline,
+                  color: Colors.green, size: 60),
+              const SizedBox(height: 16),
+              const Text(
+                'Success!',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You saved ${discountAmount.toStringAsFixed(0)}₫ on your order.',
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                spacing: 12,
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Just close the dialog
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close the dialog
+                        Navigator.pop(context,
+                            discountAmount); // Return to previous screen
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Apply'),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -284,7 +358,13 @@ class EnterVoucherCode extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              if (controller.text.isEmpty) {
+                showCustomSnackBar(context, 'Please enter a voucher code');
+                return;
+              }
+              handleApplyCode(context);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               elevation: 0,

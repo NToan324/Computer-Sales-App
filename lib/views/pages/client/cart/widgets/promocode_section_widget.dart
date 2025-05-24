@@ -12,29 +12,25 @@ class PromocodeSectionWidget extends StatefulWidget {
 }
 
 class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
-  final TextEditingController _promoCodeController = TextEditingController();
   String _selectedShippingMethod = 'Express delivery';
+  double voucherDiscountMoney = 0;
 
   final List<String> _shippingMethods = [
     'Pickup at store',
     'Express delivery',
   ];
 
-  double get subtotal => widget.cartItems.fold(
+  double get subtotal {
+    double total = widget.cartItems.fold(
       0,
       (sum, item) =>
           sum +
-          (item.unitPrice - item.unitPrice * item.discount) * item.quantity);
-
-  // Example delivery fee
-  double _discount = 10.0;
-
-  double get discount => _discount;
-
-  set discount(double value) {
-    setState(() {
-      _discount = value;
-    });
+          (item.unitPrice - item.unitPrice * item.discount) * item.quantity,
+    );
+    // Trừ thêm voucherDiscountMoney cho toàn bộ đơn hàng
+    total -= voucherDiscountMoney;
+    if (total < 0) total = 0;
+    return total;
   }
 
   @override
@@ -48,8 +44,13 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
             child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, 'voucher');
+              onTap: () async {
+                final result = await Navigator.pushNamed(context, 'voucher');
+                if (result != null) {
+                  setState(() {
+                    voucherDiscountMoney = result as double;
+                  });
+                }
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,7 +74,7 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Shipping Free',
+                          formatMoney(voucherDiscountMoney),
                           style: TextStyle(
                             fontSize: 10,
                             color: const Color.fromARGB(255, 0, 69, 23),
@@ -136,7 +137,7 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Total Pay',
+                        'Subtotal Pay',
                         style: TextStyle(fontSize: 14, color: Colors.black),
                       ),
                       Text(
@@ -158,6 +159,7 @@ class _PromocodeSectionWidgetState extends State<PromocodeSectionWidget> {
                       onPressed: () {
                         Navigator.pushNamed(context, 'payment', arguments: {
                           'shippingMethod': _selectedShippingMethod,
+                          'voucherDiscountMoney': voucherDiscountMoney,
                         });
                       },
                       style: ElevatedButton.styleFrom(

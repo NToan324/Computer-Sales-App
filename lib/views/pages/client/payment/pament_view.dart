@@ -1,5 +1,4 @@
 import 'package:computer_sales_app/components/custom/snackbar.dart';
-import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/order.model.dart';
 import 'package:computer_sales_app/provider/cart_provider.dart';
@@ -33,6 +32,7 @@ class _PaymentViewState extends State<PaymentView> {
   String shippingMethod = 'Express delivery';
   double currentPoint = 0;
   double totalAmountFinal = 0;
+  double voucherDiscountMoney = 0;
 
   Future<String> getCurrentLocation() async {
     final prefs = await SharedPreferences.getInstance();
@@ -77,11 +77,17 @@ class _PaymentViewState extends State<PaymentView> {
       if (mounted) {
         showCustomSnackBar(context, e.message);
       }
+      setState(() {
+        isLoading = false;
+      });
       return;
     } on BadRequestException catch (e) {
       if (mounted) {
         showCustomSnackBar(context, e.message);
       }
+      setState(() {
+        isLoading = false;
+      });
       return;
     } catch (e) {
       if (mounted) {
@@ -96,6 +102,10 @@ class _PaymentViewState extends State<PaymentView> {
     //Removew cart in local storage
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('cart');
+
+    //check if user exists
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isExistUser = userProvider.userModel != null;
 
     showDialog(
       context: context,
@@ -113,12 +123,35 @@ class _PaymentViewState extends State<PaymentView> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            MyButton(
-                text: 'View Order',
-                onTap: (_) {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushReplacementNamed('order-view');
-                }),
+            isExistUser
+                ? MyButton(
+                    text: 'View Order',
+                    onTap: (_) {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pushReplacementNamed('order-view');
+                    },
+                  )
+                : Column(
+                    children: [
+                      const Text(
+                        'Please sign in to track your order status.',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      MyButton(
+                        text: 'Sign In',
+                        onTap: (_) {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pushReplacementNamed('login');
+                        },
+                      ),
+                    ],
+                  ),
             const SizedBox(height: 10),
             MyButton(
               text: 'Back to Home',
@@ -153,6 +186,7 @@ class _PaymentViewState extends State<PaymentView> {
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>? ??
               {};
       shippingMethod = args['shippingMethod'] ?? 'Express delivery';
+      voucherDiscountMoney = args['voucherDiscountMoney'] ?? 0;
 
       name = userProvider.userModel?.fullName ?? 'Unknown';
       email = userProvider.userModel?.email ?? 'example@gmail.com';
@@ -206,6 +240,8 @@ class _PaymentViewState extends State<PaymentView> {
                                         email: email,
                                         shippingMethod: shippingMethod,
                                         currentPoint: currentPoint,
+                                        voucherDiscountMoney:
+                                            voucherDiscountMoney,
                                         onUpdateTotalPrice: (totalPrice) {
                                           setState(() {
                                             totalAmountFinal = totalPrice;
@@ -252,6 +288,8 @@ class _PaymentViewState extends State<PaymentView> {
                                         email: email,
                                         shippingMethod: shippingMethod,
                                         currentPoint: currentPoint,
+                                        voucherDiscountMoney:
+                                            voucherDiscountMoney,
                                         handleCreateOrder: () {
                                           handleCreateOrder();
                                         },

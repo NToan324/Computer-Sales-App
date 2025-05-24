@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AvatarWidget extends StatelessWidget {
-   AvatarWidget({
+  AvatarWidget({
     super.key,
     this.userName,
     this.userId,
@@ -20,7 +20,7 @@ class AvatarWidget extends StatelessWidget {
   final String? userName;
   final String? userId;
 
-    final List<String> recentSearches = [
+  final List<String> recentSearches = [
     "Macbook",
     "Lenovo",
     "Asus",
@@ -50,71 +50,73 @@ class AvatarWidget extends StatelessWidget {
                         size: 25,
                       ),
                       onPressed: () {
-                       Navigator.of(context).pushNamed(
+                        Navigator.of(context).pushNamed(
                           AppRoutes.searchProduct,
                           arguments: {'recentSearches': recentSearches},
                         );
-
                       },
                     )
                   : SizedBox(),
               CartWidget(),
-              PopupMenuButton<String>(
-                color: Colors.white,
-                onSelected: (value) {
-                  _handleMenuSelection(value, context);
-                },
-                offset: Offset(
-                  0,
-                  50,
-                ),
-                itemBuilder: (BuildContext context) {
-                  return [
-                    if (userId != null && Responsive.isDesktop(context))
+              SizedBox(
+                height: 50,
+                child: PopupMenuButton<String>(
+                  color: Colors.white,
+                  onSelected: (value) {
+                    _handleMenuSelection(value, context);
+                  },
+                  offset: Offset(
+                    0,
+                    50,
+                  ),
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      if (userId != null && Responsive.isDesktop(context))
+                        PopupMenuItem<String>(
+                          value: 'profile',
+                          child: Row(
+                            children: [
+                              Icon(CupertinoIcons.person),
+                              SizedBox(width: 8),
+                              Text('Profile'),
+                            ],
+                          ),
+                        ),
                       PopupMenuItem<String>(
-                        value: 'profile',
+                        value: 'home',
                         child: Row(
                           children: [
-                            Icon(CupertinoIcons.person),
+                            Icon(CupertinoIcons.square_grid_2x2),
                             SizedBox(width: 8),
-                            Text('Profile'),
+                            Text('Home'),
                           ],
                         ),
                       ),
-                    PopupMenuItem<String>(
-                      value: 'home',
-                      child: Row(
-                        children: [
-                          Icon(CupertinoIcons.square_grid_2x2),
-                          SizedBox(width: 8),
-                          Text('Home'),
-                        ],
+                      PopupMenuItem<String>(
+                        value: userId != null ? 'logout' : 'login',
+                        child: Row(
+                          children: [
+                            Icon(
+                              userId != null
+                                  ? Icons.logout_rounded
+                                  : CupertinoIcons.arrow_right_circle,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              userId != null ? 'Logout' : 'Login',
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: userId != null ? 'logout' : 'login',
-                      child: Row(
-                        children: [
-                          Icon(
-                            userId != null
-                                ? Icons.logout_rounded
-                                : CupertinoIcons.arrow_right_circle,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            userId != null ? 'Logout' : 'Login',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ];
-                },
-                child: CircleAvatar(
-                  backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
-                      ? NetworkImage(avatarUrl)
-                      : const AssetImage('assets/images/avatar.jpeg')
-                          as ImageProvider,
-                  radius: Responsive.isDesktop(context) ? 25 : 20,
+                    ];
+                  },
+                  child: CircleAvatar(
+                    backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                        ? NetworkImage(avatarUrl)
+                        : const AssetImage('assets/images/avatar.jpeg')
+                            as ImageProvider,
+                    radius: Responsive.isDesktop(context) ? 25 : 20,
+                  ),
                 ),
               ),
             ],
@@ -158,26 +160,5 @@ class AvatarWidget extends StatelessWidget {
       default:
         break;
     }
-  }
-
-  // Hàm hiển thị popup thông báo
-  void _showNotificationPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Thông báo'),
-          content: Text('Bạn có thông báo mới!'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Đóng'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

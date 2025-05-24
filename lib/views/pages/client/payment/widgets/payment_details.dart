@@ -17,6 +17,7 @@ class PaymentDetails extends StatefulWidget {
     this.currentPoint = 0,
     this.handleCreateOrder,
     this.onUpdateTotalPrice,
+    this.voucherDiscountMoney = 0,
   });
 
   final double totalAmount;
@@ -29,6 +30,8 @@ class PaymentDetails extends StatefulWidget {
     required String address,
     required String paymentMethod,
   }) onChangeValue;
+
+  final double voucherDiscountMoney;
 
   final String shippingMethod;
   final double currentPoint;
@@ -101,10 +104,11 @@ class _PaymentDetailsState extends State<PaymentDetails> {
     double vatPrice = (widget.totalAmount * 0.1).floorToDouble();
 
     double totalPrice = (widget.totalAmount +
-            (widget.shippingMethod == "Pickup at store" ? 0 : 49000) +
-            vatPrice -
-            pointsToUse * 1000)
-        .floorToDouble();
+                (widget.shippingMethod == "Pickup at store" ? 0 : 49000) +
+                vatPrice -
+                pointsToUse * 1000)
+            .floorToDouble() -
+        widget.voucherDiscountMoney;
 
     if (_lastNotifiedTotalPrice != totalPrice) {
       _lastNotifiedTotalPrice = totalPrice;
@@ -130,7 +134,8 @@ class _PaymentDetailsState extends State<PaymentDetails> {
     double totalPrice = (widget.totalAmount +
             (widget.shippingMethod == "Pickup at store" ? 0 : 49000) +
             vatPrice -
-            pointsToUse * 1000)
+            pointsToUse * 1000 -
+            widget.voucherDiscountMoney)
         .floorToDouble();
 
     return Container(
@@ -253,6 +258,9 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                   _buildRowWithLabel(
                       label: 'Subtotal',
                       value: formatMoney(widget.totalAmount)),
+                  _buildRowWithLabel(
+                      label: 'Voucher',
+                      value: formatMoney(widget.voucherDiscountMoney)),
                   _buildRowWithLabel(
                       label: 'Vat (10%)', value: formatMoney(vatPrice)),
                   _buildRowWithLabel(

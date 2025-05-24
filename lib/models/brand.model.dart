@@ -55,6 +55,8 @@ class BrandModel extends HiveObject {
       isActive: json['isActive'] is bool ? json['isActive'] : true,
     );
   }
+
+
 }
 
 @HiveType(typeId: 5)
@@ -84,12 +86,18 @@ class BrandImage extends HiveObject {
     );
   }
 
-  String toJson() => json.encode(toMap());
 
   factory BrandImage.fromJson(Map<String, dynamic> json) {
     return BrandImage(
       url: json['url']?.toString() ?? '',
       publicId: json['public_id']?.toString() ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'public_id': publicId,
+    };
   }
 }

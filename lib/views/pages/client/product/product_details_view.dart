@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:computer_sales_app/components/custom/bottom_navigation_bar.dart';
 import 'package:computer_sales_app/components/custom/pagination.dart';
 import 'package:computer_sales_app/components/custom/skeleton.dart';
@@ -745,8 +746,13 @@ class _ProductRelevantState extends State<ProductRelevant> {
         currentPage = getProductVariants['page'];
       });
     } catch (e) {
+      print('Error fetching products: $e');
+      showCustomSnackBar(
+        context,
+        'Please check your internet connection',
+      );
       setState(() {
-        errorMessage = e.toString();
+        errorMessage = 'Please check your internet connection';
       });
     } finally {
       setState(() {
@@ -769,6 +775,37 @@ class _ProductRelevantState extends State<ProductRelevant> {
 
   @override
   Widget build(BuildContext context) {
+    if (errorMessage.isNotEmpty && products.isEmpty) {
+      return SizedBox(
+        height: 350,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/No_Internet.png', // Đường dẫn ảnh bạn muốn hiển thị
+                width: 250, // Chiều rộng bạn muốn
+                height: 250, // Chiều cao bạn muốn
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: 300,
+                child: Text(
+                  errorMessage,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return Column(
       children: [
         GridView.builder(
@@ -861,15 +898,15 @@ class ProductView extends StatelessWidget {
                 height: 180,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  child: images[0].url.isNotEmpty
-                      ? Image.network(
-                          images[0].url,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'assets/images/laptop.png',
-                          fit: BoxFit.cover,
-                        ),
+                  child: CachedNetworkImage(
+                    imageUrl: images[0].url,
+                    placeholder: (context, url) => const SkeletonImage(
+                      imageHeight: 160,
+                    ),
+                    errorWidget: (context, url, error) =>
+                        Image.asset('assets/images/image_default_error.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),

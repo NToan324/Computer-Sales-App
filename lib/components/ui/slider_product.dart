@@ -1,5 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:computer_sales_app/components/custom/fadeIn_network_image.dart';
 import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
@@ -64,12 +64,17 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
   Widget build(BuildContext context) {
     var items = List.generate(
       widget.imagesUrl.length,
-      (index) => Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage(
-              widget.imagesUrl[index],
-            ),
+      (index) => SizedBox(
+        child: CachedNetworkImage(
+          imageUrl: widget.imagesUrl[index],
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 350, // hoặc chiều cao bạn muốn
+          placeholder: (context, url) => const SkeletonImage(
+            imageHeight: 160,
+          ),
+          errorWidget: (context, url, error) => Image.asset(
+            'assets/images/image_default_error.png',
             fit: BoxFit.cover,
           ),
         ),
@@ -115,19 +120,27 @@ class _CarouselSliderCustomState extends State<SliderProductCustom> {
                             duration: const Duration(milliseconds: 300),
                             scale: isHover && activeIndex == index ? 0.99 : 1,
                             child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: !Responsive.isMobile(context)
-                                    ? BorderRadius.circular(10)
-                                    : null,
-                              ),
-                              child: FadeInNetworkImage(
-                                imageUrl: (widget.imagesUrl[index].isNotEmpty &&
-                                        widget.imagesUrl[index].isNotEmpty)
-                                    ? widget.imagesUrl[index]
-                                    : 'https://placehold.co/600x400.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                                decoration: BoxDecoration(
+                                  borderRadius: !Responsive.isMobile(context)
+                                      ? BorderRadius.circular(10)
+                                      : null,
+                                ),
+                                child: CachedNetworkImage(
+                                  imageUrl: (widget.imagesUrl[index]),
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => SkeletonImage(
+                                    imageHeight: !Responsive.isMobile(context)
+                                        ? 500.0
+                                        : 300.0, // hoặc chiều cao bạn muốn
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Image.asset(
+                                    'assets/images/image_default_error.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                  fadeInDuration:
+                                      const Duration(milliseconds: 500),
+                                )),
                           ),
                         ),
                         options: CarouselOptions(

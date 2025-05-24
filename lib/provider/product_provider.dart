@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'package:computer_sales_app/consts/index.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
 import 'package:computer_sales_app/models/brand.model.dart';
@@ -9,6 +10,7 @@ import 'package:computer_sales_app/services/brand.service.dart';
 import 'package:computer_sales_app/services/category.service.dart';
 import 'package:computer_sales_app/services/product.service.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class ProductProvider with ChangeNotifier {
   List<ProductEntity> productsData = [];
@@ -22,6 +24,9 @@ class ProductProvider with ChangeNotifier {
   int limit = 12;
   int totalPage = 0;
   String? errorMessage;
+  Box<ProductModel>? _productBox;
+  Box<CategoryModel>? _categoryBox;
+  Box<BrandModel>? _brandBox;
 
   final BrandService brandService = BrandService();
   final CategoryService categoryService = CategoryService();
@@ -30,20 +35,50 @@ class ProductProvider with ChangeNotifier {
   Future<void> fetchBrands() async {
     try {
       final response = await brandService.getBrands();
-      brands = response;
-      notifyListeners();
+      brands = response.map((brand) => brand).toList();
+
+      // Lưu cache
+      if (_brandBox != null) {
+        await _brandBox!.clear();
+        for (var brand in brands) {
+          await _brandBox!.put(brand.id, brand);
+        }
+      }
     } catch (e) {
-      throw Exception('Failed to fetch brands: $e');
+      // Nếu lỗi (mất mạng), lấy từ cache
+      if (_brandBox != null && _brandBox!.isNotEmpty) {
+        brands = _brandBox!.values.toList();
+        debugPrint("Đã load brand từ cache do lỗi: $e");
+      } else {
+        debugPrint("Không có dữ liệu brand cache và lỗi xảy ra: $e");
+      }
     }
   }
 
   Future<void> fetchCategories() async {
     try {
       final response = await categoryService.getCategories();
-      categories = response;
-      notifyListeners();
+      categories = response.map((category) => category).toList();
+      await _updateCategoryHiveCache(categories);
     } catch (e) {
-      throw Exception('Failed to fetch categories: $e');
+      // Nếu lỗi (mất mạng), lấy từ cache
+      if (_categoryBox != null && _categoryBox!.isNotEmpty) {
+        categories = _categoryBox!.values.toList();
+        debugPrint("Đã load category từ cache do lỗi: $e");
+      } else {
+        debugPrint("Không có dữ liệu category cache và lỗi xảy ra: $e");
+      }
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> _updateCategoryHiveCache(
+      List<CategoryModel> newCategories) async {
+    if (_categoryBox == null) return;
+    await _categoryBox!.clear();
+    for (var category in newCategories) {
+      await _categoryBox!.put(category.id, category);
     }
   }
 
@@ -51,7 +86,8 @@ class ProductProvider with ChangeNotifier {
     try {
       final response = await productService.get('product/$productId/variants');
       List<dynamic> variantList;
-      if (response['data'] is Map && (response['data']['data'] as List?) != null) {
+      if (response['data'] is Map &&
+          (response['data']['data'] as List?) != null) {
         variantList = response['data']['data'] as List;
       } else {
         return [];
@@ -115,6 +151,7 @@ class ProductProvider with ChangeNotifier {
       throw Exception('Failed to fetch products: $e');
     }
   }
+
   void setCategoryFilter(String? categoryId) {
     selectedCategoryId = categoryId;
     fetchFilteredProducts();
@@ -177,6 +214,7 @@ class ProductProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> searchFilteredProducts({
     String? name,
     int page = 1,
@@ -221,6 +259,7 @@ class ProductProvider with ChangeNotifier {
       throw Exception('Failed to search products: $e');
     }
   }
+
   Future<void> handleSortChange(String value) async {
     String? sortName;
     String? sortPrice;
@@ -241,8 +280,11 @@ class ProductProvider with ChangeNotifier {
         brandIds.add(brands.firstWhere((b) => b.name == filter).id);
       } else if (categories.any((c) => c.name == filter)) {
         categoryIds.add(categories.firstWhere((c) => c.name == filter).id);
-      } else if (RatingFilterValue.values.any((rating) => filter.contains(rating.label.toString()))) {
-        rating = RatingFilterValue.values.firstWhere((rating) => filter.contains(rating.label.toString())).value;
+      } else if (RatingFilterValue.values
+          .any((rating) => filter.contains(rating.label.toString()))) {
+        rating = RatingFilterValue.values
+            .firstWhere((rating) => filter.contains(rating.label.toString()))
+            .value;
       }
     }
 
@@ -304,21 +346,33 @@ class ProductProvider with ChangeNotifier {
             .value);
       }
     }
+    try {
+      final response = await productService.searchProductVariants(
+        brandIds: brandIds.isNotEmpty ? brandIds : null,
+        categoryIds: categoryIds.isNotEmpty ? categoryIds : null,
+        ratings: ratings,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        page: 1,
+        limit: limit,
+      );
 
-    final response = await productService.searchProductVariants(
-      brandIds: brandIds.isNotEmpty ? brandIds : null,
-      categoryIds: categoryIds.isNotEmpty ? categoryIds : null,
-      ratings: ratings,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
-      page: 1,
-      limit: limit,
-    );
+      if (response['data'].length == 0) {
+        products = [];
+        totalPage = 0;
+        page = 0;
+        limit = 0;
+        return;
+      }
 
-    products = response['data'];
-    totalPage = response['totalPages'];
-    page = response['page'];
-    limit = response['limit'];
+      products = response['data'];
+      totalPage = response['totalPages'];
+      page = response['page'];
+      limit = response['limit'];
+    } catch (e) {
+      errorMessage = e.toString();
+    }
+
     notifyListeners();
   }
 
@@ -341,16 +395,24 @@ class ProductProvider with ChangeNotifier {
       limit: limit,
     );
 
-
     // Cập nhật danh sách filters để hiển thị ra giao diện
     final Set<String> combined = {
-      if (minPrice != null && maxPrice != null) '${formatMoney(minPrice)} - ${formatMoney(maxPrice)}',
+      if (minPrice != null && maxPrice != null)
+        '${formatMoney(minPrice)} - ${formatMoney(maxPrice)}',
       if (brandIds != null) ...getNameBrandById(brandIds),
       if (categoryIds != null) ...getNameCategoryById(categoryIds),
       if (rating != null && rating.value != null) rating.label,
     };
 
     updateFilters(combined.toList());
+
+    if (response['data'].length == 0) {
+      products = [];
+      totalPage = 0;
+      this.page = 0;
+      this.limit = 0;
+      return;
+    }
 
     products = response['data'];
     totalPage = response['totalPages'];
@@ -368,8 +430,8 @@ class ProductProvider with ChangeNotifier {
 
   Future<void> removeFilterByName(String name) async {
     filters.removeWhere((item) => item == name);
-    notifyListeners();
     await fetchFilteredProducts();
+    notifyListeners();
   }
 
   void updateFilters(List<String> newFilters) {
@@ -395,18 +457,62 @@ class ProductProvider with ChangeNotifier {
     }).toList();
   }
 
+  //Get name of category by id
   List<String> getNameCategoryById(List<String> categoryIds) {
-    return categoryIds.map((categoryId) {
-      try {
-        return categories.firstWhere((category) => category.id == categoryId).name;
-      } catch (e) {
-        return 'Unknown';
-      }
-    }).toList();
+    return categoryIds
+        .map((categoryId) =>
+            categories.firstWhere((category) => category.id == categoryId).name)
+        .toList();
   }
 
   void setProducts(List<ProductModel> products) {
     this.products = products;
+    notifyListeners();
+  }
+
+  Future<void> getProductsBestSelling() async {
+    try {
+      final response = await productService.getProductsBestSelling();
+
+      if (response['data'].length == 0) {
+        products = [];
+        totalPage = 0;
+        page = 0;
+        limit = 0;
+        notifyListeners();
+        return;
+      }
+
+      products = response['data'];
+      totalPage = response['totalPages'];
+      page = response['page'];
+      limit = response['limit'];
+    } catch (e) {
+      errorMessage = e.toString();
+    }
+    notifyListeners();
+  }
+
+  Future<void> getProductsNewest() async {
+    try {
+      final response = await productService.getProductsNewest();
+
+      if (response['data'].length == 0) {
+        products = [];
+        totalPage = 0;
+        page = 0;
+        limit = 0;
+        notifyListeners();
+        return;
+      }
+
+      products = response['data'];
+      totalPage = response['totalPages'];
+      page = response['page'];
+      limit = response['limit'];
+    } catch (e) {
+      errorMessage = e.toString();
+    }
     notifyListeners();
   }
 }

@@ -9,7 +9,6 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/consts/index.dart';
 import 'package:computer_sales_app/models/brand.model.dart';
 import 'package:computer_sales_app/models/category.model.dart';
-import 'package:computer_sales_app/models/product.model.dart';
 import 'package:computer_sales_app/provider/product_provider.dart';
 import 'package:computer_sales_app/services/brand.service.dart';
 import 'package:computer_sales_app/services/category.service.dart';
@@ -17,6 +16,7 @@ import 'package:computer_sales_app/services/product.service.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/home/widgets/product_widget.dart';
 import 'package:computer_sales_app/views/pages/client/login/widgets/button.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -598,10 +598,6 @@ class _ShowListProductWidgetState extends State<ShowListProductWidget> {
                         Provider.of<ProductProvider>(context, listen: false)
                             .removeFilterByName(removedFilter);
 
-                        setState(() {
-                          //Remove the filter from the list
-                        });
-
                         showCustomSnackBar(context, '$removedFilter removed');
                       },
                       icon: const Icon(
@@ -636,6 +632,7 @@ class ProductList extends StatefulWidget {
 
 class _ProductListState extends State<ProductList> {
   bool _isLoading = true;
+  String errorMessage = '';
 
   @override
   void initState() {
@@ -649,21 +646,35 @@ class _ProductListState extends State<ProductList> {
     setState(() {
       _isLoading = true;
     });
-    final productProvider =
-        Provider.of<ProductProvider>(context, listen: false);
 
-    //clear filters
-    productProvider.clearFilters();
+    try {
+      final productProvider =
+          Provider.of<ProductProvider>(context, listen: false);
+      productProvider.clearFilters();
 
-    if (widget.categoryId != null) {
-      productProvider.filters =
-          widget.categoryId != null ? [widget.categoryId!] : ['PC>ad>'];
+      if (widget.categoryId != null) {
+        if (widget.categoryId == 'PC') {
+          productProvider.updateFilters([widget.categoryId!]);
+        } else {
+          productProvider.updateFilters([widget.categoryId!]);
+        }
+      }
+
+      await productProvider.fetchProducts(page: 1, limit: 12);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Please check your internet connection';
+        });
+        showCustomSnackBar(context, 'Please check your internet connection');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-
-    productProvider.fetchProducts(page: 1, limit: 12);
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
@@ -677,10 +688,72 @@ class _ProductListState extends State<ProductList> {
     final products = provider.products;
     final totalPage = provider.totalPage;
     final currentPage = provider.page;
+
+    if (_isLoading) {
+      return GridView.builder(
+        itemCount: 10,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: Responsive.isDesktop(context) ? 4 : 2,
+          childAspectRatio: 0.55,
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20,
+          mainAxisExtent: 350,
+        ),
+        itemBuilder: (context, index) => Skeleton(),
+      );
+    }
+
+    if (errorMessage.isNotEmpty && products.isEmpty) {
+      final mediaQuery = MediaQuery.of(context);
+      final remainingHeight =
+          mediaQuery.size.height - 350; // hoặc tính lại nếu cần
+
+      return SizedBox(
+        height: remainingHeight,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/No_Internet.png', // Đường dẫn ảnh bạn muốn hiển thị
+                width: 250, // Chiều rộng bạn muốn
+                height: 250, // Chiều cao bạn muốn
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: 300,
+                child: Text(
+                  errorMessage,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (products.isEmpty) {
+      return const Center(
+        child: Text(
+          'No products found!',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+      );
+    }
+
     return Column(
       children: [
         GridView.builder(
-          itemCount: _isLoading ? 10 : products.length,
+          itemCount: products.length,
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -691,35 +764,28 @@ class _ProductListState extends State<ProductList> {
             mainAxisExtent: 350,
           ),
           itemBuilder: (context, index) {
-            final variant =
-                !_isLoading && index < products.length ? products[index] : null;
-            return _isLoading
-                ? Skeleton()
-                : ProductView(
-                    id: variant?.id ?? '',
-                    categoryId: variant?.categoryId ?? '',
-                    variantName: variant?.variantName ?? '',
-                    images: (variant?.images as List<ProductImage>),
-                    price: (variant?.price as double),
-                    variantDescription: variant?.variantDescription ??
-                        'No description available',
-                    averageRating: variant?.averageRating.toString() ?? '0.0',
-                  );
+            final variant = products[index];
+            return ProductView(
+              id: variant.id,
+              categoryId: variant.categoryId ?? '',
+              variantName: variant.variantName,
+              images: variant.images,
+              price: variant.price,
+              variantDescription:
+                  variant.variantDescription ?? 'No description available',
+              averageRating: variant.averageRating.toString(),
+            );
           },
         ),
-        SizedBox(
-          height: 20,
-        ),
+        const SizedBox(height: 20),
         PaginationWidget(
           currentPage: currentPage,
           totalPages: totalPage,
-          onPageChanged: (page) {
+          onPageChanged: (page) async {
             provider.fetchProducts(page: page, limit: 12);
           },
         ),
-        SizedBox(
-          height: 20,
-        ),
+        const SizedBox(height: 20),
       ],
     );
   }

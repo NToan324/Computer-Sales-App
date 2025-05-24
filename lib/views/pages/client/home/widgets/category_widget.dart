@@ -5,6 +5,7 @@ import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/models/category.model.dart';
 import 'package:computer_sales_app/models/product_card.model.dart';
 import 'package:computer_sales_app/provider/product_provider.dart';
+import 'package:computer_sales_app/services/app_exceptions.dart';
 import 'package:computer_sales_app/utils/responsive.dart';
 import 'package:computer_sales_app/views/pages/client/product/product_page_view.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,50 @@ class _CategoryWidgetState extends State<CategoryWidget> {
   bool isLoading = true;
 
   List<CategoryModel> categories = [];
+
+  final List<CategoryModel> defaultCategories = [
+    CategoryModel(
+        id: '1',
+        name: 'PC',
+        image: CategoryImage(publicId: '', url: 'assets/images/pc.png'),
+        isActive: true),
+    CategoryModel(
+        id: '2',
+        name: 'Monitor',
+        image: CategoryImage(publicId: '', url: 'assets/images/monitor.png'),
+        isActive: true),
+    CategoryModel(
+        id: '3',
+        name: 'Laptop',
+        image: CategoryImage(publicId: '', url: 'assets/images/laptop.png'),
+        isActive: true),
+    CategoryModel(
+        id: '4',
+        name: 'Best Seller',
+        image:
+            CategoryImage(publicId: '', url: 'assets/images/best_seller.png'),
+        isActive: true),
+    CategoryModel(
+        id: '5',
+        name: 'Keyboard',
+        image: CategoryImage(publicId: '', url: 'assets/images/keyboard.png'),
+        isActive: true),
+    CategoryModel(
+        id: '6',
+        name: 'Mouse',
+        image: CategoryImage(publicId: '', url: 'assets/images/mouse.png'),
+        isActive: true),
+    CategoryModel(
+        id: '7',
+        name: 'Desktop',
+        image: CategoryImage(publicId: '', url: 'assets/images/desktop.png'),
+        isActive: true),
+    CategoryModel(
+        id: '8',
+        name: 'Headphone',
+        image: CategoryImage(publicId: '', url: 'assets/images/headphone.png'),
+        isActive: true),
+  ];
 
   final Map<String, String> categoriesIcon = {
     'PC': 'assets/icons/Category00003.svg',
@@ -77,12 +122,24 @@ class _CategoryWidgetState extends State<CategoryWidget> {
   Future<void> fetchCategories() async {
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
-    await productProvider.fetchCategories();
 
-    setState(() {
-      categories = productProvider.categories;
-      isLoading = false;
-    });
+    try {
+      await productProvider.fetchCategories();
+
+      setState(() {
+        if (productProvider.categories.isNotEmpty) {
+          categories = productProvider.categories;
+        } else {
+          categories = defaultCategories;
+        }
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        categories = defaultCategories;
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -222,18 +279,40 @@ class ListCategoryWidget extends StatefulWidget {
 }
 
 class _ListCategoryWidgetState extends State<ListCategoryWidget> {
+  Future<void> _fetchProducts() async {
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
+    productProvider.clearFilters();
+
+    try {
+      await productProvider.fetchProducts(page: 1, limit: 12);
+    } on BadRequestException catch (e) {
+      // Xử lý lỗi, ví dụ hiện snackbar hoặc log
+      print('Error fetching products: ${e.message}');
+      // Có thể show alert, hoặc đặt state lỗi
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => {
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (_) => ProductPageView(
+        //       categoryId: widget.text,
+        //     ),
+        //   ),
+        // )
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ProductPageView(
-              categoryId: widget.text,
-            ),
-          ),
-        )
+              builder: (context) => ProductPageView(categoryId: widget.text)),
+        ).then((_) {
+          _fetchProducts();
+        })
       },
       child: Column(
         spacing: 10,

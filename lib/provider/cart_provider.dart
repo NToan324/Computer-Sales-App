@@ -14,6 +14,7 @@ class CartProvider with ChangeNotifier {
   CartService cartService = CartService();
   bool isLoading = false;
   String errorMessage = '';
+  bool isOffline = false;
 
   Future<void> getCartByUserId() async {
     isLoading = true;
@@ -76,8 +77,7 @@ class CartProvider with ChangeNotifier {
 
         await prefs.setStringList('cart', simpleCartItems);
       } catch (e) {
-        errorMessage = 'Error fetching cart: $e';
-        print('Error fetching cart: $e');
+        errorMessage = 'Please check your internet connection';
       } finally {
         isLoading = false;
         notifyListeners();

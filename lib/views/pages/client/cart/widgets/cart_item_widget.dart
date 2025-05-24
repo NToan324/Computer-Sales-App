@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:computer_sales_app/components/custom/skeleton.dart';
 import 'package:computer_sales_app/components/custom/snackbar.dart';
 import 'package:computer_sales_app/config/color.dart';
 import 'package:computer_sales_app/helpers/formatMoney.dart';
@@ -54,12 +56,17 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                         decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              (widget.itemCart.images.url.isNotEmpty)
-                                  ? widget.itemCart.images.url
-                                  : 'https://placehold.co/600x400.png',
-                            ),
+                        ),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.itemCart.images.url,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 350, // hoặc chiều cao bạn muốn
+                          placeholder: (context, url) => const SkeletonImage(
+                            imageHeight: 80,
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            'assets/images/image_default_error.png',
                             fit: BoxFit.cover,
                           ),
                         ),

@@ -262,4 +262,44 @@ class ProductService extends BaseClient {
           .toList() as List<ProductModel>
     };
   }
+
+  Future<Map<String, dynamic>> getProductsBestSelling() async {
+    final res = await get('product/variant/best-seller');
+    if (res['data'].length == 0) {
+      return {
+        'data': [],
+        'totalPages': 0,
+        'page': 0,
+        'limit': 0,
+      };
+    }
+    return {
+      'totalPages': res['data']['totalPages'],
+      'page': res['data']['page'],
+      'limit': res['data']['limit'],
+      'data': res['data']['data']
+          .map<ProductModel>((item) => ProductModel.fromJson(item))
+          .toList() as List<ProductModel>
+    };
+  }
+
+  Future<Map<String, dynamic>> getProductsNewest() async {
+    final res = await get('product/variant/newest');
+    if (res['data'].length == 0) {
+      return {
+        'data': [],
+        'totalPages': 0,
+        'page': 0,
+        'limit': 0,
+      };
+    }
+    return {
+      'totalPages': res['data']['totalPages'],
+      'page': res['data']['page'],
+      'limit': res['data']['limit'],
+      'data': res['data']['data']
+          .map<ProductModel>((item) => ProductModel.fromJson(item))
+          .toList() as List<ProductModel>
+    };
+  }
 }
